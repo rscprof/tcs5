@@ -17,17 +17,9 @@
 ;; https://docs.ton.org/develop/func/functions
 ;; We need not to work with internal messages by task
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
-    if in_msg_body.slice_empty?() {
-        ;;It's OK to simple return empty messages (https://ton-community.github.io/tutorials/02-contract/)
-        return ();
-    }
 }
 
 () recv_external(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
-    if in_msg_body.slice_empty?() {
-        ;;It's OK to simple return empty messages (https://ton-community.github.io/tutorials/02-contract/)
-        return ();
-    }
     var ds = begin_parse(get_data());
     ;;public_key: uint256
     ;;execution_time: uint32
@@ -37,8 +29,7 @@
     int execution_time = ds~load_uint(32);
     var receiver = ds~load_msg_addr();
     int seqno = ds~load_uint(32);
-
-    ds.end_parse();
+    ;; ds.end_parse();
 
     int op = in_msg_body~load_uint(32); ;; load operation
     if op == 0x9df10277 {
@@ -49,7 +40,7 @@
         var parse = ref.begin_parse();
         int locked_for = parse~load_int(32);
         int new_seqno = parse~load_uint(32);
-        parse.end_parse();
+     ;;   parse.end_parse();
 
 
         ;; update#9df10277 query_id:uint64 signature:bits512 ^[ locked_for:uint32 new_seqno:uint32 ] = ExtInMsgBody
@@ -210,7 +201,7 @@ int get_seqno() method_id {
         var receiver = ds~load_msg_addr();
         int seqno = ds~load_uint(32);
 
-        ds.end_parse();
+       ;; ds.end_parse();
     return seqno;
 }
 
@@ -225,7 +216,7 @@ int  get_execution_time() method_id {
     int public_key = ds~load_uint(256);
     int execution_time = ds~load_uint(32);
 
-    ds.end_parse();
+    ;; ds.end_parse();
     return execution_time;
 
 }
