@@ -1,5 +1,247 @@
 #include "imports/stdlib.fc";
+;;Storage
+;;admin_address: MsgAddressInt
+;;users: (HashmapE 267 uint32)
+const op::add_user = 0x368ddef3;
+const op::remove_user = 0x278205c8;
+const op::split_ton = 0x068530b3;
+const op::transfer_notification = 0x7362d09c;
 
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
 
+    int op = in_msg_body~load_uint(32);
+
+    if op == op::add_user {
+
+        var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(2);  ;;skip flags
+        var source = in_msg_full_slice~load_msg_addr();
+      ;;  (int source_type_addr, int source_addr) = source.parse_std_addr();
+
+        ;;        The contract should accept a message with op = 0x368ddef3 and the following fields:
+        ;;
+        ;;        query_id: uint64
+        ;;        address: MsgAddressInt
+        ;;        share: uint32
+        ;;        The contract accepts the message, checks that it came from the admin, and if so, adds the user to its storage. If the message did not come from the admin, the contract should throw error 120.
+        ;;
+        ;;        If the user is already in the storage, then it is necessary to update its share to a new one.
+        var ds = begin_parse(get_data());
+        var admin_addr = ds~load_msg_addr();
+        throw_if(120,~ admin_addr.equal_slices(source));
+
+        ;;    add_user#368ddef3 query_id:uint64 address:MsgAddressInt share:uint32 = InternalMsgBody;
+        in_msg_body~skip_bits(64);
+        var address_with_prefix = in_msg_body~load_msg_addr();
+        var share = in_msg_body~load_uint(32);
+
+        var dict = ds.preload_dict();
+
+        ;; https://docs.ton.org/develop/func/stdlib/#load_msg_addr
+        (int prefix, int address) = address_with_prefix.parse_std_addr();
+
+
+
+        dict~dict_set(256,begin_cell().store_uint(address,256).end_cell().begin_parse(),begin_cell().store_uint(share,32).end_cell().begin_parse());
+
+        set_data(
+                begin_cell().store_slice(admin_addr).store_dict(dict).end_cell()
+        );
+
+
+    } else {
+        if op == op::remove_user {
+            ;;            The contract should accept a message with op = 0x278205c8 and the following fields:
+            ;;
+            ;;            query_id: uint64
+            ;;            address: MsgAddressInt
+            ;;            The contract accepts the message, checks that it came from the admin, and if so, it removes the user from its storage. If the message did not come from the admin, the contract should throw error 120.
+            ;;
+            ;;            If the user is not in the storage, it should throw error 121.
+
+            var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(2);  ;;skip flags
+            var source = in_msg_full_slice~load_msg_addr();
+
+            var ds = begin_parse(get_data());
+            var admin_addr = ds~load_msg_addr();
+            throw_if(120,~ admin_addr.equal_slices(source));
+
+            in_msg_body~skip_bits(64);
+            var address_with_prefix = in_msg_body~load_msg_addr();
+
+            ;; https://docs.ton.org/develop/func/stdlib/#load_msg_addr
+            (int prefix, int address) = address_with_prefix.parse_std_addr();
+            var dict = ds.preload_dict();
+
+            ;; var address_slice = address_with_prefix;
+
+            ;; int address_index = address_slice.preload_uint(address_slice.slice_bits());
+            throw_unless(121,address);
+
+            set_data(
+                begin_cell().store_slice(admin_addr).store_dict(dict).end_cell()
+            );
+
+        } else {
+            if op == op::split_ton {
+;;                Split (TON).
+;;                The contract should accept a message with op = 0x068530b3 and the following fields:
+;;
+;;                query_id: uint64
+;;                amount: Coins
+;;                The contract accepts the message, distributes the TON to users according to their shares. Transactions must be sent with mode = 1 and no body.
+;;
+;;                If there are no users, error 122 must be thrown
+
+                var ds = begin_parse(get_data());
+                ds~load_msg_addr();
+                var dict = ds.preload_dict();
+                throw_if(122,dict.dict_empty?());
+
+                in_msg_body~skip_bits(64);
+                var amount = in_msg_body~load_coins();
+                int sum = 0;
+                int key = -1;
+                do {
+                    (key , slice cs, int f) = dict.udict_get_next?(267, key);
+                    if f {
+                        int value = cs.preload_uint(32);
+                        sum = sum + value;
+                    }
+                } until (~ f);
+
+                key = -1;
+                do {
+                    (key , slice cs, int f) = dict.udict_get_next?(267, key);
+                    if f {
+                        int share = cs.preload_uint(32);
+                        var sending_amount = amount * share / sum;
+                        var address = begin_cell()
+                        .store_uint(2,2)
+                        .store_uint(0,1) ;;Maybe Anycast
+                        .store_uint(0,8) ;;Workchain id
+                        .store_uint(key,256)
+                        .end_cell().begin_parse();
+
+                        cell msg = begin_cell()
+                        .store_uint(0x18, 6) ;; flags
+                        .store_slice(address) ;; destination address
+                        .store_coins(sending_amount)
+                        .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)
+                        ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
+                        ;;  .store_slice("Hello from FunC!") ;; comment
+                        .end_cell();
+
+                        send_raw_message(msg, 1);
+
+                    }
+                } until (~ f);
+
+
+            } else {
+                if op == op::transfer_notification {
+;;                    The contract should receive a message with op = 0x7362d09c and the following fields:
+;;
+;;                    query_id: uint64
+;;                    amount: Coins
+;;                    If there are no users, then error 122 must be thrown.
+;;
+;;                    The contract should send out to all users according to their amount of tokens. You should send messages to the address of your token jack jetton_address according to TEP-0074.
+;;
+;;                    Message Value: 0.02 TON
+;;                    Response address must be equal to the recipient address
+;;                    Forward_amount = 1 nanoTON
+;;                    Without custom_payload / without forward_payload.
+;;                    Note: transfer_notification in this task does not conform to the TEP-0074 standard. This is done to simplify the task.
+                    var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(2);  ;;skip flags
+                    var source = in_msg_full_slice~load_msg_addr();
+
+                    var ds = begin_parse(get_data());
+                    ds~load_msg_addr();
+                    var dict = ds.preload_dict();
+                    throw_if(122,dict.dict_empty?());
+
+                    in_msg_body~skip_bits(64);
+                    var amount = in_msg_body~load_coins();
+                    int sum = 0;
+                    int key = -1;
+                    do {
+                        (key , slice cs, int f) = dict.udict_get_next?(256, key);
+                        if f {
+                            int value = cs.preload_uint(32);
+                            sum = sum + value;
+                        }
+                    } until (~ f);
+
+                    key = -1;
+                    do {
+                        (key , slice cs, int f) = dict.udict_get_next?(256, key);
+                        if f {
+                            int share = cs.preload_uint(32);
+                            var sending_amount = amount * share / sum;
+
+                            ;; key -> address
+                            ;; addr_std$10 anycast:(Maybe Anycast)
+                            ;; workchain_id:int8 address:bits256  = MsgAddressInt;
+                            var address = begin_cell()
+                                .store_uint(2,2)
+                                .store_uint(0,1) ;;Maybe Anycast
+                                .store_uint(0,8) ;;Workchain id
+                                .store_uint(key,256)
+                                .end_cell().begin_parse();
+;;                            transfer#0f8a7ea5 query_id:uint64 amount:(VarUInteger 16) destination:MsgAddress
+;;                            response_destination:MsgAddress custom_payload:(Maybe ^Cell)
+;;                            forward_ton_amount:(VarUInteger 16) forward_payload:(Either Cell ^Cell)
+;;                            = InternalMsgBody;
+                            cell msg = begin_cell()
+                            .store_uint(0x18, 6) ;; flags -- TEST
+                            .store_slice(source) ;; destination address
+                            .store_coins(0)
+                            .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)  -- TEST
+                            .store_uint(0x0f8a7ea5,32)
+                            .store_coins(sending_amount)
+                            .store_slice(address)  ;; destination TEST (perhaps wallet)
+                            .store_slice(address)  ;; response destination
+                            .store_coins(1000) ;;in nanotons (10^-9 ton) we need gram
+                            ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
+                            ;;  .store_slice("Hello from FunC!") ;; comment
+                            .end_cell();
+
+                            send_raw_message(msg, 1);
+
+                        }
+                    } until (~ f);
+
+
+                }
+            }
+        }
+    }
+
+
+;;    remove_user#278205c8 query_id:uint64 address:MsgAddressInt = InternalMsgBody;
+;;    split_ton#068530b3 query_id:uint64 amount:Coins = InternalMsgBody;
+;;    transfer_notification#701c09a6 query_id:uint64 amount:Coins = InternalMsgBody;
+
+}
+
+
+;;get_users: returns a dictionary with 267 bit keys (user addresses) and the value is uint32, which means user share.
+cell  get_users() method_id {
+    var ds = begin_parse(get_data());
+    ds~load_msg_addr();
+    var dict = ds.preload_dict();
+    return dict;
+}
+
+;;get_user_share(slice user_address): calculates and returns the user's share.
+;;get_execution_time: returns the time in seconds when the contract should be unlocked to transfer the TONs to the beneficiary address.
+int  get_user_share(slice user_address) method_id {
+    var ds = begin_parse(get_data());
+    ds~load_msg_addr();
+    var dict = ds.preload_dict();
+    (int prefix, int address) = user_address.parse_std_addr();
+
+    ;;garantee of exists
+    (slice res,int f) = dict.udict_get?(256,address);
+    return res.preload_uint(32);
 }
