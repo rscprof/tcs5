@@ -1,8 +1,10 @@
 import { Address, beginCell, Cell, Contract, contractAddress, ContractProvider, ExternalAddress, Sender, SendMode } from 'ton-core';
 import { Maybe } from 'ton-core/dist/utils/maybe';
+import { sign } from 'ton-crypto';
 
 export type Task1Config = {
     address: Maybe<Address | ExternalAddress>;
+    public_key: Buffer;
 };
 
 // public_key: uint256
@@ -11,7 +13,7 @@ export type Task1Config = {
 // seqno: uint32
 export function task1ConfigToCell(config: Task1Config): Cell {
     return beginCell()
-    .storeInt(0,256) //public_key
+    .storeBuffer(config.public_key,256/8) //public_key
     .storeInt(199,32) //exec time
     .storeAddress(config.address) //receiver
     .storeInt(123,32) //seqno
@@ -54,15 +56,29 @@ export class Task1 implements Contract {
     async sendUpdate(
         provider: ContractProvider, 
         queryId: bigint,
-        signature: bigint,
+        key: Buffer,
         locked_for: bigint,
         new_seqno: bigint
         ) {
+
+            let message = beginCell().storeInt(locked_for,32).storeUint(new_seqno,32).endCell()
+            let signature = sign(message.hash(),key)
         await provider.external(
-            beginCell().storeUint(0x9df10277,32).storeUint(queryId,64).storeUint(signature,512).storeRef(
-                beginCell().storeUint(locked_for,32).storeUint(new_seqno,32).endCell()
+            beginCell().storeUint(0x9df10277,32).storeUint(queryId,64).storeBuffer(signature,512/8).storeRef(
+                message
             ).endCell()
             );
     }
 
+        //claim#bb4be234 query_id:uint64 = ExtInMsgBody
+        async sendClaim(
+            provider: ContractProvider, 
+            queryId: bigint,
+            ) {
+    
+            await provider.external(
+                beginCell().storeUint(0xbb4be234,32).storeUint(queryId,64).endCell()
+                );
+        }
+    
 }

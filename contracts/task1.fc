@@ -171,15 +171,17 @@
             ;; https://learnxinyminutes.com/docs/func/
             ;; if we want to send a message, we first need to construct it
             ;; message serialization in most cases may be reduced to
-            var msg = begin_cell()
-            .store_uint(0x18, 6) ;; tech flags
-            .store_slice(receiver)   ;; destination address
-            .store_coins(my_balance) ;; attached value
-            .store_uint(0, 107) ;; more tech flags :)
-            .store_slice(in_msg_body) ;; just put some payload here
+            ;; https://docs.ton.org/develop/func/cookbook#how-to-send-a-message-with-the-entire-balance
+            cell msg = begin_cell()
+                .store_uint(0x18, 6) ;; flags
+                .store_slice(receiver) ;; destination address
+                .store_coins(0) ;; we don't care about this value right now
+                .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)
+                .store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
+              ;;  .store_slice("Hello from FunC!") ;; comment
             .end_cell();
 
-            send_raw_message(msg,128);
+            send_raw_message(msg, 128);
 
             ;;If execution_time has not occurred, error 124 should be thrown.
             ;;If execution_time has passed, the contract sends all TONs from its balance
