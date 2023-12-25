@@ -212,7 +212,7 @@ const op::transfer_notification = 0x7362d09c;
                             .store_uint(0,1)   ;;Maybe cell
                             .store_coins(1) ;;in nanotons (10^-9 ton) we need gram
                             .store_uint(0,1)
-                            .store_slice(begin_cell().end_cell())
+                            .store_slice(begin_cell().end_cell().begin_parse())
                             ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
                             ;;  .store_slice("Hello from FunC!") ;; comment
                             .end_cell();
