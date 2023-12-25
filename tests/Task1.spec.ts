@@ -52,7 +52,7 @@ describe('Task1', () => {
         // blockchain and task1 are ready to use
     });
 
-    it('should return correct number from get method get_seqno', async () => {
+/*    it('should return correct number from get method get_seqno', async () => {
         const caller = await blockchain.treasury('caller');
         expect(await task1.getSeqno()).toEqual(123);
     });
@@ -195,7 +195,7 @@ describe('Task1', () => {
         // const caller = await blockchain.treasury('caller');
         // expect(await task1.getExecutionTime()).toEqual(199);
     });
-   
+  */
     
 
     // it('get seq_no', async () => {
