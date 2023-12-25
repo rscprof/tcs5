@@ -21,9 +21,9 @@ describe('Task2', () => {
         blockchain = await Blockchain.create();
         blockchain.verbosity = {
             blockchainLogs: false,
-            vmLogs : 'vm_logs',
-            debugLogs: true,
-            print: true
+            vmLogs : 'none',
+            debugLogs: false,
+            print: false
         }
         
 
