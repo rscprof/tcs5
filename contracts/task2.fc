@@ -184,6 +184,8 @@ const op::transfer_notification = 0x7362d09c;
 
                     throw_if(122,dict.dict_empty?());
 
+                    throw(100);
+
                     in_msg_body~skip_bits(64);
                     var amount = in_msg_body~load_coins();
                     int sum = 0;
