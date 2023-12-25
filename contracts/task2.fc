@@ -165,6 +165,7 @@ const op::transfer_notification = 0x7362d09c;
                     var ds = begin_parse(get_data());
                     ds~load_msg_addr();
                     var dict = ds.preload_dict();
+                    throw(100);
                     throw_if(122,dict.dict_empty?());
 
                     in_msg_body~skip_bits(64);
