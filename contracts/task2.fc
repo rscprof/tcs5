@@ -184,8 +184,6 @@ const op::transfer_notification = 0x7362d09c;
 
                     throw_if(122,dict.dict_empty?());
 
-                    throw(100);
-
                     in_msg_body~skip_bits(64);
                     var amount = in_msg_body~load_coins();
                     int sum = 0;
@@ -231,7 +229,7 @@ const op::transfer_notification = 0x7362d09c;
                             .store_slice(address)  ;; response destination
                             .store_uint(0,1)   ;;Maybe cell
                             .store_coins(1) ;;in nanotons (10^-9 ton) we need gram
-                            .store_uint(0,1)
+                       ;;     .store_uint(0,1)
                       ;;      .store_slice(begin_cell().end_cell().begin_parse())
                             ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
                             ;;  .store_slice("Hello from FunC!") ;; comment
