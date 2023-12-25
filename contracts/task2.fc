@@ -237,17 +237,17 @@ const op::transfer_notification = 0x7362d09c;
 
 
 ;;get_users: returns a dictionary with 267 bit keys (user addresses) and the value is uint32, which means user share.
-slice  get_users() method_id {
+cell  get_users() method_id {
     var ds = begin_parse(get_data());
     ds~load_msg_addr();
     var dict = ds.preload_dict();
-    return dict.begin_parse();
- ;;   return dict;
+    return dict;
 }
 
 ;;get_user_share(slice user_address): calculates and returns the user's share.
 ;;get_execution_time: returns the time in seconds when the contract should be unlocked to transfer the TONs to the beneficiary address.
 int  get_user_share(slice user_address) method_id {
+    return -1;
     var ds = begin_parse(get_data());
     ds~load_msg_addr();
     var dict = ds.preload_dict();
