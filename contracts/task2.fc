@@ -39,7 +39,11 @@ const op::transfer_notification = 0x7362d09c;
         var address_with_prefix = in_msg_body~load_msg_addr();
         var share = in_msg_body~load_uint(32);
 
-        var dict = ds.preload_dict();
+        cell dict = new_dict();
+        if (~ slice_empty?(ds)) {
+            dict = ds.preload_dict();
+        }
+        ;;var dict = ds.preload_dict();
 
         ;; https://docs.ton.org/develop/func/stdlib/#load_msg_addr
         (int prefix, int address) = address_with_prefix.parse_std_addr(); ;;TODO optimise
@@ -76,12 +80,16 @@ const op::transfer_notification = 0x7362d09c;
 
             ;; https://docs.ton.org/develop/func/stdlib/#load_msg_addr
             (int prefix, int address) = address_with_prefix.parse_std_addr();
-            var dict = ds.preload_dict();
+            cell dict = new_dict();
+            if (~ slice_empty?(ds)) {
+                 dict = ds.preload_dict();
+            }
+
 
             ;; var address_slice = address_with_prefix;
 
             ;; int address_index = address_slice.preload_uint(address_slice.slice_bits());
-            throw_unless(121,address);
+            throw_unless(121,dict~udict_delete?(256,address));
 
             set_data(
                 begin_cell().store_slice(admin_addr).store_dict(dict).end_cell()
@@ -100,7 +108,11 @@ const op::transfer_notification = 0x7362d09c;
 
                 var ds = begin_parse(get_data());
                 ds~load_msg_addr();
-                var dict = ds.preload_dict();
+                cell dict = new_dict();
+                if (~ slice_empty?(ds)) {
+                     dict = ds.preload_dict();
+                }
+
                 throw_if(122,dict.dict_empty?());
 
 
@@ -164,7 +176,11 @@ const op::transfer_notification = 0x7362d09c;
 
                     var ds = begin_parse(get_data());
                     ds~load_msg_addr();
-                    var dict = ds.preload_dict();
+                                cell dict = new_dict();
+            if (~ slice_empty?(ds)) {
+                 dict = ds.preload_dict();
+            }
+
 
                     throw_if(122,dict.dict_empty?());
 
@@ -214,7 +230,7 @@ const op::transfer_notification = 0x7362d09c;
                             .store_uint(0,1)   ;;Maybe cell
                             .store_coins(1) ;;in nanotons (10^-9 ton) we need gram
                             .store_uint(0,1)
-                          ;;  .store_slice(begin_cell().end_cell().begin_parse())
+                            .store_slice(begin_cell().end_cell().begin_parse())
                             ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
                             ;;  .store_slice("Hello from FunC!") ;; comment
                             .end_cell();
@@ -240,9 +256,14 @@ const op::transfer_notification = 0x7362d09c;
 
 ;;get_users: returns a dictionary with 267 bit keys (user addresses) and the value is uint32, which means user share.
 cell  get_users() method_id {
+    return get_data();
     var ds = begin_parse(get_data());
     ds~load_msg_addr();
-    var dict = ds.preload_dict();
+                cell dict = new_dict();
+            if (~ slice_empty?(ds)) {
+                 dict = ds.preload_dict();
+            }
+
     return dict;
 }
 
@@ -251,7 +272,10 @@ cell  get_users() method_id {
 int  get_user_share(slice user_address) method_id {
     var ds = begin_parse(get_data());
     ds~load_msg_addr();
-    var dict = ds.preload_dict();
+            cell dict = new_dict();
+            if (~ slice_empty?(ds)) {
+                 dict = ds.preload_dict();
+            }
     (int prefix, int address) = user_address.parse_std_addr();
 
     ;;garantee of exists

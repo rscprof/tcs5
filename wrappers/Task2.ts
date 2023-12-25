@@ -10,10 +10,12 @@ export type Task2Config = {
 };
 
 export function task2ConfigToCell(config: Task2Config): Cell {
-    return beginCell()
+    let cell = beginCell()
         .storeAddress(config.admin_address)
         .storeDict(config.users)
         .endCell();
+    console.debug(cell);
+    return cell;
         
 }
 
@@ -55,5 +57,12 @@ export class Task2 implements Contract {
                     body: beginCell().storeUint(0x368ddef3,32).storeUint(queryId,64).storeAddress(address).storeUint(share,32).endCell()
                 }
             );
+    }
+
+    async getUsers(provider: ContractProvider) {
+        const result = (await provider.get('get_users', [])).stack;
+        console.debug(result);
+        const cell = result.readCell();
+        return cell.beginParse().loadDict(Dictionary.Keys.Uint(256),Dictionary.Values.Int(32));        
     }
 }

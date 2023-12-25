@@ -55,7 +55,8 @@ describe('Task2', () => {
            success: true  
         })
 
-        
+        let res2 = await task2.getUsers();
+        expect(res2.size).toEqual(1);
 
     });
 
