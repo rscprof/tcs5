@@ -13,7 +13,7 @@ const op::transfer_notification = 0x7362d09c;
 
     if op == op::add_user {
 
-        var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(2);  ;;skip flags
+        var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(4);  ;;skip flags
         var source = in_msg_full_slice~load_msg_addr();
       ;;  (int source_type_addr, int source_addr) = source.parse_std_addr();
 
@@ -27,7 +27,7 @@ const op::transfer_notification = 0x7362d09c;
         ;;        If the user is already in the storage, then it is necessary to update its share to a new one.
         var ds = begin_parse(get_data());
         var admin_addr = ds~load_msg_addr();
-        throw_if(120,~ admin_addr.equal_slices(source));
+        throw_if(120,~ admin_addr.equal_slice_bits(source));
 
         ;;    add_user#368ddef3 query_id:uint64 address:MsgAddressInt share:uint32 = InternalMsgBody;
         in_msg_body~skip_bits(64);
@@ -37,7 +37,7 @@ const op::transfer_notification = 0x7362d09c;
         var dict = ds.preload_dict();
 
         ;; https://docs.ton.org/develop/func/stdlib/#load_msg_addr
-        (int prefix, int address) = address_with_prefix.parse_std_addr();
+        (int prefix, int address) = address_with_prefix.parse_std_addr(); ;;TODO optimise
 
 
 
@@ -58,12 +58,12 @@ const op::transfer_notification = 0x7362d09c;
             ;;
             ;;            If the user is not in the storage, it should throw error 121.
 
-            var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(2);  ;;skip flags
+            var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(4);  ;;skip flags
             var source = in_msg_full_slice~load_msg_addr();
 
             var ds = begin_parse(get_data());
             var admin_addr = ds~load_msg_addr();
-            throw_if(120,~ admin_addr.equal_slices(source));
+            throw_if(120,~ admin_addr.equal_slice_bits(source));
 
             in_msg_body~skip_bits(64);
             var address_with_prefix = in_msg_body~load_msg_addr();
@@ -152,7 +152,7 @@ const op::transfer_notification = 0x7362d09c;
 ;;                    Forward_amount = 1 nanoTON
 ;;                    Without custom_payload / without forward_payload.
 ;;                    Note: transfer_notification in this task does not conform to the TEP-0074 standard. This is done to simplify the task.
-                    var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(2);  ;;skip flags
+                    var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(4);  ;;skip flags
                     var source = in_msg_full_slice~load_msg_addr();
 
                     var ds = begin_parse(get_data());
