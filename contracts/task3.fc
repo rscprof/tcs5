@@ -90,8 +90,12 @@ cell wrap_storage(int version_id, cell storage) {
         throw_if ( 200, null?(new_code) );
 
         ;;            var new_code = in_msg_body~load_ref(); ;; Skip the expected code
+        cell dict = new_dict();
+        if (~ slice_empty?(in_msg_body)) {
+            dict = in_msg_body~load_dict();
+        }
 
-        var dict = in_msg_body~load_dict();
+
 
         var list = null();
         var cur =  current_version;
