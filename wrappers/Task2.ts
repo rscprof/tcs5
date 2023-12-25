@@ -1,9 +1,20 @@
-import { Address, beginCell, Cell, Contract, contractAddress, ContractProvider, Sender, SendMode } from 'ton-core';
+import { Address, beginCell, Cell, Contract, contractAddress, ContractProvider, Dictionary, DictionaryKeyTypes, ExternalAddress, Sender, SendMode } from 'ton-core';
+import { Maybe } from 'ton-core/dist/utils/maybe';
+//Storage
+//admin_address: MsgAddressInt
+//users: (HashmapE 256 uint32)
 
-export type Task2Config = {};
+export type Task2Config = {
+    admin_address: Maybe<Address | ExternalAddress>
+    users: Dictionary<number,Cell>
+};
 
 export function task2ConfigToCell(config: Task2Config): Cell {
-    return beginCell().endCell();
+    return beginCell()
+        .storeAddress(config.admin_address)
+        .storeDict(config.users)
+        .endCell();
+        
 }
 
 export class Task2 implements Contract {
@@ -25,5 +36,24 @@ export class Task2 implements Contract {
             sendMode: SendMode.PAY_GAS_SEPARATELY,
             body: beginCell().endCell(),
         });
+    }
+
+
+    
+
+    //     //add_user#368ddef3 query_id:uint64 address:MsgAddressInt share:uint32 = InternalMsgBody;
+    async sendAddUser(
+        provider: ContractProvider, 
+            user: Sender, 
+            queryId: bigint,
+            address: Address,
+            share: bigint
+            ) {
+    
+            await provider.internal(user, {
+                    value: BigInt(0),
+                    body: beginCell().storeUint(0x368ddef3,32).storeUint(queryId,64).storeAddress(address).storeUint(share,32).endCell()
+                }
+            );
     }
 }

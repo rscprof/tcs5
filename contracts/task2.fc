@@ -1,7 +1,7 @@
 #include "imports/stdlib.fc";
 ;;Storage
 ;;admin_address: MsgAddressInt
-;;users: (HashmapE 267 uint32)
+;;users: (HashmapE 256 uint32)
 const op::add_user = 0x368ddef3;
 const op::remove_user = 0x278205c8;
 const op::split_ton = 0x068530b3;
@@ -237,11 +237,12 @@ const op::transfer_notification = 0x7362d09c;
 
 
 ;;get_users: returns a dictionary with 267 bit keys (user addresses) and the value is uint32, which means user share.
-cell  get_users() method_id {
+slice  get_users() method_id {
     var ds = begin_parse(get_data());
     ds~load_msg_addr();
     var dict = ds.preload_dict();
-    return dict;
+    return dict.begin_parse();
+ ;;   return dict;
 }
 
 ;;get_user_share(slice user_address): calculates and returns the user's share.
