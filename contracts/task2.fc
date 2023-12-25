@@ -256,7 +256,7 @@ const op::transfer_notification = 0x7362d09c;
 
 ;;get_users: returns a dictionary with 267 bit keys (user addresses) and the value is uint32, which means user share.
 cell  get_users() method_id {
-    return get_data();
+ ;;   return get_data();
     var ds = begin_parse(get_data());
     ds~load_msg_addr();
                 cell dict = new_dict();
