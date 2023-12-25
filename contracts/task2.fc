@@ -109,7 +109,7 @@ const op::transfer_notification = 0x7362d09c;
                 int sum = 0;
                 int key = -1;
                 do {
-                    (key , slice cs, int f) = dict.udict_get_next?(267, key);
+                    (key , slice cs, int f) = dict.udict_get_next?(256, key);
                     if f {
                         int value = cs.preload_uint(32);
                         sum = sum + value;
@@ -118,7 +118,7 @@ const op::transfer_notification = 0x7362d09c;
 
                 key = -1;
                 do {
-                    (key , slice cs, int f) = dict.udict_get_next?(267, key);
+                    (key , slice cs, int f) = dict.udict_get_next?(256, key);
                     if f {
                         int share = cs.preload_uint(32);
                         var sending_amount = amount * share / sum;
@@ -166,7 +166,6 @@ const op::transfer_notification = 0x7362d09c;
                     ds~load_msg_addr();
                     var dict = ds.preload_dict();
                     throw_if(122,dict.dict_empty?());
-                    throw(100);
 
                     in_msg_body~skip_bits(64);
                     var amount = in_msg_body~load_coins();
