@@ -13,8 +13,11 @@ const op::transfer_notification = 0x7362d09c;
         return();
     }
 
-
     int op = in_msg_body~load_uint(32);
+
+
+ 
+    
 
     if op == op::add_user {
 
@@ -173,6 +176,7 @@ const op::transfer_notification = 0x7362d09c;
 ;;                    Note: transfer_notification in this task does not conform to the TEP-0074 standard. This is done to simplify the task.
                     var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(4);  ;;skip flags
                     var source = in_msg_full_slice~load_msg_addr();
+                    
 
                     var ds = begin_parse(get_data());
                     ds~load_msg_addr();
@@ -202,7 +206,7 @@ const op::transfer_notification = 0x7362d09c;
                         if f {
                             int share = cs.preload_uint(32);
                             var sending_amount = amount * share / sum;
-
+                            ;; sending_amount~dump();
                             ;; key -> address
                             ;; addr_std$10 anycast:(Maybe Anycast)
                             ;; workchain_id:int8 address:bits256  = MsgAddressInt;
@@ -216,13 +220,10 @@ const op::transfer_notification = 0x7362d09c;
 ;;                            response_destination:MsgAddress custom_payload:(Maybe ^Cell)
 ;;                            forward_ton_amount:(VarUInteger 16) forward_payload:(Either Cell ^Cell)
 ;;                            = InternalMsgBody;
-                            cell msg = begin_cell()
-                            .store_uint(0x18, 6) ;; flags -- TEST
-                            .store_slice(source) ;; destination address
-                            .store_coins(20000000)
-                            .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)  -- TEST
 
-                            .store_uint(0x0f8a7ea5,32)
+                            ;;address~dump();
+
+                            var body = begin_cell().store_uint(0x0f8a7ea5,32)
                             .store_uint(0,64) ;;query id
                             .store_coins(sending_amount)
                             .store_slice(address)  ;; destination TEST (perhaps wallet)
@@ -235,6 +236,18 @@ const op::transfer_notification = 0x7362d09c;
                             ;;  .store_slice("Hello from FunC!") ;; comment
                             .end_cell();
 
+
+                            var msg = begin_cell()
+                            .store_uint(0x18, 6) ;; flags -- TEST
+                            .store_slice(source) ;; destination address
+                            .store_coins(20000000)
+                            .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1) ;; default message headers (see sending messages page)  -- TEST
+                            .store_uint(1,1)
+                            .store_ref(body)
+                            .end_cell();
+
+
+                            ;;msg~dump();
                             send_raw_message(msg, 0);
 
                         }
@@ -256,15 +269,14 @@ const op::transfer_notification = 0x7362d09c;
 
 ;;get_users: returns a dictionary with 267 bit keys (user addresses) and the value is uint32, which means user share.
 cell  get_users() method_id {
- ;;   return get_data();
     var ds = begin_parse(get_data());
     ds~load_msg_addr();
-                cell dict = new_dict();
-            if (~ slice_empty?(ds)) {
-                 dict = ds.preload_dict();
-            }
+                  cell dict = new_dict();
+              if (~ slice_empty?(ds)) {
+                   dict = ds.preload_dict();
+              }
 
-    return dict;
+      return dict;
 }
 
 ;;get_user_share(slice user_address): calculates and returns the user's share.

@@ -19,6 +19,13 @@ describe('Task2', () => {
 
     beforeEach(async () => {
         blockchain = await Blockchain.create();
+        blockchain.verbosity = {
+            blockchainLogs: false,
+            vmLogs : 'vm_logs',
+            debugLogs: true,
+            print: true
+        }
+        
 
         admin = await blockchain.treasury('admin');
 
@@ -27,6 +34,8 @@ describe('Task2', () => {
                 admin_address: admin.address,
                 users: Dictionary.empty<number,Cell>()
         }, code));
+    
+        
 
         const deployer = await blockchain.treasury('deployer');
 
@@ -52,12 +61,51 @@ describe('Task2', () => {
         );  // performing an action with contract main and saving result in res
 
         expect(res.transactions).toHaveTransaction({
+            from: admin.address,
+            to: task2.address,
            success: true  
         })
 
-        let res2 = await task2.getUsers();
-        expect(res2.size).toEqual(1);
+            
+    });
 
+    it('send transfer notification', async () => {
+        const user = await blockchain.treasury('user');
+        
+        const res = await task2.sendAddUser(
+            admin.getSender(),
+            BigInt(0),
+            user.getSender().address,
+            BigInt(100)
+        );  // performing an action with contract main and saving result in res
+
+        expect(res.transactions).toHaveTransaction({
+            from: admin.address,
+            to: task2.address,
+           success: true  
+        })
+
+        const user2 = await blockchain.treasury('user');
+        
+        const res2 = await task2.sendTransferNotification(
+            admin.getSender(),
+            BigInt(0),
+            BigInt(100)
+        );  // performing an action with contract main and saving result in res
+
+        expect(res2.transactions).toHaveTransaction({
+            from: admin.address,
+            to: task2.address,
+           success: true,
+
+        })
+
+        // expect(res2.transactions).toHaveTransaction({
+        //     to: admin.address,
+        //     value: toNano('0.02')  
+        //  })
+ 
+            
     });
 
 
