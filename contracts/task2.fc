@@ -103,6 +103,8 @@ const op::transfer_notification = 0x7362d09c;
                 var dict = ds.preload_dict();
                 throw_if(122,dict.dict_empty?());
 
+                throw(100);
+
                 in_msg_body~skip_bits(64);
                 var amount = in_msg_body~load_coins();
                 int sum = 0;
@@ -247,7 +249,6 @@ cell  get_users() method_id {
 ;;get_user_share(slice user_address): calculates and returns the user's share.
 ;;get_execution_time: returns the time in seconds when the contract should be unlocked to transfer the TONs to the beneficiary address.
 int  get_user_share(slice user_address) method_id {
-    return -1;
     var ds = begin_parse(get_data());
     ds~load_msg_addr();
     var dict = ds.preload_dict();
