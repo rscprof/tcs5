@@ -105,7 +105,7 @@ const op::transfer_notification = 0x7362d09c;
 
 
               ;;  in_msg_body~skip_bits(64);
-                var amount = my_balance;
+                var amount = msg_value;
                 int sum = 0;
                 int key = -1;
                 do {
