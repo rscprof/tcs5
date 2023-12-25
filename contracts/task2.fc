@@ -235,7 +235,7 @@ const op::transfer_notification = 0x7362d09c;
                             ;;  .store_slice("Hello from FunC!") ;; comment
                             .end_cell();
 
-                            send_raw_message(msg, 1);
+                            send_raw_message(msg, 0);
 
                         }
                     } until (~ f);
