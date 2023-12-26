@@ -35,6 +35,9 @@ cell migrate_one(cell old_storage) { ;; it's just a placeholder that is required
 
 ;; Custom version-specific code ends >>>>>
 
+cell callx(cell old_storage, cont c) impure asm "CALLX";
+
+
 global cell new_code;
 
 cell get_storage() {
@@ -139,8 +142,9 @@ cell wrap_storage(int version_id, cell storage) {
         ;;execute migrations
         while (~ null?(list2)) {
             (slice code,list2) = uncons(list2);
-            set_c3(bless(code));
-            storage = migrate_one(storage);
+            var c = bless(code);
+            storage = callx(storage,c);
+            ;; storage = migrate_one(storage);
         }
 
         current_version = expected_version;
