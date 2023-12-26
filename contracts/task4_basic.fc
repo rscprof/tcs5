@@ -97,11 +97,11 @@
     var end = (0,0);
     repeat(n) {
         var str2 = at(maze,i);  ;;.begin_parse();
-        if (str2.begin_parse().slice_bits() == m * 8) {
+        if (str2.tlen() == m) {
             return (-1,0,0, null());
         }
 
-        var str = str2.begin_parse();
+        var str = at(maze,i);
         var j = 0;
 
         repeat(m) {
