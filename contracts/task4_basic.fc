@@ -97,7 +97,7 @@
     var end = (0,0);
     repeat(n) {
         var str = at(maze,i);  ;;.begin_parse();
-        if (str.slice_bits() == m * 8) {
+        if (str.begin_parse().slice_bits() == m * 8) {
             return (-1,0,0, null());
         }
 
