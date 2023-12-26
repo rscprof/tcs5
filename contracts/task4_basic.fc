@@ -94,6 +94,7 @@
     var end = (0,0);
     repeat(n) {
         (var str,maze) = uncons(maze);  ;;.begin_parse();
+        return (-1,0,0, null());
 
         var j = 0;
 
@@ -112,7 +113,6 @@
         }
         i  = i + 1;
     }
-    return (-1,0,0, null());
 
     var state = new_dict();
 
