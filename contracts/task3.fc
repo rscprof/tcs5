@@ -38,7 +38,7 @@ cell migrate_one(cell old_storage) { ;; it's just a placeholder that is required
 cell callx(cell old_storage, cont c) impure asm "CALLX";
 
 
-global cell new_code;
+;; global cell new_code;
 
 cell get_storage() {
     return get_data().begin_parse().skip_bits(32).preload_ref();
@@ -50,7 +50,7 @@ cell wrap_storage(int version_id, cell storage) {
     return begin_cell()
     .store_uint(version_id,32)
     .store_ref(storage)
-    .store_maybe_ref(new_code)
+;;    .store_maybe_ref(new_code)
     .end_cell();
 }
 
@@ -60,7 +60,7 @@ cell wrap_storage(int version_id, cell storage) {
         return();
     }
 
-    new_code = null();
+   ;; new_code = null();
 
     var expected_version = in_msg_body~load_uint(32); ;; Skip the expected version
 
@@ -89,7 +89,7 @@ cell wrap_storage(int version_id, cell storage) {
     slice ds = get_data().begin_parse();
     var current_version = ds~load_uint(32);
     cell storage = ds~load_ref();
-    var old_code = get_c3();
+    ;; var old_code = get_c3();
 
     if (expected_version > current_version) {
 
@@ -98,7 +98,7 @@ cell wrap_storage(int version_id, cell storage) {
 
         ;; TODO test is not mandatory
 ;;        if (in_msg_body.slice_bits() > 0) {
-            new_code = in_msg_body~load_maybe_ref();
+            var new_code = in_msg_body~load_maybe_ref();
 ;;        }
         ;;  var exist = in_msg_body~load_uint(1);  ;; DONT WORK load_maybe_ref
         throw_if ( 200, null?(new_code) );
@@ -149,14 +149,14 @@ cell wrap_storage(int version_id, cell storage) {
 
         current_version = expected_version;
 
-
+        set_code(new_code);
         set_c3(bless(new_code.begin_parse()));
     } else {
-        var code = ds.preload_maybe_ref();
-        if (~ null?(code)) {
-            new_code = code;
-            set_c3(bless(new_code.begin_parse()));
-        }
+       ;; var code = ds.preload_maybe_ref();
+      ;;  if (~ null?(code)) {
+      ;;      new_code = code;
+      ;;      set_c3(bless(new_code.begin_parse()));
+      ;;  }
         in_msg_body~load_maybe_ref(); ;; Skip the expected code
         in_msg_body~load_dict(); ;; Skip dictionary
     }
@@ -164,7 +164,7 @@ cell wrap_storage(int version_id, cell storage) {
     cell payload = in_msg_body~load_ref();
 
     storage = process_message(storage, msg_value, balance, in_msg_full, payload.begin_parse());
-    set_c3(old_code);
+   ;;  set_c3(old_code);
 
     set_data(wrap_storage(current_version, storage)); ;; -2 is just a random placeholder for the version
 }
