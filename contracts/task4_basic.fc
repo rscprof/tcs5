@@ -54,8 +54,8 @@
     if (x >= n) { return (null(),state,0); }
     if (y >= m) { return (null(),state,0); }
     var str = at(maze,x);
-    str~skip_bits(y * 8);
-    var sym = str.preload_uint(8);
+
+    var sym = at(str,y);
   ;;  sym~dump();
     if (sym == "S"u) { return (null(),state,0); }
     if (sym == "X"u) { return (null(),state,0); }
@@ -86,9 +86,24 @@
 
    ;; return (-1,0,0, null());
 ;;() solve() method_id {
-;;    var n = 3;
-;;    var m = 3;
-;;    tuple maze = empty_tuple();
+    var n = 3;
+    var m = 3;
+    tuple maze = empty_tuple();
+    tuple maze2 = empty_tuple();
+    maze2~tpush("S"u);
+    maze2~tpush("."u);
+    maze2~tpush("."u);
+    maze~tpush(maze2);
+    tuple maze2 = empty_tuple();
+    maze2~tpush("X"u);
+    maze2~tpush("X"u);
+    maze2~tpush("X"u);
+    maze~tpush(maze2);
+    tuple maze2 = empty_tuple();
+    maze2~tpush("."u);
+    maze2~tpush("."u);
+    maze2~tpush("E"u);
+    maze~tpush(maze2);
 ;;    maze~tpush("S..");
 ;;    maze~tpush(".??");
 ;;    maze~tpush("..E");
@@ -200,8 +215,8 @@
         maze2~tpush(str_gen);
     }
     var res =  (-1,numProb,distance , maze2);
- ;;   numProb~dump();
- ;;   distance~dump();
- ;;   maze2~dump();
+   ;; numProb~dump();
+   ;; distance~dump();
+  ;;  maze2~dump();
     return res;
 }
