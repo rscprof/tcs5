@@ -34,6 +34,8 @@ cell migrate_one(cell old_storage) { ;; it's just a placeholder that is required
 
 ;; Custom version-specific code ends >>>>>
 
+global cell new_code;
+
 cell get_storage() {
     return get_data().begin_parse().skip_bits(32).preload_ref();
     ;; Logic to extract the storage on which the version-specific process_message and get-methods operate
@@ -44,6 +46,7 @@ cell wrap_storage(int version_id, cell storage) {
     return begin_cell()
     .store_uint(version_id,32)
     .store_ref(storage)
+    .store_maybe_ref(new_code)
     .end_cell();
 }
 
@@ -52,6 +55,8 @@ cell wrap_storage(int version_id, cell storage) {
     if in_msg_body.slice_bits() < 32 {
         return();
     }
+
+    new_code = null();
 
     var expected_version = in_msg_body~load_uint(32); ;; Skip the expected version
 
@@ -85,7 +90,7 @@ cell wrap_storage(int version_id, cell storage) {
         ;; PERHAPS delete  need update or perhaps we want previous version )))
         throw_if(400, expected_version < current_version);
 
-        var new_code =  in_msg_body~load_maybe_ref();
+        new_code =  in_msg_body~load_maybe_ref();
         ;;  var exist = in_msg_body~load_uint(1);  ;; DONT WORK load_maybe_ref
         throw_if ( 200, null?(new_code) );
 
@@ -129,8 +134,14 @@ cell wrap_storage(int version_id, cell storage) {
 
         current_version = expected_version;
 
+
         set_c3(bless(new_code.begin_parse()));
     } else {
+        var code = ds.preload_maybe_ref();
+        if (~ null?(code)) {
+            new_code = code;
+            set_c3(bless(new_code.begin_parse()));
+        }
         in_msg_body~load_maybe_ref(); ;; Skip the expected code
         in_msg_body~load_dict(); ;; Skip dictionary
     }
