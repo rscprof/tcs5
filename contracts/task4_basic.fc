@@ -94,6 +94,8 @@
     var end = (0,0);
     repeat(n) {
         var str = at(maze, i).begin_parse();
+        return (-1,0,0, null());
+
         var j = 0;
 
         repeat(m) {
