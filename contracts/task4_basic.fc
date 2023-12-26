@@ -79,8 +79,14 @@
 }
 
 
+(int) tlen (tuple t) asm "TLEN";
+
 ;; Tuple of slice's
 (int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
+    if (n == maze.tlen()) {
+        return (-1, 0, 0, null());
+    }
+
    ;; return (-1,0,0, null());
 ;;() solve() method_id {
 ;;    var n = 3;
