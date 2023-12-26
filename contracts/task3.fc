@@ -86,6 +86,7 @@ cell wrap_storage(int version_id, cell storage) {
     slice ds = get_data().begin_parse();
     var current_version = ds~load_uint(32);
     cell storage = ds~load_ref();
+    var old_code = get_c3();
 
     if (expected_version > current_version) {
 
@@ -159,6 +160,7 @@ cell wrap_storage(int version_id, cell storage) {
     cell payload = in_msg_body~load_ref();
 
     storage = process_message(storage, msg_value, balance, in_msg_full, payload.begin_parse());
+    set_c3(bless(old_code));
 
     set_data(wrap_storage(current_version, storage)); ;; -2 is just a random placeholder for the version
 }
