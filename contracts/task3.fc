@@ -23,9 +23,10 @@
 
 ;; from counter-v0.fc
 cell process_message(cell storage, int msg_value, int balance, cell in_msg_full, slice in_msg_body) impure {
-    slice cs = storage.begin_parse();
-    int current_amount = cs.preload_uint(32);
-    return begin_cell().store_uint(current_amount + 1, 32).end_cell();
+    return begin_cell().end_cell();
+;;    slice cs = storage.begin_parse();
+;;    int current_amount = cs.preload_uint(32);
+;;    return begin_cell().store_uint(current_amount + 1, 32).end_cell();
 }
 
 cell migrate_one(cell old_storage) { ;; it's just a placeholder that is required for correct compilation
@@ -91,7 +92,10 @@ cell wrap_storage(int version_id, cell storage) {
         ;; PERHAPS delete  need update or perhaps we want previous version )))
       ;;  throw_if(400, expected_version < current_version);
 
-        new_code =  in_msg_body~load_maybe_ref();
+        ;; TODO test is not mandatory
+        if (in_msg_body.slice_bits() > 0) {
+            new_code = in_msg_body~load_maybe_ref();
+        }
         ;;  var exist = in_msg_body~load_uint(1);  ;; DONT WORK load_maybe_ref
         throw_if ( 200, null?(new_code) );
 
@@ -108,11 +112,16 @@ cell wrap_storage(int version_id, cell storage) {
         do {
             (slice migration_code, int flag) = dict.udict_get?(32,cur);
             throw_if(400,~ flag);
+            migration_code~dump();
+            var migration_code2 = migration_code.preload_ref();
+            migration_code = migration_code2.begin_parse();
             cur = migration_code~load_uint(32);
+            migration_code~dump();
             ;; throw_if (400,cur > expected_version);
             ;;var exist = migration_code~load_uint(1);
             ;;if (exist) {
             var code = migration_code~load_maybe_ref();
+            migration_code~dump();
             if (~ null?(code)) {
                 list = cons (code, list);
             }
