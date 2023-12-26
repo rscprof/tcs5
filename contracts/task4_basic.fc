@@ -83,9 +83,6 @@
 
 ;; Tuple of slice's
 (int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
-    if (n == maze.tlen()) {
-        return (-1, 0, 0, null());
-    }
 
    ;; return (-1,0,0, null());
 ;;() solve() method_id {
@@ -99,8 +96,10 @@
     var start = (0,0);
     var end = (0,0);
     repeat(n) {
-        (var str,maze) = uncons(maze);  ;;.begin_parse();
-        return (-1,0,0, null());
+        var str = at(maze,i);  ;;.begin_parse();
+        if (str.slice_bits() == m * 8) {
+            return (-1,0,0, null());
+        }
 
         var j = 0;
 
