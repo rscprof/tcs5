@@ -96,17 +96,12 @@
     var start = (0,0);
     var end = (0,0);
     repeat(n) {
-        var str2 = at(maze,i);  ;;.begin_parse();
-        if (str2.tlen() == m) {
-            return (-1,0,0, null());
-        }
-
-        var str = at(maze,i);
+        var str = at(maze,i);  ;;.begin_parse();
         var j = 0;
 
         repeat(m) {
 
-            var item = str~load_uint(8);
+            var item = at(str,j);
             ;; maze.tpush(str);
             ;;    var item = at(str,j);
             if (item == "S"u) {
@@ -186,22 +181,22 @@
     repeat(n) {
         var str = at(maze, i);
         var j = 0;
-        var str_gen = begin_cell();
+        var str_gen = empty_tuple();
      ;;   tuple str_gen = empty_tuple();
         repeat(m) {
      ;;       str~dump();
-            var item = str~load_uint(8);
+            var item = at(str,j);
             (_,int flag) = res_dict.udict_get?(10, (i << 5) + j);
             j = j + 1;
             if (flag) {
-                str_gen~store_uint("!"u,8);
+                str_gen~tpush("!"u);
             } else {
-                str_gen~store_uint(item,8);
+                str_gen~tpush(item);
             }
         }
         i  = i + 1;
      ;;   str_gen~dump();
-        maze2~tpush(str_gen.end_cell().begin_parse());
+        maze2~tpush(str_gen);
     }
     var res =  (-1,prob,distance , maze2);
  ;;   numProb~dump();
