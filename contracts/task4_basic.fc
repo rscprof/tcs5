@@ -102,6 +102,9 @@
         repeat(m) {
 
             var item = at(str,j);
+            if (item.slice_bits()==8)  {
+                return (-1,0,0, null());
+            }
             ;; maze.tpush(str);
             ;;    var item = at(str,j);
             if (item == "S"u) {
