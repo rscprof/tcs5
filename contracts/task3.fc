@@ -35,7 +35,7 @@ cell migrate_one(cell old_storage) { ;; it's just a placeholder that is required
 
 ;; Custom version-specific code ends >>>>>
 
-cell callx(cell old_storage, cont c) impure asm "CALLX";
+;; cell callx(cell old_storage, cont c) impure asm "CALLX";
 
 
 ;; global cell new_code;
@@ -67,7 +67,7 @@ cell wrap_storage(int version_id, cell storage) {
     if ( expected_version ==  0 ) {
         cell ds = get_data();
 
-        var builder_ds  = begin_cell();
+   ;;     var builder_ds  = begin_cell();
 
 ;;        var new_ds = builder_ds
 ;;        .store_uint(1,32)
@@ -94,7 +94,7 @@ cell wrap_storage(int version_id, cell storage) {
     if (expected_version > current_version) {
 
         ;; PERHAPS delete  need update or perhaps we want previous version )))
-      ;;  throw_if(400, expected_version < current_version);
+         throw_if(400, expected_version < current_version);
 
         ;; TODO test is not mandatory
 ;;        if (in_msg_body.slice_bits() > 0) {
