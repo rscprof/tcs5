@@ -160,7 +160,7 @@ cell wrap_storage(int version_id, cell storage) {
     cell payload = in_msg_body~load_ref();
 
     storage = process_message(storage, msg_value, balance, in_msg_full, payload.begin_parse());
-    set_c3(bless(old_code));
+    set_c3(old_code);
 
     set_data(wrap_storage(current_version, storage)); ;; -2 is just a random placeholder for the version
 }
