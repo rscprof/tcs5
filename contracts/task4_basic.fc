@@ -102,10 +102,10 @@
         repeat(m) {
 
             var sl = at(str,j);
-            if ( sl.slice_bits() == 8 )  {
+            if ( sl.begin_parse().slice_bits() == 8 )  {
                 return (-1,0,0, null());
             }
-            var item = sl.preload_uint(8);
+            var item = sl.begin_parse().preload_uint(8);
             ;; maze.tpush(str);
             ;;    var item = at(str,j);
             if (item == "S"u) {
