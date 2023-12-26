@@ -16,12 +16,12 @@ describe('Task3', () => {
 
     beforeEach(async () => {
         blockchain = await Blockchain.create();
-        blockchain.verbosity = {
-            blockchainLogs: false,
-            vmLogs : 'vm_logs',
-            debugLogs: true,
-            print: true
-        }
+        // blockchain.verbosity = {
+        //     blockchainLogs: false,
+        //     vmLogs : 'vm_logs',
+        //     debugLogs: true,
+        //     print: true
+        // }
 
         task3 = blockchain.openContract(Task3.createFromConfig({}, code));
 

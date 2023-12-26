@@ -7,7 +7,10 @@
 (tuple, [(int,int),int,tuple]) update(tuple next, [(int,int),int,tuple] answer, [(int,int),int,tuple] newpos, (int,int) end, int flag)
 {
 
-    [_,var countBest,_] = answer;
+    var countBest = 2000;
+    if ~ null?(answer) {
+        [_, countBest, _] = answer;
+    }
     if (flag) {
         ;;var f = first(newpos);
         [var f,var count,_] = newpos;
@@ -26,42 +29,65 @@
             next = cons( newpos,next);
         }
     }
+
+ ;;   next~dump();
     return (next, answer);
 }
 
 ;; (start,0,())
 ([(int,int),int,tuple],cell,int) test ([(int,int),int,tuple] curpos,cell state,tuple maze,int dx,int dy,int n,int m)
 {
-    [var pos,var count,var path] = curpos;
+  ;;  curpos~dump();
+
+    [(int x,int y),int count,tuple path] = curpos;
 ;;    var pos = first(curpos);
 ;;    var count = second(curpos);
 ;;    var path = third(curpos);
 ;;    ;;    var count, var path) = curpos;
-    (var x, var y) = pos;
+    ;; (var x, var y) = pos;
     x = x + dx;
     y = y + dy;
+  ;;  x~dump();
+  ;;  y~dump();
     if (x < 0) { return (null(),state,0); }
     if (y < 0) { return (null(),state,0); }
     if (x >= n) { return (null(),state,0); }
     if (y >= m) { return (null(),state,0); }
-    var sym = at(at(maze,x),y);
+    var str = at(maze,x);
+    str~skip_bits(y * 8);
+    var sym = str.preload_uint(8);
+  ;;  sym~dump();
     if (sym == "S"u) { return (null(),state,0); }
     if (sym == "X"u) { return (null(),state,0); }
     (var state_cell, int f) = state.udict_get?(10,(x << 5) + y);
     if (sym == "?"u) { count = count + 1; }
     if (f) {
         var countInState = state_cell.preload_int(10);
-        if (countInState < count) {
+      ;;  countInState~dump();
+        if (countInState <= count) {
             { return (null(),state,0); }
         }
     }
     state = state.udict_set(10,(x << 5) + y , begin_cell().store_uint(count,10).end_cell().begin_parse());
+  ;;  state~dump();
+ ;;   x~dump();
+ ;;   y~dump();
+ ;;   count~dump();
     var newpos = (x,y);
-    path = cons([x,y],path);
+    if (sym != "E"u) { path = cons([x,y],path); }
     return ([newpos,count,path], state,-1);
 }
 
+
+;; Tuple of slice's
 (int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
+;;() solve() method_id {
+;;    var n = 3;
+;;    var m = 3;
+;;    tuple maze = empty_tuple();
+;;    maze~tpush("S..");
+;;    maze~tpush(".??");
+;;    maze~tpush("..E");
     var i = 0;
     var start = (0,0);
     var end = (0,0);
@@ -69,14 +95,16 @@
         var str = at(maze, i);
         var j = 0;
         repeat(m) {
-            var item = at(str,j);
-            j = j + 1;
+            var item = str~load_uint(8);
+            maze.tpush(str);
+            ;;    var item = at(str,j);
             if (item == "S"u) {
                 start = (i , j);
             }
             if (item == "E"u) {
                 end = (i , j);
             }
+            j = j + 1;
         }
         i  = i + 1;
     }
@@ -85,36 +113,45 @@
 
     var failed = 0;
     var finished = 0;
-    var current = cons ([start,0,()], null());
+    var current = cons ([start,0,null()], null());
     var answer = null();
+   ;; current~dump();
     while (  ~ finished ) {
         var next = null();
-        (var curpos, current) = uncons(current);
-        (var newpos, state, var flag) = test (curpos,state,maze,-1,-1,n, m);
-        (next,answer) = update(next,answer,newpos, end, flag);
-        (newpos,state,flag) = test (curpos,state,maze,-1,0,n, m);
-        (next,answer) = update(next,answer,newpos, end, flag);
-        (newpos,state,flag) = test (curpos,state,maze,-1,1,n, m);
-        (next,answer) = update(next,answer,newpos, end, flag);
-        (newpos,state,flag) = test (curpos,state,maze,0 ,-1,n, m);
-        (next,answer) = update(next,answer,newpos, end, flag);
-        (newpos,state,flag) = test (curpos,state,maze,0,1,n, m);
-        (next,answer) = update(next,answer,newpos, end, flag);
-        (newpos,state,flag) = test (curpos,state,maze,1,-1,n, m);
-        (next,answer) = update(next,answer,newpos, end, flag);
-        (newpos,state,flag) = test (curpos,state,maze,1,0,n, m);
-        (next,answer) = update(next,answer,newpos, end, flag);
-        (newpos,state,flag) = test (curpos,state,maze,1,1,n, m);
-        (next,answer) = update(next,answer,newpos, end, flag);
+        while (~ null?(current)) {
+            (var curpos, current) = uncons(current);
+
+            (var newpos, state, var flag) = test (curpos, state, maze, -1, -1, n, m);
+            ;;   newpos~dump();
+            (next, answer) = update(next, answer, newpos, end, flag);
+            (newpos, state, flag) = test (curpos, state, maze, -1, 0, n, m);
+            (next, answer) = update(next, answer, newpos, end, flag);
+            (newpos, state, flag) = test (curpos, state, maze, -1, 1, n, m);
+            (next, answer) = update(next, answer, newpos, end, flag);
+            ;;   next~dump();
+            (newpos, state, flag) = test (curpos, state, maze, 0, -1, n, m);
+            (next, answer) = update(next, answer, newpos, end, flag);
+            (newpos, state, flag) = test (curpos, state, maze, 0, 1, n, m);
+            (next, answer) = update(next, answer, newpos, end, flag);
+            (newpos, state, flag) = test (curpos, state, maze, 1, -1, n, m);
+            (next, answer) = update(next, answer, newpos, end, flag);
+            (newpos, state, flag) = test (curpos, state, maze, 1, 0, n, m);
+            (next, answer) = update(next, answer, newpos, end, flag);
+            (newpos, state, flag) = test (curpos, state, maze, 1, 1, n, m);
+            (next, answer) = update(next, answer, newpos, end, flag);
+        }
         if null? (next) {
             finished = true;
         }
         current = next;
     }
 
+
     if (null?(answer)) {
-        return (-1,0,0, null());
+      ;; return ();
+         return (-1,0,0, null());
     }
+  ;;  answer~dump();
     ;; [(int,int),int,tuple] answer
     [_,var prob,var path] = answer;
     var numProb = 100;
@@ -125,6 +162,7 @@
     var res_dict = new_dict();
     var value = begin_cell().end_cell().begin_parse();
     var distance = 0;
+   ;; path~dump();
     while (~ null?(path)) {
         (var coords, path) = path.uncons();
         [int x,int y] = coords;
@@ -137,21 +175,26 @@
     repeat(n) {
         var str = at(maze, i);
         var j = 0;
-        tuple str_gen = empty_tuple();
+        var str_gen = begin_cell();
+     ;;   tuple str_gen = empty_tuple();
         repeat(m) {
-            var item = at(str,j);
+     ;;       str~dump();
+            var item = str~load_uint(8);
             (_,int flag) = res_dict.udict_get?(10, (i << 5) + j);
             j = j + 1;
             if (flag) {
-                str_gen~tpush("!"u);
+                str_gen~store_uint("!"u,8);
             } else {
-                str_gen~tpush(item);
+                str_gen~store_uint(item,8);
             }
         }
         i  = i + 1;
-        maze2~tpush(str_gen);
+     ;;   str_gen~dump();
+        maze2~tpush(str_gen.end_cell().begin_parse());
     }
-
-
-    return (-1,numProb,distance + 1, maze2);
+    var res =  (-1,numProb,distance , maze2);
+ ;;   numProb~dump();
+ ;;   distance~dump();
+ ;;   maze2~dump();
+    return res;
 }

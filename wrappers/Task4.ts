@@ -1,4 +1,4 @@
-import { Address, beginCell, Cell, Contract, contractAddress, ContractProvider, Sender, SendMode } from 'ton-core';
+import { Address, beginCell, Cell, Contract, contractAddress, ContractProvider, Sender, SendMode, Tuple, TupleItemInt } from 'ton-core';
 
 export type Task4Config = {};
 
@@ -26,4 +26,7 @@ export class Task4 implements Contract {
             body: beginCell().endCell(),
         });
     }
+
+ 
+
 }

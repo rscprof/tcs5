@@ -1,5 +1,5 @@
 import { Blockchain, SandboxContract } from '@ton-community/sandbox';
-import { Cell, toNano } from 'ton-core';
+import { Cell, Slice, TupleBuilder, TupleItemInt, beginCell, toNano } from 'ton-core';
 import { Task4Basic } from '../wrappers/Task4Basic';
 import '@ton-community/test-utils';
 import { compile } from '@ton-community/blueprint';
@@ -16,6 +16,12 @@ describe('Task4Basic', () => {
 
     beforeEach(async () => {
         blockchain = await Blockchain.create();
+        blockchain.verbosity = {
+            blockchainLogs: false,
+            vmLogs : 'vm_logs',
+            debugLogs: true,
+            print: true
+        }
 
         task4Basic = blockchain.openContract(Task4Basic.createFromConfig({}, code));
 
@@ -35,4 +41,24 @@ describe('Task4Basic', () => {
         // the check is done inside beforeEach
         // blockchain and task4Basic are ready to use
     });
+
+    it('should answer', async () => {
+        // the check is done inside beforeEach
+        // blockchain and task4Basic are ready to use
+       // var builder1 = new TupleBuilder();
+        
+
+
+        // builder1.writeCell(beginCell().storeStringTail("S.").endCell());
+        // builder1.writeCell(beginCell().storeStringTail(".E").endCell());
+
+        // var arr = builder1.build();
+        
+        
+        var result = await task4Basic.getSolve();//BigInt(2),BigInt(2),{type: 'tuple',items: arr});
+        // expect(result).toEqual(
+        //     0
+        // );
+    });
+
 });
