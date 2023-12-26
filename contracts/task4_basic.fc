@@ -80,7 +80,7 @@
 
 
 ;; Tuple of slice's
-(int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
+(int, int, int, tuple) solve(int m, int n, tuple maze) method_id {
    ;; return (-1,0,0, null());
 ;;() solve() method_id {
 ;;    var n = 3;
@@ -100,7 +100,7 @@
         repeat(m) {
 
             var item = str~load_uint(8);
-            maze.tpush(str);
+            ;; maze.tpush(str);
             ;;    var item = at(str,j);
             if (item == "S"u) {
                 start = (i , j);
