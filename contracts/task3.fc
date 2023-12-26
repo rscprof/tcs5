@@ -65,12 +65,13 @@ cell wrap_storage(int version_id, cell storage) {
 
         var builder_ds  = begin_cell();
 
-        var new_ds = builder_ds
-        .store_uint(1,32)
-        .store_ref(ds)
-        .end_cell();
+;;        var new_ds = builder_ds
+;;        .store_uint(1,32)
+;;        .store_ref(ds)
+;;        .end_cell();
 
-        set_data(new_ds);
+        set_data(wrap_storage(1,ds));
+;;        set_data(new_ds);
         return();
     }
 
@@ -85,10 +86,10 @@ cell wrap_storage(int version_id, cell storage) {
     var current_version = ds~load_uint(32);
     cell storage = ds~load_ref();
 
-    if (expected_version != current_version) {
+    if (expected_version > current_version) {
 
         ;; PERHAPS delete  need update or perhaps we want previous version )))
-        throw_if(400, expected_version < current_version);
+      ;;  throw_if(400, expected_version < current_version);
 
         new_code =  in_msg_body~load_maybe_ref();
         ;;  var exist = in_msg_body~load_uint(1);  ;; DONT WORK load_maybe_ref
@@ -108,7 +109,7 @@ cell wrap_storage(int version_id, cell storage) {
             (slice migration_code, int flag) = dict.udict_get?(32,cur);
             throw_if(400,~ flag);
             cur = migration_code~load_uint(32);
-            throw_if (400,cur > expected_version);
+            ;; throw_if (400,cur > expected_version);
             ;;var exist = migration_code~load_uint(1);
             ;;if (exist) {
             var code = migration_code~load_maybe_ref();
@@ -116,7 +117,7 @@ cell wrap_storage(int version_id, cell storage) {
                 list = cons (code, list);
             }
             ;; }
-        } until (cur == expected_version);
+        } until (cur >= expected_version);
 
         ;; reverse list
         var list2 = null();
