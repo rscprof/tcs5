@@ -143,8 +143,9 @@ cell wrap_storage(int version_id, cell storage) {
         while (~ null?(list2)) {
             (slice code,list2) = uncons(list2);
             var c = bless(code);
-            storage = callx(storage,c);
-            ;; storage = migrate_one(storage);
+            set_c3(c);
+        ;;    storage = callx(storage,c);
+             storage = migrate_one(storage);
         }
 
         current_version = expected_version;
