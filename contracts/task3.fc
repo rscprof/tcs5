@@ -116,11 +116,11 @@ cell wrap_storage(int version_id, cell storage) {
         do {
             (slice migration_code, int flag) = dict.udict_get?(32,cur);
             throw_if(400,~ flag);
-            migration_code~dump();
+    ;;        migration_code~dump();
           ;;  var migration_code2 = migration_code.preload_ref();
           ;;  migration_code = migration_code2.begin_parse();
             cur = migration_code~load_uint(32);
-            migration_code~dump();
+    ;;        migration_code~dump();
             ;; throw_if (400,cur > expected_version);
             ;;var exist = migration_code~load_uint(1);
             ;;if (exist) {
