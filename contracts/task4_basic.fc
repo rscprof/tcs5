@@ -96,11 +96,12 @@
     var start = (0,0);
     var end = (0,0);
     repeat(n) {
-        var str = at(maze,i);  ;;.begin_parse();
-        if (str.begin_parse().slice_bits() == m * 8) {
+        var str2 = at(maze,i);  ;;.begin_parse();
+        if (str2.begin_parse().slice_bits() == m * 8) {
             return (-1,0,0, null());
         }
 
+        var str = str2.begin_parse();
         var j = 0;
 
         repeat(m) {
