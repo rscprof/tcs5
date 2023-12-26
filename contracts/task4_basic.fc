@@ -102,9 +102,6 @@
         repeat(m) {
 
             var item = at(str,j);
-            if ( item == "S"u )  {
-                return (-1,0,0, null());
-            }
             ;;var item = sl.begin_parse().preload_uint(8);
             ;; maze.tpush(str);
             ;;    var item = at(str,j);
@@ -202,7 +199,7 @@
      ;;   str_gen~dump();
         maze2~tpush(str_gen);
     }
-    var res =  (-1,prob,distance , maze2);
+    var res =  (-1,numProb,distance , maze2);
  ;;   numProb~dump();
  ;;   distance~dump();
  ;;   maze2~dump();
