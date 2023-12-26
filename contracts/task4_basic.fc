@@ -93,7 +93,7 @@
     var start = (0,0);
     var end = (0,0);
     repeat(n) {
-        var str = at(maze, i);  ;;.begin_parse();
+        (var str,maze) = uncons(maze);  ;;.begin_parse();
 
         var j = 0;
 
