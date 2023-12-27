@@ -4,7 +4,7 @@
     if in_msg_body.slice_bits() < 32 {
         return();
     }
-    throw (200);
+    throw (400);
 
     ;; new_code = null();
 
