@@ -7,8 +7,6 @@ const op::remove_user = 0x278205c8;
 const op::split_ton = 0x068530b3;
 const op::transfer_notification = 0x7362d09c;
 
-(cell,(slice,int)) udict_set_get_builder(cell dict, int key_len, int index, builder value) asm(value index dict key_len) "DICTUSETGETB" "NULLSWAPIFNOT";
-
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
 
     if in_msg_body.slice_bits() < 32 {
@@ -18,14 +16,14 @@ const op::transfer_notification = 0x7362d09c;
     int op = in_msg_body~load_uint(32);
 
 
- 
-    
+
+
 
     if op == op::add_user {
 
         var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(4);  ;;skip flags
         var source = in_msg_full_slice~load_msg_addr();
-      ;;  (int source_type_addr, int source_addr) = source.parse_std_addr();
+        ;;  (int source_type_addr, int source_addr) = source.parse_std_addr();
 
         ;;        The contract should accept a message with op = 0x368ddef3 and the following fields:
         ;;
@@ -45,10 +43,8 @@ const op::transfer_notification = 0x7362d09c;
         var share = in_msg_body~load_uint(32);
 
         cell dict = new_dict();
-        int sum = 0;
         if (~ slice_empty?(ds)) {
-            dict = ds~load_dict();
-            sum = ds~load_uint(32);
+            dict = ds.preload_dict();
         }
         ;;var dict = ds.preload_dict();
 
@@ -57,15 +53,11 @@ const op::transfer_notification = 0x7362d09c;
 
 
 
-        sum = sum + share;
-        (slice old, int f) = dict~udict_set_get_builder(256,address,begin_cell().store_uint(share,32));
-        if (f) {
-            var oldshare = old.preload_uint(32);
-            sum = sum - oldshare;
-        }
+
+        dict~udict_set_builder(256,address,begin_cell().store_uint(share,32));
 
         set_data(
-                begin_cell().store_slice(admin_addr).store_dict(dict).store_uint(sum,32).end_cell()
+            begin_cell().store_slice(admin_addr).store_dict(dict).end_cell()
         );
 
 
@@ -92,70 +84,63 @@ const op::transfer_notification = 0x7362d09c;
             ;; https://docs.ton.org/develop/func/stdlib/#load_msg_addr
             (_ , int address) = address_with_prefix.parse_std_addr();
             cell dict = new_dict();
-            int sum = 0;
             if (~ slice_empty?(ds)) {
-                 dict = ds.preload_dict();
-                sum = ds~load_uint(32);
+                dict = ds.preload_dict();
             }
 
 
             ;; var address_slice = address_with_prefix;
 
-            (slice old,int f) = dict~udict_delete_get?(256,address);
-
             ;; int address_index = address_slice.preload_uint(address_slice.slice_bits());
-            throw_unless(121,f);
-            sum = sum - old.preload_uint(32);
+            throw_unless(121,dict~udict_delete?(256,address));
 
             set_data(
-                begin_cell().store_slice(admin_addr).store_dict(dict).store_uint(sum,32).end_cell()
+                begin_cell().store_slice(admin_addr).store_dict(dict).end_cell()
             );
 
         } else {
             if op == op::split_ton {
-;;                Split (TON).
-;;                The contract should accept a message with op = 0x068530b3 and the following fields:
-;;
-;;                query_id: uint64
-;;                amount: Coins
-;;                The contract accepts the message, distributes the TON to users according to their shares. Transactions must be sent with mode = 1 and no body.
-;;
-;;                If there are no users, error 122 must be thrown
+                ;;                Split (TON).
+                ;;                The contract should accept a message with op = 0x068530b3 and the following fields:
+                ;;
+                ;;                query_id: uint64
+                ;;                amount: Coins
+                ;;                The contract accepts the message, distributes the TON to users according to their shares. Transactions must be sent with mode = 1 and no body.
+                ;;
+                ;;                If there are no users, error 122 must be thrown
 
                 var ds = begin_parse(get_data());
                 ds~load_msg_addr();
                 cell dict = new_dict();
-                int sum = 0 ;
                 if (~ slice_empty?(ds)) {
-                     dict = ds.preload_dict();
-                    sum = ds~load_uint(32);
+                    dict = ds.preload_dict();
                 }
 
                 throw_if(122,dict.dict_empty?());
 
 
-              ;;  in_msg_body~skip_bits(64);
+                ;;  in_msg_body~skip_bits(64);
                 var amount = msg_value;
-;;                int sum = 0;
-;;                int key = -1;
-;;                do {
-;;                    (key , slice cs, int f) = dict.udict_get_next?(256, key);
-;;                    if f {
-;;                        int value = cs.preload_uint(32);
-;;                        sum = sum + value;
-;;                    }
-;;                } until (~ f);
-
+                int sum = 0;
                 int key = -1;
+                do {
+                    (key , slice cs, int f) = dict.udict_get_next?(256, key);
+                    if f {
+                        int value = cs.preload_uint(32);
+                        sum = sum + value;
+                    }
+                } until (~ f);
+
+                key = -1;
                 do {
                     (key , slice cs, int f) = dict.udict_get_next?(256, key);
                     if f {
                         int share = cs.preload_uint(32);
                         var sending_amount = amount * share / sum;
                         var address = begin_cell()
-                   ;;     .store_uint(2,2)
+                        ;;     .store_uint(2,2)
                         .store_uint(0x400,1 + 8 + 2) ;;Maybe Anycast
-                   ;;     .store_uint(0,8) ;;Workchain id
+                        ;;     .store_uint(0,8) ;;Workchain id
                         .store_uint(key,256)
                         .end_cell().begin_parse();
 
@@ -176,48 +161,46 @@ const op::transfer_notification = 0x7362d09c;
 
             } else {
                 if op == op::transfer_notification {
-;;                    The contract should receive a message with op = 0x7362d09c and the following fields:
-;;
-;;                    query_id: uint64
-;;                    amount: Coins
-;;                    If there are no users, then error 122 must be thrown.
-;;
-;;                    The contract should send out to all users according to their amount of tokens. You should send messages to the address of your token jack jetton_address according to TEP-0074.
-;;
-;;                    Message Value: 0.02 TON
-;;                    Response address must be equal to the recipient address
-;;                    Forward_amount = 1 nanoTON
-;;                    Without custom_payload / without forward_payload.
-;;                    Note: transfer_notification in this task does not conform to the TEP-0074 standard. This is done to simplify the task.
+                    ;;                    The contract should receive a message with op = 0x7362d09c and the following fields:
+                    ;;
+                    ;;                    query_id: uint64
+                    ;;                    amount: Coins
+                    ;;                    If there are no users, then error 122 must be thrown.
+                    ;;
+                    ;;                    The contract should send out to all users according to their amount of tokens. You should send messages to the address of your token jack jetton_address according to TEP-0074.
+                    ;;
+                    ;;                    Message Value: 0.02 TON
+                    ;;                    Response address must be equal to the recipient address
+                    ;;                    Forward_amount = 1 nanoTON
+                    ;;                    Without custom_payload / without forward_payload.
+                    ;;                    Note: transfer_notification in this task does not conform to the TEP-0074 standard. This is done to simplify the task.
                     var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(4);  ;;skip flags
                     var source = in_msg_full_slice~load_msg_addr();
-                    
+
 
                     var ds = begin_parse(get_data());
                     ds~load_msg_addr();
-                    int sum  = 0;
-                                cell dict = new_dict();
-            if (~ slice_empty?(ds)) {
-                 dict = ds.preload_dict();
-                sum = ds~load_uint(32);
-            }
+                    cell dict = new_dict();
+                    if (~ slice_empty?(ds)) {
+                        dict = ds.preload_dict();
+                    }
 
 
                     throw_if(122,dict.dict_empty?());
 
                     in_msg_body~skip_bits(64);
                     var amount = in_msg_body~load_coins();
-;;                    int sum = 0;
-;;                    int key = -1;
-;;                    do {
-;;                        (key , slice cs, int f) = dict.udict_get_next?(256, key);
-;;                        if f {
-;;                            int value = cs.preload_uint(32);
-;;                            sum = sum + value;
-;;                        }
-;;                    } until (~ f);
-
+                    int sum = 0;
                     int key = -1;
+                    do {
+                        (key , slice cs, int f) = dict.udict_get_next?(256, key);
+                        if f {
+                            int value = cs.preload_uint(32);
+                            sum = sum + value;
+                        }
+                    } until (~ f);
+
+                    key = -1;
                     do {
                         (key , slice cs, int f) = dict.udict_get_next?(256, key);
                         if f {
@@ -228,15 +211,15 @@ const op::transfer_notification = 0x7362d09c;
                             ;; addr_std$10 anycast:(Maybe Anycast)
                             ;; workchain_id:int8 address:bits256  = MsgAddressInt;
                             var address = begin_cell()
-                              ;;  .store_uint(2,2)
-                              ;;  .store_uint(0,1) ;;Maybe Anycast
-                                .store_uint(0x400,8 + 1 + 2) ;;Workchain id
-                                .store_uint(key,256)
-                                .end_cell().begin_parse();
-;;                            transfer#0f8a7ea5 query_id:uint64 amount:(VarUInteger 16) destination:MsgAddress
-;;                            response_destination:MsgAddress custom_payload:(Maybe ^Cell)
-;;                            forward_ton_amount:(VarUInteger 16) forward_payload:(Either Cell ^Cell)
-;;                            = InternalMsgBody;
+                            ;;  .store_uint(2,2)
+                            ;;  .store_uint(0,1) ;;Maybe Anycast
+                            .store_uint(0x400,8 + 1 + 2) ;;Workchain id
+                            .store_uint(key,256)
+                            .end_cell().begin_parse();
+                            ;;                            transfer#0f8a7ea5 query_id:uint64 amount:(VarUInteger 16) destination:MsgAddress
+                            ;;                            response_destination:MsgAddress custom_payload:(Maybe ^Cell)
+                            ;;                            forward_ton_amount:(VarUInteger 16) forward_payload:(Either Cell ^Cell)
+                            ;;                            = InternalMsgBody;
 
                             ;;address~dump();
 
@@ -259,7 +242,7 @@ const op::transfer_notification = 0x7362d09c;
                             .store_slice(source) ;; destination address
                             .store_coins(20000000)
                             .store_uint(1, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)  -- TEST
-                           ;; .store_uint(1,1)
+                            ;; .store_uint(1,1)
                             .store_ref(body)
                             .end_cell();
 
@@ -277,9 +260,9 @@ const op::transfer_notification = 0x7362d09c;
     }
 
 
-;;    remove_user#278205c8 query_id:uint64 address:MsgAddressInt = InternalMsgBody;
-;;    split_ton#068530b3 query_id:uint64 amount:Coins = InternalMsgBody;
-;;    transfer_notification#701c09a6 query_id:uint64 amount:Coins = InternalMsgBody;
+    ;;    remove_user#278205c8 query_id:uint64 address:MsgAddressInt = InternalMsgBody;
+    ;;    split_ton#068530b3 query_id:uint64 amount:Coins = InternalMsgBody;
+    ;;    transfer_notification#701c09a6 query_id:uint64 amount:Coins = InternalMsgBody;
 
 }
 
@@ -288,12 +271,12 @@ const op::transfer_notification = 0x7362d09c;
 cell  get_users() method_id {
     var ds = begin_parse(get_data());
     ds~load_msg_addr();
-                  cell dict = new_dict();
-              if (~ slice_empty?(ds)) {
-                   dict = ds.preload_dict();
-              }
+    cell dict = new_dict();
+    if (~ slice_empty?(ds)) {
+        dict = ds.preload_dict();
+    }
 
-      return dict;
+    return dict;
 }
 
 ;;get_user_share(slice user_address): calculates and returns the user's share.
@@ -301,11 +284,11 @@ cell  get_users() method_id {
 int  get_user_share(slice user_address) method_id {
     var ds = begin_parse(get_data());
     ds~load_msg_addr();
-            cell dict = new_dict();
-            if (~ slice_empty?(ds)) {
-                 dict = ds.preload_dict();
-            }
-    (_, int address) = user_address.parse_std_addr();
+    cell dict = new_dict();
+    if (~ slice_empty?(ds)) {
+        dict = ds.preload_dict();
+    }
+    (int prefix, int address) = user_address.parse_std_addr();
 
     ;;garantee of exists
     (slice res,int f) = dict.udict_get?(256,address);
