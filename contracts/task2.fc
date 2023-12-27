@@ -141,12 +141,12 @@ const op::transfer_notification = 0x7362d09c;
                         ;;     .store_uint(2,2)
                         .store_uint(0x400,1 + 8 + 2) ;;Maybe Anycast
                         ;;     .store_uint(0,8) ;;Workchain id
-                        .store_uint(key,256)
-                        .end_cell().begin_parse();
+                        .store_uint(key,256);
+                       ;; .end_cell().begin_parse();
 
                         cell msg = begin_cell()
                         .store_uint(0x18, 6) ;; flags
-                        .store_slice(address) ;; destination address
+                        .store_builder(address) ;; destination address
                         .store_coins(sending_amount)
                         .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)
                         ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
@@ -214,8 +214,8 @@ const op::transfer_notification = 0x7362d09c;
                             ;;  .store_uint(2,2)
                             ;;  .store_uint(0,1) ;;Maybe Anycast
                             .store_uint(0x400,8 + 1 + 2) ;;Workchain id
-                            .store_uint(key,256)
-                            .end_cell().begin_parse();
+                            .store_uint(key,256);
+                            ;;.end_cell().begin_parse();
                             ;;                            transfer#0f8a7ea5 query_id:uint64 amount:(VarUInteger 16) destination:MsgAddress
                             ;;                            response_destination:MsgAddress custom_payload:(Maybe ^Cell)
                             ;;                            forward_ton_amount:(VarUInteger 16) forward_payload:(Either Cell ^Cell)
@@ -226,12 +226,12 @@ const op::transfer_notification = 0x7362d09c;
                             var body = begin_cell().store_uint(0x0f8a7ea5,32)
                             .store_uint(0,64) ;;query id
                             .store_coins(sending_amount)
-                            .store_slice(address)  ;; destination TEST (perhaps wallet)
-                            .store_slice(address)  ;; response destination
+                            .store_builder(address)  ;; destination TEST (perhaps wallet)
+                            .store_builder(address)  ;; response destination
                             .store_uint(0,1)   ;;Maybe cell
                             .store_coins(1) ;;in nanotons (10^-9 ton) we need gram
                             .store_uint(0,1)
-                            .store_slice(begin_cell().end_cell().begin_parse())
+                           ;; .store_slice(begin_cell().end_cell().begin_parse())
                             ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
                             ;;  .store_slice("Hello from FunC!") ;; comment
                             .end_cell();
