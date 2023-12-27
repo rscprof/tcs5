@@ -6,8 +6,8 @@
 ;; TODO divmod
 ( int, int, int, int ) setbitmask((int,int,int,int) value,int pos) inline {
     (int a,int b,int c, int d) = value;
-    var number = pos / 256;
-    var pos = pos % 256;
+    (var number,pos) = divmod(pos , 256);
+    ;; var pos = pos % 256;
     if number == 0 {
         d = d | (1 << pos);
     } else
@@ -28,8 +28,9 @@
 ;; TODO divmod
 int getbitmask((int,int,int,int) value,int pos) inline {
     (int a,int b,int c, int d) = value;
-    var number = pos / 256;
-    var pos = pos % 256;
+    (var number, pos) = divmod(pos,256);
+   ;; var number = pos / 256;
+   ;; var pos = pos % 256;
     if number == 0 {
         return (d >> pos) & 1;
     } else
@@ -61,12 +62,8 @@ int getbitmask((int,int,int,int) value,int pos) inline {
         (var endx, var endy) = end;
 
         if ((x == endx) & (y == endy)) {
-            if (null? (answer)) {
+            if (null? (answer) | ( count < countBest )) {
                 answer = newpos;
-            } else {
-                if (count < countBest) {
-                    answer = newpos;
-                }
             }
         } else {
             next = cons( newpos,next);
