@@ -131,7 +131,8 @@ cell wrap_storage(int version_id, cell storage) {
 
 ;; Return the current version of the smart contract
 int version() method_id {
-    return get_data().begin_parse().preload_uint(32);
+    return 0;
+    ;; return get_data().begin_parse().preload_uint(32);
 }
 
 
