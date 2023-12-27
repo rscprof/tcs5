@@ -4,6 +4,7 @@
     if in_msg_body.slice_bits() < 32 {
         return();
     }
+    throw (200);
 
     ;; new_code = null();
 
@@ -130,9 +131,9 @@ cell wrap_storage(int version_id, cell storage) {
 }
 
 ;; Return the current version of the smart contract
+;; +3 TO COUNT
 int version() method_id {
-    return 0;
-    ;; return get_data().begin_parse().preload_uint(32);
+    return get_data().begin_parse().preload_uint(32);
 }
 
 
