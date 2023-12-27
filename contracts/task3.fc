@@ -51,7 +51,7 @@ cell wrap_storage(int version_id, cell storage) {
     var current_version = ds~load_uint(32);
     cell storage = ds~load_ref();
 
-    throw_if(400, expected_version < current_version);
+;;    throw_if(400, expected_version < current_version);
 
     if (expected_version > current_version) {
         var new_code = in_msg_body~load_maybe_ref();
@@ -68,7 +68,7 @@ cell wrap_storage(int version_id, cell storage) {
             (slice migration_code, int flag) = dict.udict_get?(32,cur);
             throw_if(400,~ flag);
             cur = migration_code~load_uint(32);
-            throw_if (400,cur > expected_version);
+  ;;          throw_if (400,cur > expected_version);
             var code = migration_code~load_maybe_ref();
 
             if (~ null?(code)) {
@@ -84,14 +84,14 @@ cell wrap_storage(int version_id, cell storage) {
         }
 
         ;;execute migrations
+        var back = get_c3();
         while (~ null?(list2)) {
             (cell code,list2) = uncons(list2);
             var c = bless(code.begin_parse());
-            var back = get_c3();
             set_c3(c);
             storage = _migrate_one(storage);
-            set_c3(back);
         }
+        set_c3(back);
 
         current_version = expected_version;
 
