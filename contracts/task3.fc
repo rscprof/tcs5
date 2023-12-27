@@ -4,7 +4,7 @@
     if in_msg_body.slice_bits() < 32 {
         return();
     }
-    throw (400);
+    ;; throw (400);
 
     ;; new_code = null();
 
@@ -47,7 +47,7 @@
         var new_code = in_msg_body~load_maybe_ref();
         ;;        }
         ;;  var exist = in_msg_body~load_uint(1);  ;; DONT WORK load_maybe_ref
-        throw_if ( 200, null?(new_code) );
+       ;; throw_if ( 200, null?(new_code) );
 
         ;;            var new_code = in_msg_body~load_ref(); ;; Skip the expected code
         cell dict = new_dict();
