@@ -92,7 +92,7 @@ int getbitmask((int,int,int,int) value,int pos) inline {
     y = y + dy;
     ;;  x~dump();
     ;;  y~dump();
-    if (x < 0) | (y<0) | (x>=n) | (y>=m) { return (null(),state,0); }
+    if ((x < 0) | (y < 0) | (x >= n) | ( y >= m)) { return (null(),state,0); }
     var str = at(maze,x);
 
     var sym = at(str,y);
