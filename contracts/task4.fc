@@ -190,7 +190,7 @@
         (var coords, path) = path.uncons();
         [int x,int y] = coords;
         distance = distance + 1;
-        res_dict = res_dict | (1 <<  ( (  x << 5) + y ) );
+        res_dict = res_dict | (1 <<  (x*m + y ) ); ;;mul is less exoensice than << ???????????????
         ;;res_dict~udict_set(10,(x << 5) + y, value);
     }
 
@@ -205,7 +205,7 @@
         repeat(m) {
             ;;       str~dump();
             var item = at(str,j);
-          ;;  (_,int flag) = res_dict.udict_get?(10, (i << 5) + j);
+          ;;  (_,int flag) =     res_dict.udict_get?(10, (i << 5) + j);
             j = j + 1;
             if (res_dict & 1) {
                 str_gen~tpush("!"u);
