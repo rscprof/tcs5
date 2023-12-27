@@ -190,7 +190,7 @@
         (var coords, path) = path.uncons();
         [int x,int y] = coords;
         distance = distance + 1;
-        res_dict = res_dict | (1 <<  (x*m + y ) ); ;;mul is less exoensice than << ???????????????
+        res_dict = res_dict | (1 <<  (x * m + y ) ); ;;mul is less exoensice than << ???????????????
         ;;res_dict~udict_set(10,(x << 5) + y, value);
     }
 
