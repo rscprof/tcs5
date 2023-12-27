@@ -100,8 +100,9 @@ int getbitmask((int,int,int,int) value,int pos) inline {
     }
     var index = (x << 5) + y;
     (var state_cell, int f) = state.udict_get?(10,index);
-    if (f & state_cell.preload_int(20) <= count) {
+    if (f) { if (state_cell.preload_int(20) <= count) {
             return (null(),state,0);
+        }
     }
     state = state.udict_set_builder(10,index, begin_cell().store_uint(count,20));
     ;;  state~dump();
@@ -120,28 +121,28 @@ int getbitmask((int,int,int,int) value,int pos) inline {
 (int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
 
     ;; return (-1,0,0, null());
-    ;;    () solve() method_id {
-    ;;        var n = 3;
-    ;;        var m = 3;
-    ;;        tuple maze = empty_tuple();
-    ;;        tuple maze2 = empty_tuple();
-    ;;        maze2~tpush("S"u);
-    ;;        maze2~tpush("."u);
-    ;;        maze2~tpush("."u);
-    ;;        maze~tpush(maze2);
-    ;;        tuple maze2 = empty_tuple();
-    ;;        maze2~tpush("?"u);
-    ;;        maze2~tpush("X"u);
-    ;;        maze2~tpush("X"u);
-    ;;        maze~tpush(maze2);
-    ;;        tuple maze2 = empty_tuple();
-    ;;       maze2~tpush("."u);
-    ;;        maze2~tpush("."u);
-    ;;        maze2~tpush("E"u);
-    ;;        maze~tpush(maze2);
-    ;;        maze~tpush("S..");
-    ;;        maze~tpush(".??");
-    ;;        maze~tpush("..E");
+;;        () solve() method_id {
+;;            var n = 3;
+;;            var m = 3;
+;;            tuple maze = empty_tuple();
+;;            tuple maze2 = empty_tuple();
+;;            maze2~tpush("S"u);
+;;            maze2~tpush("."u);
+;;            maze2~tpush("."u);
+;;            maze~tpush(maze2);
+;;            tuple maze2 = empty_tuple();
+;;            maze2~tpush("?"u);
+;;            maze2~tpush("X"u);
+;;            maze2~tpush("X"u);
+;;            maze~tpush(maze2);
+;;            tuple maze2 = empty_tuple();
+;;           maze2~tpush("."u);
+;;            maze2~tpush("."u);
+;;            maze2~tpush("E"u);
+;;            maze~tpush(maze2);
+;;            maze~tpush("S..");
+;;            maze~tpush(".??");
+;;            maze~tpush("..E");
     var i = 0;
     var start = (0,0);
     var end = (0,0);
@@ -204,7 +205,7 @@ int getbitmask((int,int,int,int) value,int pos) inline {
 
 
     if (null?(answer)) {
-        ;;  return ();
+;;          return ();
         return (-1,0,0, null());
     }
     ;;  answer~dump();
@@ -259,9 +260,9 @@ int getbitmask((int,int,int,int) value,int pos) inline {
         maze2~tpush(str_gen);
     }
     var res =  (prob / 1024,prob % 1024, distance + 1 , maze2);
-    ;;  prob~dump();
-    ;;  distance~dump();
-    ;;   maze2~dump();
+;;      prob~dump();
+;;      distance~dump();
+;;       maze2~dump();
     return res;
-    ;;  return ();
+;;      return ();
 }
