@@ -181,15 +181,17 @@
 ;;        numProb = numProb >> 1;
 ;;    }
 
-    var res_dict = new_dict();
-    var value = begin_cell().end_cell().begin_parse();
+    var res_dict = 0;
+;;    var res_dict = new_dict();
+;;    var value = begin_cell().end_cell().begin_parse();
     var distance = 0;
     ;; path~dump();
     while (~ null?(path)) {
         (var coords, path) = path.uncons();
         [int x,int y] = coords;
         distance = distance + 1;
-        res_dict~udict_set(10,(x << 5) + y, value);
+        res_dict = res_dict | (1 <<  ( (  x << 5) + y ) );
+        ;;res_dict~udict_set(10,(x << 5) + y, value);
     }
 
     tuple maze2 = empty_tuple();
@@ -203,15 +205,16 @@
         repeat(m) {
             ;;       str~dump();
             var item = at(str,j);
-            (_,int flag) = res_dict.udict_get?(10, (i << 5) + j);
+          ;;  (_,int flag) = res_dict.udict_get?(10, (i << 5) + j);
             j = j + 1;
-            if (flag) {
+            if (res_dict & 1) {
                 str_gen~tpush("!"u);
                 ;;      str_print~store_uint("!"u,8);
             } else {
                 str_gen~tpush(item);
                 ;;        str_print~store_uint(item,8);
             }
+            res_dict = res_dict >> 1;
         }
         ;;  var sfd = str_print.end_cell().begin_parse();
         ;;    sfd~strdump();
