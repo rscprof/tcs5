@@ -7,6 +7,8 @@ const op::remove_user = 0x278205c8;
 const op::split_ton = 0x068530b3;
 const op::transfer_notification = 0x7362d09c;
 
+(cell,(slice,int)) udict_set_get_builder(cell dict, int key_len, int index, builder value) asm(value index dict key_len) "DICTUSETGETB" "NULLSWAPIFNOT";
+
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
 
     if in_msg_body.slice_bits() < 32 {
@@ -43,8 +45,10 @@ const op::transfer_notification = 0x7362d09c;
         var share = in_msg_body~load_uint(32);
 
         cell dict = new_dict();
+        int sum = 0;
         if (~ slice_empty?(ds)) {
-            dict = ds.preload_dict();
+            dict = ds~load_dict();
+            sum = ds~load_uint(32);
         }
         ;;var dict = ds.preload_dict();
 
@@ -53,11 +57,15 @@ const op::transfer_notification = 0x7362d09c;
 
 
 
-
-        dict~udict_set_builder(256,address,begin_cell().store_uint(share,32));
+        sum = sum + share;
+        (slice old, int f) = dict~udict_set_get_builder(256,address,begin_cell().store_uint(share,32));
+        if (f) {
+            var oldshare = old.preload_uint(32);
+            sum = sum - oldshare;
+        }
 
         set_data(
-                begin_cell().store_slice(admin_addr).store_dict(dict).end_cell()
+                begin_cell().store_slice(admin_addr).store_dict(dict).store_uint(sum,32).end_cell()
         );
 
 
@@ -84,18 +92,23 @@ const op::transfer_notification = 0x7362d09c;
             ;; https://docs.ton.org/develop/func/stdlib/#load_msg_addr
             (_ , int address) = address_with_prefix.parse_std_addr();
             cell dict = new_dict();
+            int sum = 0;
             if (~ slice_empty?(ds)) {
                  dict = ds.preload_dict();
+                sum = ds~load_uint(32);
             }
 
 
             ;; var address_slice = address_with_prefix;
 
+            (slice old,int f) = dict~udict_delete_get?(256,address);
+
             ;; int address_index = address_slice.preload_uint(address_slice.slice_bits());
-            throw_unless(121,dict~udict_delete?(256,address));
+            throw_unless(121,f);
+            sum = sum - old.preload_uint(32);
 
             set_data(
-                begin_cell().store_slice(admin_addr).store_dict(dict).end_cell()
+                begin_cell().store_slice(admin_addr).store_dict(dict).store_uint(sum,32).end_cell()
             );
 
         } else {
@@ -112,8 +125,10 @@ const op::transfer_notification = 0x7362d09c;
                 var ds = begin_parse(get_data());
                 ds~load_msg_addr();
                 cell dict = new_dict();
+                int sum = 0 ;
                 if (~ slice_empty?(ds)) {
                      dict = ds.preload_dict();
+                    sum = ds~load_uint(32);
                 }
 
                 throw_if(122,dict.dict_empty?());
@@ -121,17 +136,17 @@ const op::transfer_notification = 0x7362d09c;
 
               ;;  in_msg_body~skip_bits(64);
                 var amount = msg_value;
-                int sum = 0;
-                int key = -1;
-                do {
-                    (key , slice cs, int f) = dict.udict_get_next?(256, key);
-                    if f {
-                        int value = cs.preload_uint(32);
-                        sum = sum + value;
-                    }
-                } until (~ f);
+;;                int sum = 0;
+;;                int key = -1;
+;;                do {
+;;                    (key , slice cs, int f) = dict.udict_get_next?(256, key);
+;;                    if f {
+;;                        int value = cs.preload_uint(32);
+;;                        sum = sum + value;
+;;                    }
+;;                } until (~ f);
 
-                key = -1;
+                int key = -1;
                 do {
                     (key , slice cs, int f) = dict.udict_get_next?(256, key);
                     if f {
@@ -180,9 +195,11 @@ const op::transfer_notification = 0x7362d09c;
 
                     var ds = begin_parse(get_data());
                     ds~load_msg_addr();
+                    int sum  = 0;
                                 cell dict = new_dict();
             if (~ slice_empty?(ds)) {
                  dict = ds.preload_dict();
+                sum = ds~load_uint(32);
             }
 
 
@@ -190,17 +207,17 @@ const op::transfer_notification = 0x7362d09c;
 
                     in_msg_body~skip_bits(64);
                     var amount = in_msg_body~load_coins();
-                    int sum = 0;
-                    int key = -1;
-                    do {
-                        (key , slice cs, int f) = dict.udict_get_next?(256, key);
-                        if f {
-                            int value = cs.preload_uint(32);
-                            sum = sum + value;
-                        }
-                    } until (~ f);
+;;                    int sum = 0;
+;;                    int key = -1;
+;;                    do {
+;;                        (key , slice cs, int f) = dict.udict_get_next?(256, key);
+;;                        if f {
+;;                            int value = cs.preload_uint(32);
+;;                            sum = sum + value;
+;;                        }
+;;                    } until (~ f);
 
-                    key = -1;
+                    int key = -1;
                     do {
                         (key , slice cs, int f) = dict.udict_get_next?(256, key);
                         if f {
@@ -288,7 +305,7 @@ int  get_user_share(slice user_address) method_id {
             if (~ slice_empty?(ds)) {
                  dict = ds.preload_dict();
             }
-    (int prefix, int address) = user_address.parse_std_addr();
+    (_, int address) = user_address.parse_std_addr();
 
     ;;garantee of exists
     (slice res,int f) = dict.udict_get?(256,address);
