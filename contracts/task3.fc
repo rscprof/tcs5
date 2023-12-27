@@ -104,7 +104,7 @@ cell wrap_storage(int version_id, cell storage) {
         throw(0);
     } else {
         in_msg_body~load_maybe_ref(); ;; Skip the expected code
-        in_msg_body~skip_dict(); ;; skip_dict(); ;; Skip dictionary
+        in_msg_body = in_msg_body.skip_dict(); ;; skip_dict(); ;; Skip dictionary
         cell payload = in_msg_body~load_ref();
         storage = process_message(storage, msg_value, balance, in_msg_full, payload.begin_parse());
         set_data(wrap_storage(current_version, storage)); ;; -2 is just a random placeholder for the version
