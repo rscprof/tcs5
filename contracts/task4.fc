@@ -232,13 +232,13 @@ int getbitmask((int,int,int,int) value,int pos) inline {
 
     tuple maze2 = empty_tuple();
     var i = 0;
-    repeat(n) {
+    do {
         var str = at(maze, i);
         var j = 0;
         var str_gen = empty_tuple();
         ;;  var str_print = begin_cell();
         ;;   tuple str_gen = empty_tuple();
-        repeat(m) {
+        do {
             ;;       str~dump();
             var item = at(str,j);
             ;;  (_,int flag) =     res_dict.udict_get?(10, (i << 5) + j);
@@ -252,13 +252,13 @@ int getbitmask((int,int,int,int) value,int pos) inline {
             j = j + 1;
 
             ;; res_dict = res_dict >> 1;
-        }
+        } until (j == m);
         ;;  var sfd = str_print.end_cell().begin_parse();
         ;;    sfd~strdump();
         i  = i + 1;
         ;;      str_gen~dump();
         maze2~tpush(str_gen);
-    }
+    } until (i == n);
     var res =  (prob / 1024,prob % 1024, distance + 1 , maze2);
 ;;      prob~dump();
 ;;      distance~dump();
