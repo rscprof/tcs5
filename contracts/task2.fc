@@ -38,6 +38,8 @@ const op::transfer_notification = 0x7362d09c;
         var sum = 0;
         if (~ slice_empty?(ds)) {
             dict = ds~load_dict();
+        }
+        if (~ null? (dict)) {
             sum = ds.preload_uint(32);
         }
         ;;var dict = ds.preload_dict();
@@ -84,6 +86,8 @@ const op::transfer_notification = 0x7362d09c;
             var sum = 0;
             if (~ slice_empty?(ds)) {
                 dict = ds~load_dict();
+            }
+            if (~ null?(dict)) {
                 sum = ds.preload_uint(32);
             }
 
@@ -121,11 +125,11 @@ const op::transfer_notification = 0x7362d09c;
                 var sum = 0;
                 if (~ slice_empty?(ds)) {
                     dict = ds~load_dict();
-                    sum = ds.preload_uint(32);
+
                 }
 
                 throw_if(122,dict.dict_empty?());
-
+                sum = ds.preload_uint(32);
 
                 ;;  in_msg_body~skip_bits(64);
                 var amount = msg_value;
@@ -192,11 +196,11 @@ const op::transfer_notification = 0x7362d09c;
                     var sum = 0;
                     if (~ slice_empty?(ds)) {
                         dict = ds~load_dict();
-                        sum = ds.preload_uint(32);
                     }
 
 
                     throw_if(122,dict.dict_empty?());
+                    sum = ds.preload_uint(32);
 
                     in_msg_body~skip_bits(64);
                     var amount = in_msg_body~load_coins();

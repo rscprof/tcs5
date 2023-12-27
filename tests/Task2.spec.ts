@@ -19,13 +19,13 @@ describe('Task2', () => {
 
     beforeEach(async () => {
         blockchain = await Blockchain.create();
-//         blockchain.verbosity = {
-//             blockchainLogs: false,
-//             vmLogs : 'none',
-//             debugLogs: false,
-//             print: false
-//         }
-//
+        blockchain.verbosity = {
+            blockchainLogs: false,
+            vmLogs : 'vm_logs',
+            debugLogs: true,
+            print: true
+        }
+
 
         admin = await blockchain.treasury('admin');
 
