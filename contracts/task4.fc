@@ -105,7 +105,7 @@ int getbitmask((int,int,int,int) value,int pos) inline {
             { return (null(),state,0); }
         }
     }
-    state = state.udict_set(10,(x << 5) + y , begin_cell().store_uint(count,20).end_cell().begin_parse());
+    state = state.udict_set_builder(10,(x << 5) + y , begin_cell().store_uint(count,20));
     ;;  state~dump();
     ;;   x~dump();
     ;;   y~dump();
@@ -170,12 +170,11 @@ int getbitmask((int,int,int,int) value,int pos) inline {
 
     var state = new_dict();
 
-    var failed = 0;
-    var finished = 0;
+   ;; var finished = 0;
     var current = cons ([start,0,null()], null());
     var answer = null();
     ;; current~dump();
-    while (  ~ finished ) {
+    while (  ~ null? (current) ) {
         var next = null();
         while (~ null?(current)) {
             (var curpos, current) = uncons(current);
@@ -199,9 +198,9 @@ int getbitmask((int,int,int,int) value,int pos) inline {
             (newpos, state, flag) = test (curpos, state, maze, 1, 1, n, m);
             (next, answer) = update(next, answer, newpos, end, flag);
         }
-        if null? (next) {
-            finished = true;
-        }
+     ;;   if null? (next) {
+     ;;       finished = true;
+     ;;   }
         current = next;
     }
 
