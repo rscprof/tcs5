@@ -16,12 +16,12 @@ describe('Task4Basic', () => {
 
     beforeEach(async () => {
         blockchain = await Blockchain.create();
-        blockchain.verbosity = {
-            blockchainLogs: false,
-            vmLogs : 'vm_logs',
-            debugLogs: true,
-            print: true
-        }
+//         blockchain.verbosity = {
+//             blockchainLogs: false,
+//             vmLogs : 'vm_logs',
+//             debugLogs: true,
+//             print: true
+//         }
 
         task4Basic = blockchain.openContract(Task4Basic.createFromConfig({}, code));
 

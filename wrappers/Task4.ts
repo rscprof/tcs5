@@ -27,6 +27,15 @@ export class Task4 implements Contract {
         });
     }
 
+  async getSolve(provider: ContractProvider//,
+        // n: bigint,
+        // m: bigint,
+        // maze: Tuple
+    ) {
+
+    const result = (await provider.get('solve', [])).stack;//{type: 'int', value: n} ,{type: 'int', value: m},maze])).stack;
+    return ;//[result.readNumber(),result.readNumber(),result.readNumber(),result.readTuple()];
+}
  
 
 }

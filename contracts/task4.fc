@@ -4,7 +4,7 @@
 
 }
 ;; TODO divmod
-( int, int, int, int ) set((int,int,int,int) value,int pos) inline {
+( int, int, int, int ) setbitmask((int,int,int,int) value,int pos) inline {
     (int a,int b,int c, int d) = value;
     var number = pos / 256;
     var pos = pos % 256;
@@ -26,7 +26,7 @@
 }
 
 ;; TODO divmod
-int get((int,int,int,int) value,int pos) inline {
+int getbitmask((int,int,int,int) value,int pos) inline {
     (int a,int b,int c, int d) = value;
     var number = pos / 256;
     var pos = pos % 256;
@@ -128,28 +128,28 @@ int get((int,int,int,int) value,int pos) inline {
 (int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
 
     ;; return (-1,0,0, null());
-    ;;() solve() method_id {
-    ;;    var n = 3;
-    ;;    var m = 3;
-    ;;    tuple maze = empty_tuple();
-    ;;    tuple maze2 = empty_tuple();
-    ;;    maze2~tpush("S"u);
-    ;;    maze2~tpush("."u);
-    ;;    maze2~tpush("."u);
-    ;;    maze~tpush(maze2);
-    ;;    tuple maze2 = empty_tuple();
-    ;;    maze2~tpush("?"u);
-    ;;    maze2~tpush("X"u);
-    ;;    maze2~tpush("X"u);
-    ;;    maze~tpush(maze2);
-    ;;    tuple maze2 = empty_tuple();
-    ;;   maze2~tpush("."u);
-    ;;    maze2~tpush("."u);
-    ;;    maze2~tpush("E"u);
-    ;;    maze~tpush(maze2);
-    ;;    maze~tpush("S..");
-    ;;    maze~tpush(".??");
-    ;;    maze~tpush("..E");
+;;    () solve() method_id {
+;;        var n = 3;
+;;        var m = 3;
+;;        tuple maze = empty_tuple();
+;;        tuple maze2 = empty_tuple();
+;;        maze2~tpush("S"u);
+;;        maze2~tpush("."u);
+;;        maze2~tpush("."u);
+;;        maze~tpush(maze2);
+;;        tuple maze2 = empty_tuple();
+;;        maze2~tpush("?"u);
+;;        maze2~tpush("X"u);
+;;        maze2~tpush("X"u);
+;;        maze~tpush(maze2);
+;;        tuple maze2 = empty_tuple();
+;;       maze2~tpush("."u);
+;;        maze2~tpush("."u);
+;;        maze2~tpush("E"u);
+;;        maze~tpush(maze2);
+;;        maze~tpush("S..");
+;;        maze~tpush(".??");
+;;        maze~tpush("..E");
     var i = 0;
     var start = (0,0);
     var end = (0,0);
@@ -213,8 +213,8 @@ int get((int,int,int,int) value,int pos) inline {
 
 
     if (null?(answer)) {
-        ;; return ();
-        return (-1,0,0, null());
+       ;;  return ();
+         return (-1,0,0, null());
     }
     ;;  answer~dump();
     ;; [(int,int),int,tuple] answer
@@ -233,7 +233,7 @@ int get((int,int,int,int) value,int pos) inline {
         (var coords, path) = path.uncons();
         [int x,int y] = coords;
         distance = distance + 1;
-        res_dict = set(res_dict,x * m + y);
+        res_dict = setbitmask(res_dict,x * m + y);
      ;;   res_dict = res_dict | (1 <<  (x * m + y ) ); ;;mul is less exoensice than << ???????????????
         ;;res_dict~udict_set(10,(x << 5) + y, value);
     }
@@ -250,27 +250,27 @@ int get((int,int,int,int) value,int pos) inline {
             ;;       str~dump();
             var item = at(str,j);
           ;;  (_,int flag) =     res_dict.udict_get?(10, (i << 5) + j);
-            j = j + 1;
-            if (get(res_dict, i * m + j)) {
+            if (getbitmask(res_dict, i * m + j)) {
                 str_gen~tpush("!"u);
                 ;;      str_print~store_uint("!"u,8);
             } else {
                 str_gen~tpush(item);
                 ;;        str_print~store_uint(item,8);
             }
+            j = j + 1;
 
            ;; res_dict = res_dict >> 1;
         }
         ;;  var sfd = str_print.end_cell().begin_parse();
         ;;    sfd~strdump();
         i  = i + 1;
-        ;;   str_gen~dump();
+     ;;      str_gen~dump();
         maze2~tpush(str_gen);
     }
     var res =  (prob / 1024,prob % 1024, distance + 1 , maze2);
-    ;;  numProb~dump();
+    ;;  prob~dump();
     ;;  distance~dump();
-    ;;  maze2~dump();
-    return res;
+   ;;   maze2~dump();
+     return res;
     ;;  return ();
 }
