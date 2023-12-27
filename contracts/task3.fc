@@ -1,5 +1,5 @@
 #include "imports/stdlib.fc";
-cell execute(cell old_storage,cont c) impure asm "EXECUTE";
+cell execute(cell old_storage,int num,cont c) impure asm "EXECUTE";
 
 cell wrap_storage(int version_id, cell storage) {
     ;; add additional data required for versioning in this cell
@@ -119,7 +119,7 @@ cell migrate_one(cell old_storage) { ;; it's just a placeholder that is required
         while (~ null?(list2)) {
             (cell code,list2) = uncons(list2);
             var c = bless(code.begin_parse());
-            storage = execute(storage,c);
+            storage = execute(storage,1,c);
 
             ;; storage = migrate_one(storage);
         }
