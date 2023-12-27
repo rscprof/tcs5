@@ -110,11 +110,21 @@ describe('Task3', () => {
                 // The rest of the files which are included in main.fc if any
             }
         });
+
+        if (result.status === 'error') {
+            console.error(result.message)
+            return;
+        }
     
+        // result.codeBoc contains base64 encoded BOC with code cell 
+        let codeCell = Cell.fromBoc(Buffer.from(result.codeBoc, "base64"))[0];
+    
+
    
         const user = await blockchain.treasury('user');
 
-       // const dict = Dictionary.empty<number,Slice>(Dictionary.Keys.Uint(32),Dictionary.Values.);
+       const dict = Dictionary.empty<number,Cell>(Dictionary.Keys.Uint(32),Dictionary.Values.Cell());
+        dict.set(1,beginCell().storeInt(2,32).storeMaybeRef(null).endCell());
     
         
         
@@ -123,7 +133,7 @@ describe('Task3', () => {
             
           //  beginCell().storeUint(2,32).storeMaybeRef(null).endCell());
 
-        const sendResult = await task3.sendVersionMessageWithCodeAndDict(user.getSender(),BigInt(2),Cell.EMPTY,dict);
+        const sendResult = await task3.sendVersionMessageWithCodeAndDict(user.getSender(),BigInt(2),code,dict);
 
         expect(sendResult.transactions).toHaveTransaction({
             from: user.address,
