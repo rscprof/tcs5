@@ -90,22 +90,20 @@ int getbitmask((int,int,int,int) value,int pos) inline {
     ;;  x~dump();
     ;;  y~dump();
     if ((x < 0) | (y < 0) | (x >= n) | ( y >= m)) { return (null(),state,0); }
-    var str = at(maze,x);
-
-    var sym = at(str,y);
-    ;;  sym~dump();
+    var sym = at(at(maze,x),y);
     if (sym == "S"u) { return (null(),state,0); }
     if (sym == "X"u) { count = count + 1024; }
-    (var state_cell, int f) = state.udict_get?(10,(x << 5) + y);
-    if (sym == "?"u) { count = count + 1; }
-    if (f) {
-        var countInState = state_cell.preload_int(20);
-        ;;  countInState~dump();
-        if (countInState <= count) {
-            { return (null(),state,0); }
+    else {
+        if (sym == "?"u) {
+            count = count + 1;
         }
     }
-    state = state.udict_set_builder(10,(x << 5) + y , begin_cell().store_uint(count,20));
+    var index = (x << 5) + y;
+    (var state_cell, int f) = state.udict_get?(10,index);
+    if (f & state_cell.preload_int(20) <= count) {
+            return (null(),state,0);
+    }
+    state = state.udict_set_builder(10,index, begin_cell().store_uint(count,20));
     ;;  state~dump();
     ;;   x~dump();
     ;;   y~dump();
