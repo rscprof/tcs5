@@ -61,11 +61,11 @@
         var list = null();
         var cur =  current_version;
         do {
-            (slice migration_code, int flag) = dict.udict_get?(32,cur);
+            (cell migration_code_cell, int flag) = dict.udict_get?(32,cur);
             throw_if(400,~ flag);
             ;;        migration_code~dump();
             ;;  var migration_code2 = migration_code.preload_ref();
-            ;;  migration_code = migration_code2.begin_parse();
+            var migration_code = migration_code_cell.begin_parse();
             cur = migration_code~load_uint(32);
             ;;        migration_code~dump();
             throw_if (400,cur > expected_version);
