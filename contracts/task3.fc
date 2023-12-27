@@ -119,9 +119,11 @@ cell wrap_storage(int version_id, cell storage) {
         var list = null();
         var cur =  current_version;
         do {
-            (slice migration_code, int flag) = dict.udict_get?(32,cur);
+            (slice migration_code2, int flag) = dict.udict_get?(32,cur);
             throw_if(400,~ flag);
-          ;;  slice migration_code = migration_code2~load_ref();
+            cell migration_code3 = migration_code2.preload_ref();
+            slice migration_code = migration_code3.begin_parse();
+            migration_code~dump();
             cur = migration_code~load_uint(32);
             throw_if (400,cur > expected_version);
             var code = migration_code~load_maybe_ref();

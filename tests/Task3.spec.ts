@@ -100,24 +100,24 @@ describe('Task3', () => {
         // the check is done inside beforeEach
         // blockchain and task3 are ready to use
 
-        let result = await compileFunc({
-            // Targets of your project
-            targets: ['descriptions/3-example/counter-mig-v2-v3.fc'],
-            // Sources
-            sources: {
-                "contracts/imports/stdlib.fc": "<stdlibCode>",
-                "descriptions/3-example/counter-mig-v2-v3.fc": "<contractCode>",
-                // The rest of the files which are included in main.fc if any
-            }
-        });
+        // let result = await compileFunc({
+        //     // Targets of your project
+        //     targets: ['descriptions/3-example/counter-mig-v2-v3.fc'],
+        //     // Sources
+        //     sources: {
+        //         "contracts/imports/stdlib.fc": "<stdlibCode>",
+        //         "descriptions/3-example/counter-mig-v2-v3.fc": "<contractCode>",
+        //         // The rest of the files which are included in main.fc if any
+        //     }
+        // });
 
-        if (result.status === 'error') {
-            console.error(result.message)
-            return;
-        }
+        // if (result.status === 'error') {
+        //     console.error(result.message)
+        //     return;
+        // }
     
-        // result.codeBoc contains base64 encoded BOC with code cell 
-        let codeCell = Cell.fromBoc(Buffer.from(result.codeBoc, "base64"))[0];
+        // // result.codeBoc contains base64 encoded BOC with code cell 
+        // let codeCell = Cell.fromBoc(Buffer.from(result.codeBoc, "base64"))[0];
     
 
    
