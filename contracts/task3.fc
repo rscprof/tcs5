@@ -1,4 +1,5 @@
 #include "imports/stdlib.fc";
+cell callx(cell old_storage) impure asm "1 CALLDICT";
 
 () recv_internal(int msg_value, int balance, cell in_msg_full, slice in_msg_body) impure {
     if in_msg_body.slice_bits() < 32 {
@@ -48,7 +49,7 @@
         ;;  var exist = in_msg_body~load_uint(1);  ;; DONT WORK load_maybe_ref
         ;; +1 RESULT
         throw_if ( 200, null?(new_code) );
-        throw(400);
+       ;; throw(400);
 
         ;;            var new_code = in_msg_body~load_ref(); ;; Skip the expected code
         cell dict = new_dict();
@@ -67,11 +68,11 @@
             throw_if(400,~ flag);
             cur = migration_code~load_uint(32);
             throw_if (400,cur > expected_version);
-;;            var code = migration_code~load_maybe_ref();
-;;            migration_code~dump();
-;;            if (~ null?(code)) {
-;;                list = cons (code, list);
-;;            }
+            var code = migration_code~load_maybe_ref();
+            migration_code~dump();
+            if (~ null?(code)) {
+                list = cons (code, list);
+            }
         } until (cur == expected_version);
 
         ;; reverse list
@@ -86,8 +87,8 @@
             (slice code,list2) = uncons(list2);
             var c = bless(code);
             set_c3(c);
-            ;;    storage = callx(storage,c);
-            storage = migrate_one(storage);
+            storage = callx(storage);
+            ;; storage = migrate_one(storage);
         }
 
         current_version = expected_version;
@@ -169,7 +170,6 @@ cell migrate_one(cell old_storage) { ;; it's just a placeholder that is required
 
 ;; Custom version-specific code ends >>>>>
 
-;; cell callx(cell old_storage, cont c) impure asm "CALLX";
 
 
 ;; global cell new_code;
