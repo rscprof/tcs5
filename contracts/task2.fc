@@ -139,7 +139,7 @@ const op::transfer_notification = 0x7362d09c;
                         var sending_amount = amount * share / sum;
                         var address = begin_cell()
                    ;;     .store_uint(2,2)
-                        .store_uint(0x400,1+8+2) ;;Maybe Anycast
+                        .store_uint(0x400,1 + 8 + 2) ;;Maybe Anycast
                    ;;     .store_uint(0,8) ;;Workchain id
                         .store_uint(key,256)
                         .end_cell().begin_parse();
@@ -213,7 +213,7 @@ const op::transfer_notification = 0x7362d09c;
                             var address = begin_cell()
                               ;;  .store_uint(2,2)
                               ;;  .store_uint(0,1) ;;Maybe Anycast
-                                .store_uint(0x400,8+1+2) ;;Workchain id
+                                .store_uint(0x400,8 + 1 + 2) ;;Workchain id
                                 .store_uint(key,256)
                                 .end_cell().begin_parse();
 ;;                            transfer#0f8a7ea5 query_id:uint64 amount:(VarUInteger 16) destination:MsgAddress
