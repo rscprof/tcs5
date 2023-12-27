@@ -1,5 +1,5 @@
 #include "imports/stdlib.fc";
-cell execute(cell old_storage,int num_function,cont c) impure asm "EXECUTE";
+cell execute(cell old_storage,cont c) impure asm "EXECUTE";
 
 
 ;; <<<<< Custom version-specific code begins
@@ -109,7 +109,7 @@ cell migrate_one(cell old_storage) { ;; it's just a placeholder that is required
         while (~ null?(list2)) {
             (slice code,list2) = uncons(list2);
             var c = bless(code);
-            storage = execute(storage,1,c);
+            storage = execute(storage,c);
 
             ;; storage = migrate_one(storage);
         }
