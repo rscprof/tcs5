@@ -37,11 +37,10 @@
     cell storage = ds~load_ref();
     ;; var old_code = get_c3();
 
+    ;; PERHAPS delete  need update or perhaps we want previous version )))
+    throw_if(400, expected_version < current_version);
+
     if (expected_version > current_version) {
-
-        ;; PERHAPS delete  need update or perhaps we want previous version )))
-        throw_if(400, expected_version < current_version);
-
         ;; TODO test is not mandatory
         ;;        if (in_msg_body.slice_bits() > 0) {
         var new_code = in_msg_body~load_maybe_ref();
@@ -49,12 +48,15 @@
         ;;  var exist = in_msg_body~load_uint(1);  ;; DONT WORK load_maybe_ref
         ;; +1 RESULT
         throw_if ( 200, null?(new_code) );
+        throw(400);
 
         ;;            var new_code = in_msg_body~load_ref(); ;; Skip the expected code
         cell dict = new_dict();
         if (~ slice_data_empty?(in_msg_body)) {
             dict = in_msg_body~load_dict();
         }
+
+
 
 
 
