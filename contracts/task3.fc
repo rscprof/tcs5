@@ -1,5 +1,10 @@
 #include "imports/stdlib.fc";
 
+cell migrate_one(cell old_storage) { ;; it's just a placeholder that is required for correct compilation
+    return old_storage;
+}
+
+
 ;; <<<<< Custom version-specific code begins
 ;; This section (everything between << and >> characters) will be fully substituted for each version.
 ;; This is an IMPORTANT part, and these exact lines with <<<<< and >>>>> must be present in your code for the testing system to work correctly.
@@ -8,9 +13,6 @@
 
 ;; from counter-v0.fc
 
-cell migrate_one(cell old_storage) { ;; it's just a placeholder that is required for correct compilation
-    return old_storage;
-}
 
 
 cell process_message(cell storage, int msg_value, int balance, cell in_msg_full, slice in_msg_body) impure {
