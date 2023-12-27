@@ -9,9 +9,9 @@ const op::transfer_notification = 0x7362d09c;
 
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
 
-;;    if in_msg_body.slice_bits() < 32 {
-;;        return();
-;;    }
+    if in_msg_body.slice_bits() < 32 {
+        return();
+    }
 
     int op = in_msg_body~load_uint(32);
 
@@ -23,16 +23,7 @@ const op::transfer_notification = 0x7362d09c;
 
         var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(4);  ;;skip flags
         var source = in_msg_full_slice~load_msg_addr();
-        ;;  (int source_type_addr, int source_addr) = source.parse_std_addr();
 
-        ;;        The contract should accept a message with op = 0x368ddef3 and the following fields:
-        ;;
-        ;;        query_id: uint64
-        ;;        address: MsgAddressInt
-        ;;        share: uint32
-        ;;        The contract accepts the message, checks that it came from the admin, and if so, adds the user to its storage. If the message did not come from the admin, the contract should throw error 120.
-        ;;
-        ;;        If the user is already in the storage, then it is necessary to update its share to a new one.
         var ds = begin_parse(get_data());
         var admin_addr = ds~load_msg_addr();
         throw_if(120,~ admin_addr.equal_slice_bits(source));
@@ -50,9 +41,6 @@ const op::transfer_notification = 0x7362d09c;
 
         ;; https://docs.ton.org/develop/func/stdlib/#load_msg_addr
         (_ , int address) = address_with_prefix.parse_std_addr(); ;;TODO optimise
-
-
-
 
         dict~udict_set_builder(256,address,begin_cell().store_uint(share,32));
 
@@ -284,11 +272,11 @@ cell  get_users() method_id {
 int  get_user_share(slice user_address) method_id {
     var ds = begin_parse(get_data());
     ds~load_msg_addr();
-    cell dict = new_dict();
-    if (~ slice_empty?(ds)) {
-        dict = ds.preload_dict();
-    }
-    (int prefix, int address) = user_address.parse_std_addr();
+;;    cell dict = new_dict();
+;;    if (~ slice_empty?(ds)) {
+      cell  dict = ds.preload_dict();
+;;    }
+    (_, int address) = user_address.parse_std_addr();
 
     ;;garantee of exists
     (slice res,int f) = dict.udict_get?(256,address);
