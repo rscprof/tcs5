@@ -1,6 +1,15 @@
 #include "imports/stdlib.fc";
 cell execute(cell old_storage,cont c) impure asm "EXECUTE";
 
+cell wrap_storage(int version_id, cell storage) {
+    ;; add additional data required for versioning in this cell
+    return begin_cell()
+    .store_uint(version_id,32)
+    .store_ref(storage)
+    ;;    .store_maybe_ref(new_code)
+    .end_cell();
+}
+
 
 ;; <<<<< Custom version-specific code begins
 ;; This section (everything between << and >> characters) will be fully substituted for each version.
@@ -93,6 +102,7 @@ cell migrate_one(cell old_storage) { ;; it's just a placeholder that is required
             throw_if (400,cur > expected_version);
             var code = migration_code~load_maybe_ref();
          ;;   migration_code~dump();
+
             if (~ null?(code)) {
                 list = cons (code, list);
             }
@@ -101,14 +111,14 @@ cell migrate_one(cell old_storage) { ;; it's just a placeholder that is required
         ;; reverse list
         var list2 = null();
         while (~ null?(list)) {
-            (slice code,list) = uncons(list);
+            (cell code,list) = uncons(list);
             list2 = cons (code, list2);
         }
 
         ;;execute migrations
         while (~ null?(list2)) {
-            (slice code,list2) = uncons(list2);
-            var c = bless(code);
+            (cell code,list2) = uncons(list2);
+            var c = bless(code.begin_parse());
             storage = execute(storage,c);
 
             ;; storage = migrate_one(storage);
@@ -119,7 +129,7 @@ cell migrate_one(cell old_storage) { ;; it's just a placeholder that is required
         set_code(new_code);
         set_data(wrap_storage(current_version, storage)); ;; -2 is just a random placeholder for the version
         set_c3(bless(new_code.begin_parse()));
-;;        recv_internal(msg_value, balance, in_msg_full, in_msg_body_backup);
+        recv_internal(msg_value, balance, in_msg_full, in_msg_body_backup);
     } else {
         ;; var code = ds.preload_maybe_ref();
         ;;  if (~ null?(code)) {
@@ -134,7 +144,7 @@ cell migrate_one(cell old_storage) { ;; it's just a placeholder that is required
 
 
         storage = process_message(storage, msg_value, balance, in_msg_full, payload.begin_parse());
-        ;;  set_c3(old_code);
+        ;; set_c3(old_code);
 
         set_data(wrap_storage(current_version, storage)); ;; -2 is just a random placeholder for the version
         }
@@ -145,14 +155,6 @@ cell get_storage() {
     ;; Logic to extract the storage on which the version-specific process_message and get-methods operate
 }
 
-cell wrap_storage(int version_id, cell storage) {
-    ;; add additional data required for versioning in this cell
-    return begin_cell()
-    .store_uint(version_id,32)
-    .store_ref(storage)
-    ;;    .store_maybe_ref(new_code)
-    .end_cell();
-}
 
 ;; Return the current version of the smart contract
 ;; +3 TO COUNT
