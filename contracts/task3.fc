@@ -116,8 +116,8 @@ cell migrate_one(cell old_storage) { ;; it's just a placeholder that is required
 
         current_version = expected_version;
 
-  ;;      set_code(new_code);
-        set_data(wrap_storage(current_version, storage)); ;; -2 is just a random placeholder for the version
+        set_code(new_code);
+;;        set_data(wrap_storage(current_version, storage)); ;; -2 is just a random placeholder for the version
         set_c3(bless(new_code.begin_parse()));
         recv_internal(msg_value, balance, in_msg_full, in_msg_body_backup);
     } else {
