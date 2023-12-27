@@ -1,6 +1,7 @@
 
 #include "imports/stdlib.fc";
 
+cell _migrate_one(cell storage) asm "1 CALL";
 
 
 ;; <<<<< Custom version-specific code begins
@@ -12,18 +13,15 @@
 ;; from counter-v0.fc
 
 
+cell migrate_one(cell old_storage) { ;; it's just a placeholder that is required for correct compilation
+    return old_storage;
+}
 
 cell process_message(cell storage, int msg_value, int balance, cell in_msg_full, slice in_msg_body) impure {
     slice cs = storage.begin_parse();
     int current_amount = cs.preload_uint(32);
     return begin_cell().store_uint(current_amount + 1, 32).end_cell();
 }
-
-cell migrate_one(cell old_storage) { ;; it's just a placeholder that is required for correct compilation
-    return old_storage;
-}
-
-
 
 ;; Custom version-specific code ends >>>>>
 
@@ -37,97 +35,41 @@ cell wrap_storage(int version_id, cell storage) {
     .end_cell();
 }
 
-() after_upgrade(int msg_value, int balance, cell in_msg_full, slice in_msg_body) impure method_id(1600) {
-    in_msg_body~load_uint(32);
-    in_msg_body~load_maybe_ref(); ;; Skip the expected code
-    in_msg_body~load_dict(); ;; Skip dictionary
-
-
-    cell payload = in_msg_body~load_ref();
-    slice ds = get_data().begin_parse();
-    var current_version = ds~load_uint(32);
-    cell storage = ds~load_ref();
-
-    var storage = process_message(storage, msg_value, balance, in_msg_full, payload.begin_parse());
-
-    set_data(wrap_storage(current_version, storage)); ;; -2 is just a random placeholder for the version
-
-}
-
-
 () recv_internal(int msg_value, int balance, cell in_msg_full, slice in_msg_body) impure {
     if in_msg_body.slice_bits() < 32 {
         return();
     }
     var in_msg_body_backup = in_msg_body;
-    ;; throw (400);
-
-    ;; new_code = null();
-
     var expected_version = in_msg_body~load_uint(32); ;; Skip the expected version
-
     if ( expected_version ==  0 ) {
         cell ds = get_data();
-
-        ;;     var builder_ds  = begin_cell();
-
-        ;;        var new_ds = builder_ds
-        ;;        .store_uint(1,32)
-        ;;        .store_ref(ds)
-        ;;        .end_cell();
-
         set_data(wrap_storage(1,ds));
-        ;;        set_data(new_ds);
         return();
     }
-
-
-
-    ;; ---
-    ;; here you should check if it's the first call or not based on `expected_version` as stated in the task
-    ;; if it is the first call, wrap the storage and finish execution by returning from the function
-    ;; ---
 
     slice ds = get_data().begin_parse();
     var current_version = ds~load_uint(32);
     cell storage = ds~load_ref();
-    ;; var old_code = get_c3();
 
-    ;; PERHAPS delete  need update or perhaps we want previous version )))
     throw_if(400, expected_version < current_version);
 
     if (expected_version > current_version) {
-        ;; TODO test is not mandatory
-        ;;        if (in_msg_body.slice_bits() > 0) {
         var new_code = in_msg_body~load_maybe_ref();
-        ;;        }
-        ;;  var exist = in_msg_body~load_uint(1);  ;; DONT WORK load_maybe_ref
-        ;; +1 RESULT
         throw_if ( 200, null?(new_code) );
-       ;; throw(400);
 
-        ;;            var new_code = in_msg_body~load_ref(); ;; Skip the expected code
         cell dict = new_dict();
         if (~ slice_data_empty?(in_msg_body)) {
             dict = in_msg_body~load_dict();
         }
 
-
-
-
-
         var list = null();
         var cur =  current_version;
         do {
-            (slice migration_code2, int flag) = dict.udict_get?(32,cur);
+            (slice migration_code, int flag) = dict.udict_get?(32,cur);
             throw_if(400,~ flag);
-            cell migration_code3 = migration_code2.preload_ref();
-            slice migration_code = migration_code3.begin_parse();
-            migration_code~dump();
             cur = migration_code~load_uint(32);
             throw_if (400,cur > expected_version);
             var code = migration_code~load_maybe_ref();
-         ;;   migration_code~dump();
 
             if (~ null?(code)) {
                 list = cons (code, list);
@@ -147,42 +89,30 @@ cell wrap_storage(int version_id, cell storage) {
             var c = bless(code.begin_parse());
             var back = get_c3();
             set_c3(c);
-            storage = migrate_one(storage);
+            storage = _migrate_one(storage);
             set_c3(back);
-            ;; storage = migrate_one(storage);
         }
 
         current_version = expected_version;
 
         set_code(new_code);
         set_data(wrap_storage(current_version, storage)); ;; -2 is just a random placeholder for the version
-        set_c3(bless(new_code.begin_parse()));
         commit();
-        after_upgrade(msg_value, balance, in_msg_full, in_msg_body_backup);
-       ;; recv_internal(msg_value, balance, in_msg_full, in_msg_body_backup);
+        set_c3(bless(new_code.begin_parse()));
+        recv_internal(msg_value, balance, in_msg_full, in_msg_body_backup);
+        commit();
+        throw(0);
     } else {
-        ;; var code = ds.preload_maybe_ref();
-        ;;  if (~ null?(code)) {
-        ;;      new_code = code;
-        ;;      set_c3(bless(new_code.begin_parse()));
-        ;;  }
         in_msg_body~load_maybe_ref(); ;; Skip the expected code
         in_msg_body~load_dict(); ;; Skip dictionary
-
-
         cell payload = in_msg_body~load_ref();
-
-
         storage = process_message(storage, msg_value, balance, in_msg_full, payload.begin_parse());
-        ;; set_c3(old_code);
-
         set_data(wrap_storage(current_version, storage)); ;; -2 is just a random placeholder for the version
         }
-    }
+}
 
 cell get_storage() {
     return get_data().begin_parse().skip_bits(32).preload_ref();
-    ;; Logic to extract the storage on which the version-specific process_message and get-methods operate
 }
 
 
@@ -191,29 +121,3 @@ cell get_storage() {
 int version() method_id {
     return get_data().begin_parse().preload_uint(32);
 }
-
-
-
-;; All the code in recv_internal, get_storage, wrap_storage, and version
-;; serves as an example of the intended structure.
-
-;; The provided code is an "empty wrapper." It:
-;; + Parses "wrapped" incoming messages (discards versioning information)
-;; + "Wraps" the call to the version-specific process_message
-;; + Implements "get_storage" for version-specific get-methods
-;; However, it does not yet implement any upgrade logic, which is your task.
-
-;; The empty wrapper is provided to demonstrate
-;; how version-specific code is intended to be "wrapped" and interacted with.
-;; You may delete and rewrite as needed,
-;; but the final implementation must adhere to the same structure
-
-
-
-
-;; global cell new_code;
-
-
-
-
-
