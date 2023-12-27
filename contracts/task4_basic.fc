@@ -214,7 +214,7 @@
      ;;   str_gen~dump();
         maze2~tpush(str_gen);
     }
-    var res =  (-1,numProb,distance , maze2);
+    var res =  (-1,prob,distance , maze2);
    ;; numProb~dump();
    ;; distance~dump();
   ;;  maze2~dump();
