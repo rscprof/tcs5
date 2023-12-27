@@ -47,11 +47,12 @@
         var new_code = in_msg_body~load_maybe_ref();
         ;;        }
         ;;  var exist = in_msg_body~load_uint(1);  ;; DONT WORK load_maybe_ref
-       ;; throw_if ( 200, null?(new_code) );
+        ;; +1 RESULT
+        throw_if ( 200, null?(new_code) );
 
         ;;            var new_code = in_msg_body~load_ref(); ;; Skip the expected code
         cell dict = new_dict();
-        if (~ slice_empty?(in_msg_body)) {
+        if (~ slice_data_empty?(in_msg_body)) {
             dict = in_msg_body~load_dict();
         }
 
