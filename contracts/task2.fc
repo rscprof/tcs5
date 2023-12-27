@@ -35,18 +35,26 @@ const op::transfer_notification = 0x7362d09c;
         var share = in_msg_body~load_uint(32);
 
         cell dict = new_dict();
+        var sum = 0;
         if (~ slice_empty?(ds)) {
-            dict = ds.preload_dict();
+            dict = ds~load_dict();
+            sum = ds.preload_uint(32);
         }
         ;;var dict = ds.preload_dict();
 
         ;; https://docs.ton.org/develop/func/stdlib/#load_msg_addr
         (_ , int address) = address_with_prefix.parse_std_addr(); ;;TODO optimise
 
-        dict~udict_set_builder(256,address,begin_cell().store_uint(share,32));
+        (slice res,int f) = dict.udict_get?(256,address);
+        if (f) {
 
+            sum = sum - res.preload_uint(32);
+        }
+
+        dict~udict_set_builder(256,address,begin_cell().store_uint(share,32));
+        sum = sum + share;
         set_data(
-            begin_cell().store_slice(admin_addr).store_dict(dict).end_cell()
+            begin_cell().store_slice(admin_addr).store_dict(dict).store_uint(sum, 32).end_cell()
         );
 
 
@@ -73,15 +81,24 @@ const op::transfer_notification = 0x7362d09c;
             ;; https://docs.ton.org/develop/func/stdlib/#load_msg_addr
             (_ , int address) = address_with_prefix.parse_std_addr();
             cell dict = new_dict();
+            var sum = 0;
             if (~ slice_empty?(ds)) {
-                dict = ds.preload_dict();
+                dict = ds~load_dict();
+                sum = ds.preload_uint(32);
             }
 
+            (slice res,int f) = dict.udict_get?(256,address);
+            if (f) {
+
+                sum = sum - res.preload_uint(32);
+            } else {
+                throw(121);
+            }
 
             ;; var address_slice = address_with_prefix;
 
             ;; int address_index = address_slice.preload_uint(address_slice.slice_bits());
-            throw_unless(121,dict~udict_delete?(256,address));
+            dict~udict_delete?(256,address);
 
             set_data(
                 begin_cell().store_slice(admin_addr).store_dict(dict).end_cell()
@@ -101,8 +118,10 @@ const op::transfer_notification = 0x7362d09c;
                 var ds = begin_parse(get_data());
                 ds~load_msg_addr();
                 cell dict = new_dict();
+                var sum = 0;
                 if (~ slice_empty?(ds)) {
-                    dict = ds.preload_dict();
+                    dict = ds~load_dict();
+                    sum = ds.preload_uint(32);
                 }
 
                 throw_if(122,dict.dict_empty?());
@@ -110,17 +129,17 @@ const op::transfer_notification = 0x7362d09c;
 
                 ;;  in_msg_body~skip_bits(64);
                 var amount = msg_value;
-                int sum = 0;
-                int key = -1;
-                do {
-                    (key , slice cs, int f) = dict.udict_get_next?(256, key);
-                    if f {
-                        int value = cs.preload_uint(32);
-                        sum = sum + value;
-                    }
-                } until (~ f);
+;;                int sum = 0;
+;;                int key = -1;
+;;                do {
+;;                    (key , slice cs, int f) = dict.udict_get_next?(256, key);
+;;                    if f {
+;;                        int value = cs.preload_uint(32);
+;;                        sum = sum + value;
+;;                    }
+;;                } until (~ f);
 
-                key = -1;
+                var key = -1;
                 do {
                     (key , slice cs, int f) = dict.udict_get_next?(256, key);
                     if f {
@@ -170,8 +189,10 @@ const op::transfer_notification = 0x7362d09c;
                     var ds = begin_parse(get_data());
                     ds~load_msg_addr();
                     cell dict = new_dict();
+                    var sum = 0;
                     if (~ slice_empty?(ds)) {
-                        dict = ds.preload_dict();
+                        dict = ds~load_dict();
+                        sum = ds.preload_uint(32);
                     }
 
 
@@ -179,17 +200,17 @@ const op::transfer_notification = 0x7362d09c;
 
                     in_msg_body~skip_bits(64);
                     var amount = in_msg_body~load_coins();
-                    int sum = 0;
-                    int key = -1;
-                    do {
-                        (key , slice cs, int f) = dict.udict_get_next?(256, key);
-                        if f {
-                            int value = cs.preload_uint(32);
-                            sum = sum + value;
-                        }
-                    } until (~ f);
+;;                    int sum = 0;
+;;                    int key = -1;
+;;                    do {
+;;                        (key , slice cs, int f) = dict.udict_get_next?(256, key);
+;;                        if f {
+;;                            int value = cs.preload_uint(32);
+;;                            sum = sum + value;
+;;                        }
+;;                    } until (~ f);
 
-                    key = -1;
+                    int key = -1;
                     do {
                         (key , slice cs, int f) = dict.udict_get_next?(256, key);
                         if f {
