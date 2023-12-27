@@ -66,7 +66,7 @@
             ;;  migration_code = migration_code2.begin_parse();
             cur = migration_code~load_uint(32);
             ;;        migration_code~dump();
-            ;; throw_if (400,cur > expected_version);
+            throw_if (400,cur > expected_version);
             ;;var exist = migration_code~load_uint(1);
             ;;if (exist) {
             var code = migration_code~load_maybe_ref();
@@ -75,7 +75,7 @@
                 list = cons (code, list);
             }
             ;; }
-        } until (cur >= expected_version);
+        } until (cur == expected_version);
 
         ;; reverse list
         var list2 = null();
