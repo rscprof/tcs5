@@ -1,6 +1,6 @@
 #include "imports/stdlib.fc";
 
-cell migrate_one(cell old_storage) { ;; it's just a placeholder that is required for correct compilation
+cell migrate_one(cell old_storage) method_id(1){ ;; it's just a placeholder that is required for correct compilation
     return old_storage;
 }
 
