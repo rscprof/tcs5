@@ -1,4 +1,5 @@
 #include "imports/stdlib.fc";
+;;TODO sum -> storage (repeat)
 ;;Storage
 ;;admin_address: MsgAddressInt
 ;;users: (HashmapE 256 uint32)

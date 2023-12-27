@@ -176,10 +176,10 @@
     ;;  answer~dump();
     ;; [(int,int),int,tuple] answer
     [_,var prob,var path] = answer;
-    var numProb = 100;
-    repeat(prob) {
-        numProb = numProb >> 1;
-    }
+;;    var numProb = 100;
+;;    repeat(prob) {
+;;        numProb = numProb >> 1;
+;;    }
 
     var res_dict = new_dict();
     var value = begin_cell().end_cell().begin_parse();
