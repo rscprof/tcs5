@@ -173,30 +173,46 @@ int getbitmask((int,int,int,int) value,int pos) inline {
    ;; var finished = 0;
     var current = cons ([start,0,null()], null());
     var answer = null();
+    tuple vectors = empty_tuple();
+    vectors~tpush([-1,-1]);
+    vectors~tpush([-1,0]);
+    vectors~tpush([-1,1]);
+    vectors~tpush([0,-1]);
+    vectors~tpush([0,1]);
+    vectors~tpush([1,-1]);
+    vectors~tpush([1,0]);
+    vectors~tpush([1,1]);
     ;; current~dump();
     while (  ~ null? (current) ) {
         var next = null();
         while (~ null?(current)) {
             (var curpos, current) = uncons(current);
-
-            (var newpos, state, var flag) = test (curpos, state, maze, -1, -1, n, m);
-            ;;   newpos~dump();
-            (next, answer) = update(next, answer, newpos, end, flag);
-            (newpos, state, flag) = test (curpos, state, maze, -1, 0, n, m);
-            (next, answer) = update(next, answer, newpos, end, flag);
-            (newpos, state, flag) = test (curpos, state, maze, -1, 1, n, m);
-            (next, answer) = update(next, answer, newpos, end, flag);
-            ;;   next~dump();
-            (newpos, state, flag) = test (curpos, state, maze, 0, -1, n, m);
-            (next, answer) = update(next, answer, newpos, end, flag);
-            (newpos, state, flag) = test (curpos, state, maze, 0, 1, n, m);
-            (next, answer) = update(next, answer, newpos, end, flag);
-            (newpos, state, flag) = test (curpos, state, maze, 1, -1, n, m);
-            (next, answer) = update(next, answer, newpos, end, flag);
-            (newpos, state, flag) = test (curpos, state, maze, 1, 0, n, m);
-            (next, answer) = update(next, answer, newpos, end, flag);
-            (newpos, state, flag) = test (curpos, state, maze, 1, 1, n, m);
-            (next, answer) = update(next, answer, newpos, end, flag);
+            var num = 0;
+            do {
+                [var dx,var dy] = at(vectors,num);
+                (var newpos, state, var flag) = test (curpos, state, maze, dx, dy, n, m);
+                ;;   newpos~dump();
+                (next, answer) = update(next, answer, newpos, end, flag);
+                num = num + 1;
+            }  until (num < 8);
+;;            (var newpos, state, var flag) = test (curpos, state, maze, -1, -1, n, m);
+;;            ;;   newpos~dump();
+;;            (next, answer) = update(next, answer, newpos, end, flag);
+;;            (newpos, state, flag) = test (curpos, state, maze, -1, 0, n, m);
+;;            (next, answer) = update(next, answer, newpos, end, flag);
+;;            (newpos, state, flag) = test (curpos, state, maze, -1, 1, n, m);
+;;            (next, answer) = update(next, answer, newpos, end, flag);
+;;            ;;   next~dump();
+;;            (newpos, state, flag) = test (curpos, state, maze, 0, -1, n, m);
+;;            (next, answer) = update(next, answer, newpos, end, flag);
+;;            (newpos, state, flag) = test (curpos, state, maze, 0, 1, n, m);
+;;            (next, answer) = update(next, answer, newpos, end, flag);
+;;            (newpos, state, flag) = test (curpos, state, maze, 1, -1, n, m);
+;;            (next, answer) = update(next, answer, newpos, end, flag);
+;;            (newpos, state, flag) = test (curpos, state, maze, 1, 0, n, m);
+;;            (next, answer) = update(next, answer, newpos, end, flag);
+;;            (newpos, state, flag) = test (curpos, state, maze, 1, 1, n, m);
+;;            (next, answer) = update(next, answer, newpos, end, flag);
         }
      ;;   if null? (next) {
      ;;       finished = true;
