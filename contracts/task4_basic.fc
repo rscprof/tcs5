@@ -82,25 +82,25 @@
 (int) tlen (tuple t) asm "TLEN";
 
 ;; Tuple of slice's
-(int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
+ (int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
 
    ;; return (-1,0,0, null());
 ;;() solve() method_id {
- ;;   var n = 3;
- ;;   var m = 3;
- ;;   tuple maze = empty_tuple();
- ;;   tuple maze2 = empty_tuple();
- ;;   maze2~tpush("S"u);
- ;;   maze2~tpush("."u);
- ;;   maze2~tpush("."u);
- ;;   maze~tpush(maze2);
- ;;   tuple maze2 = empty_tuple();
- ;;   maze2~tpush("X"u);
- ;;   maze2~tpush("X"u);
- ;;   maze2~tpush("X"u);
- ;;   maze~tpush(maze2);
- ;;   tuple maze2 = empty_tuple();
+;;    var n = 3;
+;;    var m = 3;
+;;    tuple maze = empty_tuple();
+;;    tuple maze2 = empty_tuple();
+;;    maze2~tpush("S"u);
 ;;    maze2~tpush("."u);
+;;    maze2~tpush("."u);
+;;    maze~tpush(maze2);
+;;    tuple maze2 = empty_tuple();
+;;    maze2~tpush("?"u);
+;;    maze2~tpush("X"u);
+;;    maze2~tpush("X"u);
+;;    maze~tpush(maze2);
+;;    tuple maze2 = empty_tuple();
+;;   maze2~tpush("."u);
 ;;    maze2~tpush("."u);
 ;;    maze2~tpush("E"u);
 ;;    maze~tpush(maze2);
@@ -198,6 +198,7 @@
         var str = at(maze, i);
         var j = 0;
         var str_gen = empty_tuple();
+      ;;  var str_print = begin_cell();
      ;;   tuple str_gen = empty_tuple();
         repeat(m) {
      ;;       str~dump();
@@ -206,17 +207,22 @@
             j = j + 1;
             if (flag) {
                 str_gen~tpush("!"u);
+          ;;      str_print~store_uint("!"u,8);
             } else {
                 str_gen~tpush(item);
+        ;;        str_print~store_uint(item,8);
             }
         }
+      ;;  var sfd = str_print.end_cell().begin_parse();
+    ;;    sfd~strdump();
         i  = i + 1;
      ;;   str_gen~dump();
         maze2~tpush(str_gen);
     }
-    var res =  (-1,prob,distance , maze2);
-   ;; numProb~dump();
-   ;; distance~dump();
+    var res =  (-1,prob,distance + 1 , maze2);
+  ;;  numProb~dump();
+  ;;  distance~dump();
   ;;  maze2~dump();
     return res;
+  ;;  return ();
 }
