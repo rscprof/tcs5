@@ -49,7 +49,7 @@ const op::transfer_notification = 0x7362d09c;
         ;;var dict = ds.preload_dict();
 
         ;; https://docs.ton.org/develop/func/stdlib/#load_msg_addr
-        (int prefix, int address) = address_with_prefix.parse_std_addr(); ;;TODO optimise
+        (_ , int address) = address_with_prefix.parse_std_addr(); ;;TODO optimise
 
 
 
@@ -82,7 +82,7 @@ const op::transfer_notification = 0x7362d09c;
             var address_with_prefix = in_msg_body~load_msg_addr();
 
             ;; https://docs.ton.org/develop/func/stdlib/#load_msg_addr
-            (int prefix, int address) = address_with_prefix.parse_std_addr();
+            (_ , int address) = address_with_prefix.parse_std_addr();
             cell dict = new_dict();
             if (~ slice_empty?(ds)) {
                  dict = ds.preload_dict();
@@ -138,9 +138,9 @@ const op::transfer_notification = 0x7362d09c;
                         int share = cs.preload_uint(32);
                         var sending_amount = amount * share / sum;
                         var address = begin_cell()
-                        .store_uint(2,2)
-                        .store_uint(0,1) ;;Maybe Anycast
-                        .store_uint(0,8) ;;Workchain id
+                   ;;     .store_uint(2,2)
+                        .store_uint(0x400,1+8+2) ;;Maybe Anycast
+                   ;;     .store_uint(0,8) ;;Workchain id
                         .store_uint(key,256)
                         .end_cell().begin_parse();
 
@@ -211,9 +211,9 @@ const op::transfer_notification = 0x7362d09c;
                             ;; addr_std$10 anycast:(Maybe Anycast)
                             ;; workchain_id:int8 address:bits256  = MsgAddressInt;
                             var address = begin_cell()
-                                .store_uint(2,2)
-                                .store_uint(0,1) ;;Maybe Anycast
-                                .store_uint(0,8) ;;Workchain id
+                              ;;  .store_uint(2,2)
+                              ;;  .store_uint(0,1) ;;Maybe Anycast
+                                .store_uint(0x400,8+1+2) ;;Workchain id
                                 .store_uint(key,256)
                                 .end_cell().begin_parse();
 ;;                            transfer#0f8a7ea5 query_id:uint64 amount:(VarUInteger 16) destination:MsgAddress
@@ -241,8 +241,8 @@ const op::transfer_notification = 0x7362d09c;
                             .store_uint(0x18, 6) ;; flags -- TEST
                             .store_slice(source) ;; destination address
                             .store_coins(20000000)
-                            .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1) ;; default message headers (see sending messages page)  -- TEST
-                            .store_uint(1,1)
+                            .store_uint(1, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)  -- TEST
+                           ;; .store_uint(1,1)
                             .store_ref(body)
                             .end_cell();
 
