@@ -74,7 +74,7 @@ int getbitmask((int,int,int,int) value,int pos) inline {
                 var item = at(str, j);
                 if (item == "S"u) {
                     start = (i, j);
-                    throw(0);
+              ;;      throw(0);
                 }
                 j = j + 1;
             }
