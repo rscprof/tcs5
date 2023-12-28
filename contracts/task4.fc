@@ -229,14 +229,28 @@ int getbitmask((int,int,int,int) value,int pos) inline {
         while (~ null?(current)) {
             (var curpos, current) = uncons(current);
 
-            (next, answer, state) = update(curpos, state, maze, -1, -1, n, m, next, answer, end);
-            (next, answer, state) = update(curpos, state, maze, -1, 0, n, m, next, answer, end);
-            (next, answer, state) = update(curpos, state, maze, -1, 1, n, m, next, answer, end);
-            (next, answer, state) = update(curpos, state, maze, 0, -1, n, m, next, answer, end);
-            (next, answer, state) = update(curpos, state, maze, 0, 1, n, m, next, answer, end);
-            (next, answer, state) = update(curpos, state, maze, 1, -1, n, m, next, answer, end);
-            (next, answer, state) = update(curpos, state, maze, 1, 0, n, m, next, answer, end);
-            (next, answer, state) = update(curpos, state, maze, 1, 1, n, m, next, answer, end);
+            var dx = -1;
+            do {
+                var dy = -1;
+                do {
+                    if (dx | dy) {
+                        (next, answer, state) = update(curpos, state, maze, dx, dy, n, m, next, answer, end);
+
+                    }
+
+                    dy = dy + 1;
+                } until (dy == 1);
+
+                dx = dx + 1;
+            } until (dx == 1);
+;;            (next, answer, state) = update(curpos, state, maze, -1, -1, n, m, next, answer, end);
+;;            (next, answer, state) = update(curpos, state, maze, -1, 0, n, m, next, answer, end);
+;;            (next, answer, state) = update(curpos, state, maze, -1, 1, n, m, next, answer, end);
+;;            (next, answer, state) = update(curpos, state, maze, 0, -1, n, m, next, answer, end);
+;;            (next, answer, state) = update(curpos, state, maze, 0, 1, n, m, next, answer, end);
+;;            (next, answer, state) = update(curpos, state, maze, 1, -1, n, m, next, answer, end);
+;;            (next, answer, state) = update(curpos, state, maze, 1, 0, n, m, next, answer, end);
+;;            (next, answer, state) = update(curpos, state, maze, 1, 1, n, m, next, answer, end);
 ;;
 ;;            (newpos, state, flag) = test (curpos, state, maze, -1, 0, n, m);
 ;;            (next, answer) = update(next, answer, newpos, end, flag);
