@@ -97,8 +97,10 @@ int getbitmask((int,int,int,int) value,int pos) inline {
         while (~ null?(current)) {
             (var curpos, current) = uncons(current);
 
-            var dx = -1;
-            repeat(3) {
+            [int _x, _ , _ , _ ] = curpos;
+            var dx = ( _x == 0 ) ? 0 : -1 ;
+
+            do {
                 var dy = -1;
                 repeat(3) {
                     if (dx | dy) {
@@ -126,6 +128,7 @@ int getbitmask((int,int,int,int) value,int pos) inline {
                                     }
                                 }
                                 if (test) {
+
                                     state = state.udict_set_builder(10, index, begin_cell().store_uint(count, 20));
                                     if (sym != "E"u) {
                                         path = cons([x, y], path);
@@ -146,7 +149,7 @@ int getbitmask((int,int,int,int) value,int pos) inline {
                 }
 
                 dx = dx + 1;
-            }
+            } until (dx <= 1);
         }
         current = next;
     }
