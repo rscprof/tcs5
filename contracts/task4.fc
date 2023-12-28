@@ -153,6 +153,7 @@ int getbitmask((int,int,int,int) value,int pos) inline {
     ;; var finished = 0;
     var current = cons ([start,0,null()], null());
     var answer = null();
+    var countBest = 2000000;
     ;; current~dump();
     while (  ~ null? (current) ) {
         var next = null();
@@ -193,12 +194,13 @@ int getbitmask((int,int,int,int) value,int pos) inline {
                                         path = cons([x, y], path);
                                         next = cons( [(x, y),count,path],next);
                                     } else {
-                                        var countBest = 2000000;
-                                        if ~ null?(answer) {
-                                            [countBest, _] = answer;
-                                        }
+;;                                        var countBest = 2000000;
+;;                                        if ~ null?(answer) {
+;;                                            [countBest, _] = answer;
+;;                                        }
                                         if ( count < countBest ) {
                                             answer = [count,path];
+                                            countBest = count;
                                         }
                                     }
                                 }
