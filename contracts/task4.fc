@@ -98,7 +98,7 @@ int getbitmask((int,int,int,int) value,int pos) inline {
             (var curpos, current) = uncons(current);
 
             [int _x, _ , _ , _ ] = curpos;
-            var dx = ( _x == 0 ) ? 0 : -1 ;
+            var dx = ( _x ) ? -1 : 0 ;
 
             do {
                 var dy = -1;
