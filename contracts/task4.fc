@@ -108,7 +108,7 @@ int getbitmask((int,int,int,int) value,int pos) inline {
                         [int x,int y,int count,tuple path] = curpos;
                         x = x + dx;
                         y = y + dy;
-                        if (~ ((y < 0) | (x >= n) | ( y >= m))) {
+                        if (((y >= 0) & (x < n) & ( y < m))) {
                             var sym = at(at(maze, x), y);
                             if (sym != "S"u) {
                                 if (sym == "X"u) {
