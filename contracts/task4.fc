@@ -82,13 +82,13 @@ int getbitmask((int,int,int,int) value,int pos) inline {
     ;;            maze~tpush(".??");
     ;;            maze~tpush("..E");
     var i = 0;
-    var start = look_start(n,m,maze);
+    (int startx,int starty) = look_start(n,m,maze);
 
 
     var state = new_dict();
 
     ;; var finished = 0;
-    var current = cons ([start,0,null()], null());
+    var current = cons ([ startx , starty , 0 , null() ], null());
     var answer = null();
     var countBest = 2000000;
     ;; current~dump();
@@ -103,7 +103,7 @@ int getbitmask((int,int,int,int) value,int pos) inline {
                 repeat(3) {
                     if (dx | dy) {
                         ;;  (next, answer, state) = update(curpos, state, maze, dx, dy, n, m, next, answer, end);
-                        [(int x,int y),int count,tuple path] = curpos;
+                        [int x,int y,int count,tuple path] = curpos;
                         x = x + dx;
                         y = y + dy;
                         if (~ ((x < 0) | (y < 0) | (x >= n) | ( y >= m))) {
@@ -129,7 +129,7 @@ int getbitmask((int,int,int,int) value,int pos) inline {
                                     state = state.udict_set_builder(10, index, begin_cell().store_uint(count, 20));
                                     if (sym != "E"u) {
                                         path = cons([x, y], path);
-                                        next = cons( [(x, y),count,path],next);
+                                        next = cons( [x, y,count,path],next);
                                     } else {
                                         if ( count < countBest ) {
                                             answer = path;
