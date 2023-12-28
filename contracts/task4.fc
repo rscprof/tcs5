@@ -83,17 +83,16 @@ int getbitmask((int,int,int,int) value,int pos) inline {
             }
             if (test) {
                 state = state.udict_set_builder(10, index, begin_cell().store_uint(count, 20));
-                var newpos = [(x, y),count,path];
                 if (sym != "E"u) {
                     path = cons([x, y], path);
-                    next = cons( newpos,next);
+                    next = cons( [(x, y),count,path],next);
                 } else {
                     var countBest = 2000000;
                     if ~ null?(answer) {
                         [_, countBest, _] = answer;
                     }
                     if ( count < countBest ) {
-                        answer = newpos;
+                        answer = [(x, y),count,path];
                     }
                 }
        ;;         newpos = [(x, y),count,path];
