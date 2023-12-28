@@ -1,6 +1,4 @@
 #include "imports/stdlib.fc";
-;; 5397
-;; 5862
 
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
 
@@ -50,100 +48,16 @@ int getbitmask((int,int,int,int) value,int pos) inline {
 }
 
 
-(tuple, [(int,int),int,tuple],cell) update(
-    [(int,int),int,tuple] curpos,cell state,tuple maze,int dx,int dy,int n,int m, ;;from test
-    tuple next, [(int,int),int,tuple] answer, (int,int) end) inline ;;from update
-{
-    [(int x,int y),int count,tuple path] = curpos;
-  ;;  var newpos = null();
-  ;;  var flag = 0;
- ;;   var default = (null(),state,0);
- ;;   (var newpos, var state, var flag) = default;
-    x = x + dx;
-    y = y + dy;
-    if (~ ((x < 0) | (y < 0) | (x >= n) | ( y >= m))) {
-        var sym = at(at(maze, x), y);
-        if (sym != "S"u) {
-
-            if (sym == "X"u) {
-                count = count + 1024;
-            }
-            else {
-                if (sym == "?"u) {
-                    count = count + 1;
-                }
-            }
-            var index = (x << 5) + y;
-            (var state_cell, int f) = state.udict_get?(10, index);
-            var test = true;
-            if (f) {
-                if (state_cell.preload_int(20) <= count) {
-                    test = false;
-                }
-            }
-            if (test) {
-                state = state.udict_set_builder(10, index, begin_cell().store_uint(count, 20));
-                if (sym != "E"u) {
-                    path = cons([x, y], path);
-                    next = cons( [(x, y),count,path],next);
-                } else {
-                    var countBest = 2000000;
-                    if ~ null?(answer) {
-                        [_, countBest, _] = answer;
-                    }
-                    if ( count < countBest ) {
-                        answer = [(x, y),count,path];
-                    }
-                }
-       ;;         newpos = [(x, y),count,path];
-    ;;            flag = true;
-              ;;  default = ([newpos, count, path], state, -1);
-               ;; (newpos, state, flag) = default;
-            }
-        }
-    }
-;;    (var newpos, var state, var flag) = default;
-
-
-;;    if (flag) {
-;;        ;;var f = first(newpos);
-;;     ;;   [var f,var count,_] = newpos;
-;;     ;;   (var x, var y) = f;
-;;    ;;    (var endx, var endy) = end;
-;;
-;;        if ((x == endx) & (y == endy)) {
-;;            if (null? (answer) | ( count < countBest )) {
-;;                answer = newpos;
-;;            }
-;;        } else {
-;;            next = cons( newpos,next);
-;;        }
-;;    }
-
-    ;;   next~dump();
-    return (next, answer,state);
-}
-
-;; (start,0,())
-;;([(int,int),int,tuple],cell,int) test ([(int,int),int,tuple] curpos,cell state,tuple maze,int dx,int dy,int n,int m) inline
+;;(tuple, [(int,int),int,tuple],cell) update(
+;;    [(int,int),int,tuple] curpos,cell state,tuple maze,int dx,int dy,int n,int m, ;;from test
+;;    tuple next, [(int,int),int,tuple] answer, (int,int) end) inline ;;from update
 ;;{
-;;    ;;  curpos~dump();
-;;
 ;;    [(int x,int y),int count,tuple path] = curpos;
-;;    var default = (null(),state,0);
-;;    ;;    var pos = first(curpos);
-;;    ;;    var count = second(curpos);
-;;    ;;    var path = third(curpos);
-;;    ;;    ;;    var count, var path) = curpos;
-;;    ;; (var x, var y) = pos;
 ;;    x = x + dx;
 ;;    y = y + dy;
-;;    ;;  x~dump();
-;;    ;;  y~dump();
 ;;    if (~ ((x < 0) | (y < 0) | (x >= n) | ( y >= m))) {
 ;;        var sym = at(at(maze, x), y);
 ;;        if (sym != "S"u) {
-;;
 ;;            if (sym == "X"u) {
 ;;                count = count + 1024;
 ;;            }
@@ -162,20 +76,24 @@ int getbitmask((int,int,int,int) value,int pos) inline {
 ;;            }
 ;;            if (test) {
 ;;                state = state.udict_set_builder(10, index, begin_cell().store_uint(count, 20));
-;;                ;;  state~dump();
-;;                ;;   x~dump();
-;;                ;;   y~dump();
-;;                ;;   count~dump();
-;;                var newpos = (x, y);
 ;;                if (sym != "E"u) {
 ;;                    path = cons([x, y], path);
+;;                    next = cons( [(x, y),count,path],next);
+;;                } else {
+;;                    var countBest = 2000000;
+;;                    if ~ null?(answer) {
+;;                        [_, countBest, _] = answer;
+;;                    }
+;;                    if ( count < countBest ) {
+;;                        answer = [(x, y),count,path];
+;;                    }
 ;;                }
-;;                default = ([newpos, count, path], state, -1);
 ;;            }
 ;;        }
 ;;    }
-;;    return default;
+;;    return (next, answer,state);
 ;;}
+
 
 
 (int) tlen (tuple t) asm "TLEN";
@@ -246,7 +164,46 @@ int getbitmask((int,int,int,int) value,int pos) inline {
                 var dy = -1;
                 do {
                     if (dx | dy) {
-                        (next, answer, state) = update(curpos, state, maze, dx, dy, n, m, next, answer, end);
+                      ;;  (next, answer, state) = update(curpos, state, maze, dx, dy, n, m, next, answer, end);
+                        [(int x,int y),int count,tuple path] = curpos;
+                        x = x + dx;
+                        y = y + dy;
+                        if (~ ((x < 0) | (y < 0) | (x >= n) | ( y >= m))) {
+                            var sym = at(at(maze, x), y);
+                            if (sym != "S"u) {
+                                if (sym == "X"u) {
+                                    count = count + 1024;
+                                }
+                                else {
+                                    if (sym == "?"u) {
+                                        count = count + 1;
+                                    }
+                                }
+                                var index = (x << 5) + y;
+                                (var state_cell, int f) = state.udict_get?(10, index);
+                                var test = true;
+                                if (f) {
+                                    if (state_cell.preload_int(20) <= count) {
+                                        test = false;
+                                    }
+                                }
+                                if (test) {
+                                    state = state.udict_set_builder(10, index, begin_cell().store_uint(count, 20));
+                                    if (sym != "E"u) {
+                                        path = cons([x, y], path);
+                                        next = cons( [(x, y),count,path],next);
+                                    } else {
+                                        var countBest = 2000000;
+                                        if ~ null?(answer) {
+                                            [_, countBest, _] = answer;
+                                        }
+                                        if ( count < countBest ) {
+                                            answer = [(x, y),count,path];
+                                        }
+                                    }
+                                }
+                            }
+                        }
 
                     }
 
