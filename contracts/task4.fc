@@ -197,7 +197,7 @@ int getbitmask((int,int,int,int) value,int pos) inline {
     }
 
 
-    if (null?(answer)) {
+    if (countBest == 2000000) {
         ;;          return ();
         return (-1,0,0, null());
     }
