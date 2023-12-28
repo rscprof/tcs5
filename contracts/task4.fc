@@ -121,25 +121,31 @@ int getbitmask((int,int,int,int) value,int pos) inline {
                                 }
                                 var index = (x << 5) + y;
                                 (var state_cell, int f) = state.udict_get?(10, index);
-                                var test = true;
-                                if (f) {
-                                    if (state_cell.preload_int(20) <= count) {
-                                        test = false;
-                                    }
-                                }
-                                if (test) {
-
-                                    state = state.udict_set_builder(10, index, begin_cell().store_uint(count, 20));
-                                    if (sym != "E"u) {
-                                        path = cons([x, y], path);
-                                        next = cons( [x, y,count,path],next);
-                                    } else {
-                                        if ( count < countBest ) {
-                                            answer = path;
-                                            countBest = count;
+                                try {
+                                   ;; var test = true;
+                                    if (f) {
+                                        if (state_cell.preload_int(20) <= count) {
+                                            ;; test = false;
+                                            throw(0);
                                         }
                                     }
+                                   ;; if (test) {
+
+                                        state = state.udict_set_builder(10, index, begin_cell().store_uint(count, 20));
+                                        if (sym != "E"u) {
+                                            path = cons([x, y], path);
+                                            next = cons([x, y, count, path], next);
+                                        } else {
+                                            if (count < countBest) {
+                                                answer = path;
+                                                countBest = count;
+                                            }
+                                        }
+                                   ;; }
+                                } catch(_,_) {
+
                                 }
+
                             }
                         }
 
