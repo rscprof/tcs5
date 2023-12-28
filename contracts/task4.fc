@@ -199,7 +199,7 @@ int getbitmask((int,int,int,int) value,int pos) inline {
 ;;                                            [countBest, _] = answer;
 ;;                                        }
                                         if ( count < countBest ) {
-                                            answer = [count,path];
+                                            answer = path;
                                             countBest = count;
                                         }
                                     }
@@ -252,7 +252,8 @@ int getbitmask((int,int,int,int) value,int pos) inline {
     }
     ;;  answer~dump();
     ;; [(int,int),int,tuple] answer
-    [var prob,var path] = answer;
+    var path = answer;
+    var prob = countBest;
     ;;    var numProb = 100;
     ;;    repeat(prob) {
     ;;        numProb = numProb >> 1;
