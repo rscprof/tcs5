@@ -268,12 +268,41 @@ cell  get_users() method_id {
     return dict;
 }
 
+;;    (_, int address) = user_address.parse_std_addr();
+;;    var ds = begin_parse(get_data());
+;;    ds~load_msg_addr();
+;;    (slice res,_) = ds.preload_dict().udict_get?(256,address);
+;;    return res.preload_uint(32);
+int get_user_share_asm(slice user_address) asm """
+  REWRITESTDADDR
+  NIP
+  c4 PUSH
+  // addr c4
+  CTOS
+// addr slice
+  LDMSGADDR
+// addr addr' slice
+  NIP
+// addr slice
+  PLDDICT
+// addr dict
+  8 PUSHPOW2
+// addr dict 256
+  DICTUGET
+// x flag
+  DROP
+  // x
+  32 PLDU
+""";
+
+
 ;;get_user_share(slice user_address): calculates and returns the user's share.
 ;;get_execution_time: returns the time in seconds when the contract should be unlocked to transfer the TONs to the beneficiary address.
 int  get_user_share(slice user_address) method_id {
-    (_, int address) = user_address.parse_std_addr();
-    var ds = begin_parse(get_data());
-    ds~load_msg_addr();
-    (slice res,_) = ds.preload_dict().udict_get?(256,address);
-    return res.preload_uint(32);
+    return get_user_share_asm(user_address);
+;;        (_, int address) = user_address.parse_std_addr();
+;;    var ds = begin_parse(get_data());
+;;    ds~load_msg_addr();
+;;    (slice res,_) = ds.preload_dict().udict_get?(256,address);
+;;    return res.preload_uint(32);
 }

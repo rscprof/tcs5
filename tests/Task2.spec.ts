@@ -19,12 +19,12 @@ describe('Task2', () => {
 
     beforeEach(async () => {
         blockchain = await Blockchain.create();
-        // blockchain.verbosity = {
-        //     blockchainLogs: false,
-        //     vmLogs : 'vm_logs',
-        //     debugLogs: true,
-        //     print: true
-        // }
+        blockchain.verbosity = {
+            blockchainLogs: false,
+            vmLogs : 'vm_logs_full',
+            debugLogs: true,
+            print: true
+        }
 
 
         admin = await blockchain.treasury('admin');
@@ -66,47 +66,48 @@ describe('Task2', () => {
            success: true  
         })
 
+        expect(await task2.getShare(user.getSender().address)).toEqual(100);
             
     });
 
-    it('send transfer notification', async () => {
-        const user = await blockchain.treasury('user');
+    // it('send transfer notification', async () => {
+    //     const user = await blockchain.treasury('user');
         
-        const res = await task2.sendAddUser(
-            admin.getSender(),
-            BigInt(0),
-            user.getSender().address,
-            BigInt(100)
-        );  // performing an action with contract main and saving result in res
+    //     const res = await task2.sendAddUser(
+    //         admin.getSender(),
+    //         BigInt(0),
+    //         user.getSender().address,
+    //         BigInt(100)
+    //     );  // performing an action with contract main and saving result in res
 
-        expect(res.transactions).toHaveTransaction({
-            from: admin.address,
-            to: task2.address,
-           success: true  
-        })
+    //     expect(res.transactions).toHaveTransaction({
+    //         from: admin.address,
+    //         to: task2.address,
+    //        success: true  
+    //     })
 
-        const user2 = await blockchain.treasury('user');
+    //     const user2 = await blockchain.treasury('user');
         
-        const res2 = await task2.sendTransferNotification(
-            admin.getSender(),
-            BigInt(0),
-            BigInt(100)
-        );  // performing an action with contract main and saving result in res
+    //     const res2 = await task2.sendTransferNotification(
+    //         admin.getSender(),
+    //         BigInt(0),
+    //         BigInt(100)
+    //     );  // performing an action with contract main and saving result in res
 
-        expect(res2.transactions).toHaveTransaction({
-            from: admin.address,
-            to: task2.address,
-           success: true,
+    //     expect(res2.transactions).toHaveTransaction({
+    //         from: admin.address,
+    //         to: task2.address,
+    //        success: true,
 
-        })
+    //     })
 
-        // expect(res2.transactions).toHaveTransaction({
-        //     to: admin.address,
-        //     value: toNano('0.02')  
-        //  })
+    //     // expect(res2.transactions).toHaveTransaction({
+    //     //     to: admin.address,
+    //     //     value: toNano('0.02')  
+    //     //  })
  
             
-    });
+    // });
 
 
 

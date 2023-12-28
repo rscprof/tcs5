@@ -75,6 +75,13 @@ export class Task2 implements Contract {
             );
     }
 
+    async getShare(provider: ContractProvider, address: Address) {
+        let slice = beginCell().storeAddress(address).endCell();
+        let result = (await provider.get('get_user_share', [{type: 'slice', cell: slice}])).stack;
+        return result.readNumber();
+    }
+
+
     // async getUsers(provider: ContractProvider) {
     //     const result = (await provider.get('get_users', [])).stack;
     //     console.debug(result);
