@@ -48,6 +48,51 @@ int getbitmask((int,int,int,int) value,int pos) inline {
 }
 
 
+;;(tuple, [(int,int),int,tuple],cell) update(
+;;    [(int,int),int,tuple] curpos,cell state,tuple maze,int dx,int dy,int n,int m, ;;from test
+;;    tuple next, [(int,int),int,tuple] answer, (int,int) end) inline ;;from update
+;;{
+;;    [(int x,int y),int count,tuple path] = curpos;
+;;    x = x + dx;
+;;    y = y + dy;
+;;    if (~ ((x < 0) | (y < 0) | (x >= n) | ( y >= m))) {
+;;        var sym = at(at(maze, x), y);
+;;        if (sym != "S"u) {
+;;            if (sym == "X"u) {
+;;                count = count + 1024;
+;;            }
+;;            else {
+;;                if (sym == "?"u) {
+;;                    count = count + 1;
+;;                }
+;;            }
+;;            var index = (x << 5) + y;
+;;            (var state_cell, int f) = state.udict_get?(10, index);
+;;            var test = true;
+;;            if (f) {
+;;                if (state_cell.preload_int(20) <= count) {
+;;                    test = false;
+;;                }
+;;            }
+;;            if (test) {
+;;                state = state.udict_set_builder(10, index, begin_cell().store_uint(count, 20));
+;;                if (sym != "E"u) {
+;;                    path = cons([x, y], path);
+;;                    next = cons( [(x, y),count,path],next);
+;;                } else {
+;;                    var countBest = 2000000;
+;;                    if ~ null?(answer) {
+;;                        [_, countBest, _] = answer;
+;;                    }
+;;                    if ( count < countBest ) {
+;;                        answer = [(x, y),count,path];
+;;                    }
+;;                }
+;;            }
+;;        }
+;;    }
+;;    return (next, answer,state);
+;;}
 
 
 
@@ -57,28 +102,28 @@ int getbitmask((int,int,int,int) value,int pos) inline {
 (int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
 
     ;; return (-1,0,0, null());
-;;        () solve() method_id {
-;;            var n = 3;
-;;            var m = 3;
-;;            tuple maze = empty_tuple();
-;;            tuple maze2 = empty_tuple();
-;;            maze2~tpush("S"u);
-;;            maze2~tpush("."u);
-;;            maze2~tpush("."u);
-;;            maze~tpush(maze2);
-;;            tuple maze2 = empty_tuple();
-;;            maze2~tpush("?"u);
-;;            maze2~tpush("X"u);
-;;            maze2~tpush("X"u);
-;;            maze~tpush(maze2);
-;;            tuple maze2 = empty_tuple();
-;;           maze2~tpush("."u);
-;;            maze2~tpush("."u);
-;;            maze2~tpush("E"u);
-;;            maze~tpush(maze2);
-;;            maze~tpush("S..");
-;;            maze~tpush(".??");
-;;            maze~tpush("..E");
+    ;;        () solve() method_id {
+    ;;            var n = 3;
+    ;;            var m = 3;
+    ;;            tuple maze = empty_tuple();
+    ;;            tuple maze2 = empty_tuple();
+    ;;            maze2~tpush("S"u);
+    ;;            maze2~tpush("."u);
+    ;;            maze2~tpush("."u);
+    ;;            maze~tpush(maze2);
+    ;;            tuple maze2 = empty_tuple();
+    ;;            maze2~tpush("?"u);
+    ;;            maze2~tpush("X"u);
+    ;;            maze2~tpush("X"u);
+    ;;            maze~tpush(maze2);
+    ;;            tuple maze2 = empty_tuple();
+    ;;           maze2~tpush("."u);
+    ;;            maze2~tpush("."u);
+    ;;            maze2~tpush("E"u);
+    ;;            maze~tpush(maze2);
+    ;;            maze~tpush("S..");
+    ;;            maze~tpush(".??");
+    ;;            maze~tpush("..E");
     var i = 0;
     var start = (0,0);
     var end = (0,0);
@@ -107,9 +152,7 @@ int getbitmask((int,int,int,int) value,int pos) inline {
 
     ;; var finished = 0;
     var current = cons ([start,0,null()], null());
-   ;; var answer = null();
-    var countBest = 2000000;
-    var pathBest = null();
+    var answer = null();
     ;; current~dump();
     while (  ~ null? (current) ) {
         var next = null();
@@ -121,7 +164,7 @@ int getbitmask((int,int,int,int) value,int pos) inline {
                 var dy = -1;
                 do {
                     if (dx | dy) {
-                      ;;  (next, answer, state) = update(curpos, state, maze, dx, dy, n, m, next, answer, end);
+                        ;;  (next, answer, state) = update(curpos, state, maze, dx, dy, n, m, next, answer, end);
                         [(int x,int y),int count,tuple path] = curpos;
                         x = x + dx;
                         y = y + dy;
@@ -150,14 +193,12 @@ int getbitmask((int,int,int,int) value,int pos) inline {
                                         path = cons([x, y], path);
                                         next = cons( [(x, y),count,path],next);
                                     } else {
-     ;;                                   var countBest = 2000000;
-     ;;                                   if ~ null?(answer) {
-     ;;                                       [_, countBest, _] = answer;
-     ;;                                   }
+                                        var countBest = 2000000;
+                                        if ~ null?(answer) {
+                                            [countBest, _] = answer;
+                                        }
                                         if ( count < countBest ) {
-                                            countBest = count;
-                                            pathBest = path;
-                                      ;;      answer = [(x, y),count,path];
+                                            answer = [count,path];
                                         }
                                     }
                                 }
@@ -171,30 +212,30 @@ int getbitmask((int,int,int,int) value,int pos) inline {
 
                 dx = dx + 1;
             } until (dx > 1);
-;;            (next, answer, state) = update(curpos, state, maze, -1, -1, n, m, next, answer, end);
-;;            (next, answer, state) = update(curpos, state, maze, -1, 0, n, m, next, answer, end);
-;;            (next, answer, state) = update(curpos, state, maze, -1, 1, n, m, next, answer, end);
-;;            (next, answer, state) = update(curpos, state, maze, 0, -1, n, m, next, answer, end);
-;;            (next, answer, state) = update(curpos, state, maze, 0, 1, n, m, next, answer, end);
-;;            (next, answer, state) = update(curpos, state, maze, 1, -1, n, m, next, answer, end);
-;;            (next, answer, state) = update(curpos, state, maze, 1, 0, n, m, next, answer, end);
-;;            (next, answer, state) = update(curpos, state, maze, 1, 1, n, m, next, answer, end);
-;;
-;;            (newpos, state, flag) = test (curpos, state, maze, -1, 0, n, m);
-;;            (next, answer) = update(next, answer, newpos, end, flag);
-;;            (newpos, state, flag) = test (curpos, state, maze, -1, 1, n, m);
-;;            (next, answer) = update(next, answer, newpos, end, flag);
-;;            ;;   next~dump();
-;;            (newpos, state, flag) = test (curpos, state, maze, 0, -1, n, m);
-;;            (next, answer) = update(next, answer, newpos, end, flag);
-;;            (newpos, state, flag) = test (curpos, state, maze, 0, 1, n, m);
-;;            (next, answer) = update(next, answer, newpos, end, flag);
-;;            (newpos, state, flag) = test (curpos, state, maze, 1, -1, n, m);
-;;            (next, answer) = update(next, answer, newpos, end, flag);
-;;            (newpos, state, flag) = test (curpos, state, maze, 1, 0, n, m);
-;;            (next, answer) = update(next, answer, newpos, end, flag);
-;;            (newpos, state, flag) = test (curpos, state, maze, 1, 1, n, m);
-;;            (next, answer) = update(next, answer, newpos, end, flag);
+            ;;            (next, answer, state) = update(curpos, state, maze, -1, -1, n, m, next, answer, end);
+            ;;            (next, answer, state) = update(curpos, state, maze, -1, 0, n, m, next, answer, end);
+            ;;            (next, answer, state) = update(curpos, state, maze, -1, 1, n, m, next, answer, end);
+            ;;            (next, answer, state) = update(curpos, state, maze, 0, -1, n, m, next, answer, end);
+            ;;            (next, answer, state) = update(curpos, state, maze, 0, 1, n, m, next, answer, end);
+            ;;            (next, answer, state) = update(curpos, state, maze, 1, -1, n, m, next, answer, end);
+            ;;            (next, answer, state) = update(curpos, state, maze, 1, 0, n, m, next, answer, end);
+            ;;            (next, answer, state) = update(curpos, state, maze, 1, 1, n, m, next, answer, end);
+            ;;
+            ;;            (newpos, state, flag) = test (curpos, state, maze, -1, 0, n, m);
+            ;;            (next, answer) = update(next, answer, newpos, end, flag);
+            ;;            (newpos, state, flag) = test (curpos, state, maze, -1, 1, n, m);
+            ;;            (next, answer) = update(next, answer, newpos, end, flag);
+            ;;            ;;   next~dump();
+            ;;            (newpos, state, flag) = test (curpos, state, maze, 0, -1, n, m);
+            ;;            (next, answer) = update(next, answer, newpos, end, flag);
+            ;;            (newpos, state, flag) = test (curpos, state, maze, 0, 1, n, m);
+            ;;            (next, answer) = update(next, answer, newpos, end, flag);
+            ;;            (newpos, state, flag) = test (curpos, state, maze, 1, -1, n, m);
+            ;;            (next, answer) = update(next, answer, newpos, end, flag);
+            ;;            (newpos, state, flag) = test (curpos, state, maze, 1, 0, n, m);
+            ;;            (next, answer) = update(next, answer, newpos, end, flag);
+            ;;            (newpos, state, flag) = test (curpos, state, maze, 1, 1, n, m);
+            ;;            (next, answer) = update(next, answer, newpos, end, flag);
         }
         ;;   if null? (next) {
         ;;       finished = true;
@@ -203,15 +244,13 @@ int getbitmask((int,int,int,int) value,int pos) inline {
     }
 
 
-    if (null?(pathBest)) {
-;;          return ();
+    if (null?(answer)) {
+        ;;          return ();
         return (-1,0,0, null());
     }
     ;;  answer~dump();
     ;; [(int,int),int,tuple] answer
- ;;   var prob = countBest;
-    ;; var path = pathBest;
-  ;;  [_,var prob,var path] = answer;
+    [var prob,var path] = answer;
     ;;    var numProb = 100;
     ;;    repeat(prob) {
     ;;        numProb = numProb >> 1;
@@ -222,8 +261,8 @@ int getbitmask((int,int,int,int) value,int pos) inline {
     ;;    var value = begin_cell().end_cell().begin_parse();
     var distance = 0;
     ;; path~dump();
-    while (~ null?(pathBest)) {
-        (var coords, pathBest) = pathBest.uncons();
+    while (~ null?(path)) {
+        (var coords, path) = path.uncons();
         [int x,int y] = coords;
         distance = distance + 1;
         res_dict = setbitmask(res_dict,x * m + y);
@@ -260,10 +299,10 @@ int getbitmask((int,int,int,int) value,int pos) inline {
         ;;      str_gen~dump();
         maze2~tpush(str_gen);
     } until (i == n);
-    var res =  (countBest / 1024,countBest % 1024, distance + 1 , maze2);
-;;      prob~dump();
-;;      distance~dump();
-;;       maze2~dump();
+    var res =  (prob / 1024,prob % 1024, distance + 1 , maze2);
+    ;;      prob~dump();
+    ;;      distance~dump();
+    ;;       maze2~dump();
     return res;
-;;      return ();
+    ;;      return ();
 }
