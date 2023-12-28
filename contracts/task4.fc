@@ -30,20 +30,21 @@
 int getbitmask((int,int,int,int) value,int pos) inline {
     (int a,int b,int c, int d) = value;
     (var number, pos) = divmod(pos,256);
-    if number == 0 {
-        return (d >> pos) & 1;
-    } else
-    {
-        if number == 1 {
-            return (c >> pos) & 1;
-        } else {
-        ;;    if number == 2 {
-                return (((number == 2)? b : a ) >> pos) & 1;
-         ;;   } else {
-         ;;       return (a >> pos) & 1;
-         ;;   }
-        }
-    }
+    return (((number == 0) ? d : (number == 1) ? c : ( number == 2 ) ? b : a ) >> pos) & 1;
+;;    if number == 0 {
+;;        return (d >> pos) & 1;
+;;    } else
+;;    {
+;;        if number == 1 {
+;;            return (c >> pos) & 1;
+;;        } else {
+;;        ;;    if number == 2 {
+;;                return (((number == 2)? b : a ) >> pos) & 1;
+;;         ;;   } else {
+;;         ;;       return (a >> pos) & 1;
+;;         ;;   }
+;;        }
+;;    }
 }
 
 
