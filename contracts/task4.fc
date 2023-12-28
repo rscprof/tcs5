@@ -1,4 +1,6 @@
 #include "imports/stdlib.fc";
+;; 5397
+;; 5862
 
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
 
@@ -53,8 +55,8 @@ int getbitmask((int,int,int,int) value,int pos) inline {
     tuple next, [(int,int),int,tuple] answer, (int,int) end) inline ;;from update
 {
     [(int x,int y),int count,tuple path] = curpos;
-    var newpos = null();
-    var flag = 0;
+  ;;  var newpos = null();
+  ;;  var flag = 0;
  ;;   var default = (null(),state,0);
  ;;   (var newpos, var state, var flag) = default;
     x = x + dx;
@@ -81,11 +83,21 @@ int getbitmask((int,int,int,int) value,int pos) inline {
             }
             if (test) {
                 state = state.udict_set_builder(10, index, begin_cell().store_uint(count, 20));
+                var newpos = [(x, y),count,path];
                 if (sym != "E"u) {
                     path = cons([x, y], path);
+                    next = cons( newpos,next);
+                } else {
+                    var countBest = 2000000;
+                    if ~ null?(answer) {
+                        [_, countBest, _] = answer;
+                    }
+                    if ( count < countBest ) {
+                        answer = newpos;
+                    }
                 }
-                newpos = [(x, y),count,path];
-                flag = true;
+       ;;         newpos = [(x, y),count,path];
+    ;;            flag = true;
               ;;  default = ([newpos, count, path], state, -1);
                ;; (newpos, state, flag) = default;
             }
@@ -94,24 +106,20 @@ int getbitmask((int,int,int,int) value,int pos) inline {
 ;;    (var newpos, var state, var flag) = default;
 
 
-    var countBest = 2000000;
-    if ~ null?(answer) {
-        [_, countBest, _] = answer;
-    }
-    if (flag) {
-        ;;var f = first(newpos);
-        [var f,var count,_] = newpos;
-        (var x, var y) = f;
-        (var endx, var endy) = end;
-
-        if ((x == endx) & (y == endy)) {
-            if (null? (answer) | ( count < countBest )) {
-                answer = newpos;
-            }
-        } else {
-            next = cons( newpos,next);
-        }
-    }
+;;    if (flag) {
+;;        ;;var f = first(newpos);
+;;     ;;   [var f,var count,_] = newpos;
+;;     ;;   (var x, var y) = f;
+;;    ;;    (var endx, var endy) = end;
+;;
+;;        if ((x == endx) & (y == endy)) {
+;;            if (null? (answer) | ( count < countBest )) {
+;;                answer = newpos;
+;;            }
+;;        } else {
+;;            next = cons( newpos,next);
+;;        }
+;;    }
 
     ;;   next~dump();
     return (next, answer,state);
