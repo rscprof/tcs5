@@ -112,7 +112,7 @@ int getbitmask((int,int,int,int) value,int pos) inline {
                             var sym = at(at(maze, x), y);
                             if (sym != "S"u) {
                                 if (sym == "X"u) {
-                                    count = count + 1025;
+                                    count = count + 1000;
                                 }
                                 else {
                                     if (sym == "?"u) {
@@ -189,7 +189,7 @@ int getbitmask((int,int,int,int) value,int pos) inline {
         i  = i + 1;
         maze2~tpush(str_gen);
     } until (i == n);
-    var res =  (prob / 1024,prob % 1024, distance + 1 , maze2);
+    var res =  (prob / 1000,prob % 1000, distance + 1 , maze2);
     ;;      prob~dump();
     ;;      distance~dump();
     ;;       maze2~dump();
