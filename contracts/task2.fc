@@ -271,15 +271,9 @@ cell  get_users() method_id {
 ;;get_user_share(slice user_address): calculates and returns the user's share.
 ;;get_execution_time: returns the time in seconds when the contract should be unlocked to transfer the TONs to the beneficiary address.
 int  get_user_share(slice user_address) method_id {
+    (_, int address) = user_address.parse_std_addr();
     var ds = begin_parse(get_data());
     ds~load_msg_addr();
-    ;;    cell dict = new_dict();
-    ;;    if (~ slice_empty?(ds)) {
-    cell  dict = ds.preload_dict();
-    ;;    }
-    (_, int address) = user_address.parse_std_addr();
-
-    ;;garantee of exists
-    (slice res,int f) = dict.udict_get?(256,address);
+    (slice res,_) = ds.preload_dict().udict_get?(256,address);
     return res.preload_uint(32);
 }
