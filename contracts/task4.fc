@@ -7,18 +7,19 @@
 ( int, int, int, int ) setbitmask((int,int,int,int) value,int pos) inline {
     (int a,int b,int c, int d) = value;
     (var number,pos) = divmod(pos , 256);
+    var bit = 1 << pos;
     ;; var pos = pos % 256;
     if number == 0 {
-        d = d | (1 << pos);
+        d = d | bit;
     } else
     {
         if number == 1 {
-            c = c | (1 << pos);
+            c = c | bit;
         } else {
             if number == 2 {
-                b = b | (1 << pos);
+                b = b | bit;
             } else {
-                a = a | (1 << pos);
+                a = a | bit;
             }
         }
     }
@@ -29,8 +30,6 @@
 int getbitmask((int,int,int,int) value,int pos) inline {
     (int a,int b,int c, int d) = value;
     (var number, pos) = divmod(pos,256);
-    ;; var number = pos / 256;
-    ;; var pos = pos % 256;
     if number == 0 {
         return (d >> pos) & 1;
     } else
@@ -38,11 +37,11 @@ int getbitmask((int,int,int,int) value,int pos) inline {
         if number == 1 {
             return (c >> pos) & 1;
         } else {
-            if number == 2 {
-                return (b >> pos) & 1;
-            } else {
-                return (a >> pos) & 1;
-            }
+        ;;    if number == 2 {
+                return (((number == 2)? b : a ) >> pos) & 1;
+         ;;   } else {
+         ;;       return (a >> pos) & 1;
+         ;;   }
         }
     }
 }
@@ -80,20 +79,14 @@ int getbitmask((int,int,int,int) value,int pos) inline {
     ;;            maze~tpush("..E");
     var i = 0;
     var start = (0,0);
-;;    var end = (0,0);
     repeat(n) {
         var str = at(maze,i);  ;;.begin_parse();
         var j = 0;
-
         repeat(m) {
-
             var item = at(str,j);
             if (item == "S"u) {
                 start = (i , j);
             }
-  ;;          if (item == "E"u) {
-  ;;              end = (i , j);
- ;;           }
             j = j + 1;
         }
         i  = i + 1;
@@ -145,10 +138,6 @@ int getbitmask((int,int,int,int) value,int pos) inline {
                                         path = cons([x, y], path);
                                         next = cons( [(x, y),count,path],next);
                                     } else {
-;;                                        var countBest = 2000000;
-;;                                        if ~ null?(answer) {
-;;                                            [countBest, _] = answer;
-;;                                        }
                                         if ( count < countBest ) {
                                             answer = path;
                                             countBest = count;
@@ -165,34 +154,7 @@ int getbitmask((int,int,int,int) value,int pos) inline {
 
                 dx = dx + 1;
             } until (dx > 1);
-            ;;            (next, answer, state) = update(curpos, state, maze, -1, -1, n, m, next, answer, end);
-            ;;            (next, answer, state) = update(curpos, state, maze, -1, 0, n, m, next, answer, end);
-            ;;            (next, answer, state) = update(curpos, state, maze, -1, 1, n, m, next, answer, end);
-            ;;            (next, answer, state) = update(curpos, state, maze, 0, -1, n, m, next, answer, end);
-            ;;            (next, answer, state) = update(curpos, state, maze, 0, 1, n, m, next, answer, end);
-            ;;            (next, answer, state) = update(curpos, state, maze, 1, -1, n, m, next, answer, end);
-            ;;            (next, answer, state) = update(curpos, state, maze, 1, 0, n, m, next, answer, end);
-            ;;            (next, answer, state) = update(curpos, state, maze, 1, 1, n, m, next, answer, end);
-            ;;
-            ;;            (newpos, state, flag) = test (curpos, state, maze, -1, 0, n, m);
-            ;;            (next, answer) = update(next, answer, newpos, end, flag);
-            ;;            (newpos, state, flag) = test (curpos, state, maze, -1, 1, n, m);
-            ;;            (next, answer) = update(next, answer, newpos, end, flag);
-            ;;            ;;   next~dump();
-            ;;            (newpos, state, flag) = test (curpos, state, maze, 0, -1, n, m);
-            ;;            (next, answer) = update(next, answer, newpos, end, flag);
-            ;;            (newpos, state, flag) = test (curpos, state, maze, 0, 1, n, m);
-            ;;            (next, answer) = update(next, answer, newpos, end, flag);
-            ;;            (newpos, state, flag) = test (curpos, state, maze, 1, -1, n, m);
-            ;;            (next, answer) = update(next, answer, newpos, end, flag);
-            ;;            (newpos, state, flag) = test (curpos, state, maze, 1, 0, n, m);
-            ;;            (next, answer) = update(next, answer, newpos, end, flag);
-            ;;            (newpos, state, flag) = test (curpos, state, maze, 1, 1, n, m);
-            ;;            (next, answer) = update(next, answer, newpos, end, flag);
         }
-        ;;   if null? (next) {
-        ;;       finished = true;
-        ;;   }
         current = next;
     }
 
@@ -201,27 +163,16 @@ int getbitmask((int,int,int,int) value,int pos) inline {
         ;;          return ();
         return (-1,0,0, null());
     }
-    ;;  answer~dump();
-    ;; [(int,int),int,tuple] answer
     var path = answer;
     var prob = countBest;
-    ;;    var numProb = 100;
-    ;;    repeat(prob) {
-    ;;        numProb = numProb >> 1;
-    ;;    }
 
     var res_dict = (0,0,0,0);
-    ;;    var res_dict = new_dict();
-    ;;    var value = begin_cell().end_cell().begin_parse();
     var distance = 0;
-    ;; path~dump();
     while (~ null?(path)) {
         (var coords, path) = path.uncons();
         [int x,int y] = coords;
         distance = distance + 1;
         res_dict = setbitmask(res_dict,x * m + y);
-        ;;   res_dict = res_dict | (1 <<  (x * m + y ) ); ;;mul is less exoensice than << ???????????????
-        ;;res_dict~udict_set(10,(x << 5) + y, value);
     }
 
     tuple maze2 = empty_tuple();
@@ -230,27 +181,16 @@ int getbitmask((int,int,int,int) value,int pos) inline {
         var str = at(maze, i);
         var j = 0;
         var str_gen = empty_tuple();
-        ;;  var str_print = begin_cell();
-        ;;   tuple str_gen = empty_tuple();
         do {
-            ;;       str~dump();
             var item = at(str,j);
-            ;;  (_,int flag) =     res_dict.udict_get?(10, (i << 5) + j);
             if (getbitmask(res_dict, i * m + j)) {
                 str_gen~tpush("!"u);
-                ;;      str_print~store_uint("!"u,8);
             } else {
                 str_gen~tpush(item);
-                ;;        str_print~store_uint(item,8);
             }
             j = j + 1;
-
-            ;; res_dict = res_dict >> 1;
         } until (j == m);
-        ;;  var sfd = str_print.end_cell().begin_parse();
-        ;;    sfd~strdump();
         i  = i + 1;
-        ;;      str_gen~dump();
         maze2~tpush(str_gen);
     } until (i == n);
     var res =  (prob / 1024,prob % 1024, distance + 1 , maze2);
