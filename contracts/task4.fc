@@ -53,7 +53,10 @@ int getbitmask((int,int,int,int) value,int pos) inline {
     tuple next, [(int,int),int,tuple] answer, (int,int) end) inline ;;from update
 {
     [(int x,int y),int count,tuple path] = curpos;
-    var default = (null(),state,0);
+    var newpos = null();
+    var flag = 0;
+ ;;   var default = (null(),state,0);
+ ;;   (var newpos, var state, var flag) = default;
     x = x + dx;
     y = y + dy;
     if (~ ((x < 0) | (y < 0) | (x >= n) | ( y >= m))) {
@@ -78,15 +81,17 @@ int getbitmask((int,int,int,int) value,int pos) inline {
             }
             if (test) {
                 state = state.udict_set_builder(10, index, begin_cell().store_uint(count, 20));
-                var newpos = (x, y);
                 if (sym != "E"u) {
                     path = cons([x, y], path);
                 }
-                default = ([newpos, count, path], state, -1);
+                newpos = [(x, y),count,path];
+                flag = true;
+              ;;  default = ([newpos, count, path], state, -1);
+               ;; (newpos, state, flag) = default;
             }
         }
     }
-    (var newpos, var state, var flag) = default;
+;;    (var newpos, var state, var flag) = default;
 
 
     var countBest = 2000000;
