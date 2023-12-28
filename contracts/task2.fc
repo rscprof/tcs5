@@ -112,18 +112,21 @@ const op::transfer_notification = 0x7362d09c;
                 var amount = msg_value;
                 int sum = 0;
                 int key = -1;
+                int count = 0;
                 do {
                     (key , slice cs, int f) = dict.udict_get_next?(256, key);
                     if f {
                         int value = cs.preload_uint(32);
                         sum = sum + value;
+                        count = count + 1;
                     }
                 } until (~ f);
 
                 key = -1;
-                do {
-                    (key , slice cs, int f) = dict.udict_get_next?(256, key);
-                    if f {
+                repeat(count) {
+                    (key , slice cs, _) = dict.udict_get_next?(256, key);
+                    ;; if f
+                    {
                         int share = cs.preload_uint(32);
                         var sending_amount = amount * share / sum;
                         var address = begin_cell()
@@ -145,7 +148,7 @@ const op::transfer_notification = 0x7362d09c;
                         send_raw_message(msg, 1);
 
                     }
-                } until (~ f);
+                }
 
 
             } else {
