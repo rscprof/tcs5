@@ -149,7 +149,7 @@ const op::transfer_notification = 0x7362d09c;
 
 
             } else {
-                if op == op::transfer_notification {
+           ;;     if op == op::transfer_notification {
                     ;;                    The contract should receive a message with op = 0x7362d09c and the following fields:
                     ;;
                     ;;                    query_id: uint64
@@ -243,7 +243,7 @@ const op::transfer_notification = 0x7362d09c;
                     } until (~ f);
 
 
-                }
+             ;;   }
             }
         }
     }
