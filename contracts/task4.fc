@@ -80,6 +80,7 @@ int getbitmask((int,int,int,int) value,int pos) inline {
     ;;  curpos~dump();
 
     [(int x,int y),int count,tuple path] = curpos;
+    var default = (null(),state,0);
     ;;    var pos = first(curpos);
     ;;    var count = second(curpos);
     ;;    var path = third(curpos);
@@ -89,29 +90,41 @@ int getbitmask((int,int,int,int) value,int pos) inline {
     y = y + dy;
     ;;  x~dump();
     ;;  y~dump();
-    if ((x < 0) | (y < 0) | (x >= n) | ( y >= m)) { return (null(),state,0); }
-    var sym = at(at(maze,x),y);
-    if (sym == "S"u) { return (null(),state,0); }
-    if (sym == "X"u) { count = count + 1024; }
-    else {
-        if (sym == "?"u) {
-            count = count + 1;
+    if (~ ((x < 0) | (y < 0) | (x >= n) | ( y >= m))) {
+        var sym = at(at(maze, x), y);
+        if (sym != "S"u) {
+
+            if (sym == "X"u) {
+                count = count + 1024;
+            }
+            else {
+                if (sym == "?"u) {
+                    count = count + 1;
+                }
+            }
+            var index = (x << 5) + y;
+            (var state_cell, int f) = state.udict_get?(10, index);
+            var test = true;
+            if (f) {
+                if (state_cell.preload_int(20) <= count) {
+                    test = false;
+                }
+            }
+            if (test) {
+                state = state.udict_set_builder(10, index, begin_cell().store_uint(count, 20));
+                ;;  state~dump();
+                ;;   x~dump();
+                ;;   y~dump();
+                ;;   count~dump();
+                var newpos = (x, y);
+                if (sym != "E"u) {
+                    path = cons([x, y], path);
+                }
+                default = ([newpos, count, path], state, -1);
+            }
         }
     }
-    var index = (x << 5) + y;
-    (var state_cell, int f) = state.udict_get?(10,index);
-    if (f) { if (state_cell.preload_int(20) <= count) {
-            return (null(),state,0);
-        }
-    }
-    state = state.udict_set_builder(10,index, begin_cell().store_uint(count,20));
-    ;;  state~dump();
-    ;;   x~dump();
-    ;;   y~dump();
-    ;;   count~dump();
-    var newpos = (x,y);
-    if (sym != "E"u) { path = cons([x,y],path); }
-    return ([newpos,count,path], state,-1);
+    return default;
 }
 
 
