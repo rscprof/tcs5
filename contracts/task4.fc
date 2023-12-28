@@ -149,7 +149,7 @@ int getbitmask((int,int,int,int) value,int pos) inline {
                 }
 
                 dx = dx + 1;
-            } until (dx <= 1);
+            } until (dx > 1);
         }
         current = next;
     }
