@@ -250,7 +250,7 @@ cell preload_dict_with_throw_122(slice s) asm """
                     .store_coins(sending_amount)
                     .store_builder(address)  ;; destination TEST (perhaps wallet)
                     .store_builder(address)  ;; response destination
-                    .store_uint(0x200,1 + 4 + 8 + 1)   ;;Maybe cell
+                    .store_uint(0x202,1 + 4 + 8 + 1)   ;;Maybe cell
                   ;;  .store_uint(1,4)
                   ;;  .store_uint(1,8)
                     ;; .store_coins(1) ;;in nanotons (10^-9 ton) we need gram
