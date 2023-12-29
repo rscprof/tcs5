@@ -25,7 +25,7 @@ cell process_message(cell storage, int msg_value, int balance, cell in_msg_full,
 
 ;; Custom version-specific code ends >>>>>
 
-
+;; OPT
 cell wrap_storage(int version_id, cell storage) {
     ;; add additional data required for versioning in this cell
     return begin_cell()
@@ -49,7 +49,7 @@ cell wrap_storage(int version_id, cell storage) {
 
     slice ds = get_data().begin_parse();
     var current_version = ds~load_uint(32);
-    cell storage = ds~load_ref();
+    cell storage = ds.preload_ref();
 
 ;;    throw_if(400, expected_version < current_version);
 
@@ -111,11 +111,14 @@ cell wrap_storage(int version_id, cell storage) {
         }
 }
 
+
+;; OPT
 cell get_storage() {
     return get_data().begin_parse().skip_bits(32).preload_ref();
 }
 
 
+;; OPT
 ;; Return the current version of the smart contract
 ;; +3 TO COUNT
 int version() method_id {
