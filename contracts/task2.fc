@@ -78,11 +78,7 @@ cell preload_dict_with_throw_122(slice s) asm """
             var admin_addr = ds~load_msg_addr();
             throw_if(120,~ admin_addr.equal_slice_bits(source));
 
-            in_msg_body~skip_bits(64);
-            var address_with_prefix = in_msg_body~load_msg_addr();
 
-            ;; https://docs.ton.org/develop/func/stdlib/#load_msg_addr
-            (_ , int address) = address_with_prefix.parse_std_addr();
             cell dict = preload_dict_with_throw(ds);
             ;;            cell dict = new_dict();
             ;;            if (~ slice_empty?(ds)) {
@@ -92,7 +88,11 @@ cell preload_dict_with_throw_122(slice s) asm """
 
             ;; var address_slice = address_with_prefix;
 
+            in_msg_body~skip_bits(64);
             ;; int address_index = address_slice.preload_uint(address_slice.slice_bits());
+            var address_with_prefix = in_msg_body~load_msg_addr();
+            ;; https://docs.ton.org/develop/func/stdlib/#load_msg_addr
+            (_ , int address) = address_with_prefix.parse_std_addr();
             throw_unless(121,dict~udict_delete?(256,address));
 
             set_data(
