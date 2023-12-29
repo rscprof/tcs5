@@ -1,41 +1,10 @@
 #include "imports/stdlib.fc";
 
 forall X -> tuple set_index_var (tuple t,X value,int pos) asm "SETINDEXVAR";
-;; tuple set_index_var (tuple t,tuple value,int pos) asm "SETINDEXVER";
 
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
 
 }
-;; TODO divmod
-( int, int, int, int ) setbitmask((int,int,int,int) value,int pos) inline {
-    (int a,int b,int c, int d) = value;
-    (var number,pos) = divmod(pos , 256);
-    var bit = 1 << pos;
-    ;; var pos = pos % 256;
-    if number == 0 {
-        d = d | bit;
-    } else
-    {
-        if number == 1 {
-            c = c | bit;
-        } else {
-            if number == 2 {
-                b = b | bit;
-            } else {
-                a = a | bit;
-            }
-        }
-    }
-    return (a,b,c,d);
-}
-
-;; TODO divmod
-int getbitmask((int,int,int,int) value,int pos) inline {
-    (int a,int b,int c, int d) = value;
-    (var number, pos) = divmod(pos,256);
-    return (((number == 0) ? d : (number == 1) ? c : ( number == 2 ) ? b : a ) >> pos) & 1;
-}
-
 
 
 
@@ -165,7 +134,6 @@ int getbitmask((int,int,int,int) value,int pos) inline {
     var path = answer;
     var prob = countBest;
 
-    var res_dict = (0,0,0,0);
     var distance = 0;
     while (~ null?(path)) {
         (var coords, path) = path.uncons();
@@ -176,31 +144,8 @@ int getbitmask((int,int,int,int) value,int pos) inline {
         maze = set_index_var(maze,str,x);
 
 
- ;;       res_dict = setbitmask(res_dict,x * m + y);
     }
 
-;;    tuple maze2 = empty_tuple();
-;;    var i = 0;
-;;    do {
-;;        var str = at(maze, i);
-;;        var j = 0;
-;;        var str_gen = empty_tuple();
-;;        do {
-;;            var item = at(str,j);
-;;            if (getbitmask(res_dict, i * m + j)) {
-;;                str_gen~tpush("!"u);
-;;            } else {
-;;                str_gen~tpush(item);
-;;            }
-;;            j = j + 1;
-;;        } until (j == m);
-;;        i  = i + 1;
-;;        maze2~tpush(str_gen);
-;;    } until (i == n);
-    var res =  (prob / 1000,prob % 1000, distance + 1 , maze);
-    ;;      prob~dump();
-    ;;      distance~dump();
-    ;;       maze2~dump();
-    return res;
-    ;;      return ();
+    (int d,int m) = divmod(prob,1000);
+    return  (d,m, distance + 1 , maze);
 }
