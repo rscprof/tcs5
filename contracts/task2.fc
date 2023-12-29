@@ -131,7 +131,7 @@ cell load_dict_with_check(slice ds) inline {
 
 
                 ;;  in_msg_body~skip_bits(64);
-                var amount = msg_value;
+            ;;    var amount = msg_value;
                 int sum = 0;
                 int key = -1;
                 tuple list = null();
@@ -156,7 +156,7 @@ cell load_dict_with_check(slice ds) inline {
                     ;; if f
                     ;;     {
                     ;;     int share = cs.preload_uint(32);
-                    var sending_amount = amount * share / sum;
+                    var sending_amount = msg_value * share / sum;
 ;;                    var address = begin_cell()
 ;;                    ;;     .store_uint(2,2)
 ;;                    .store_uint(0x400,1 + 8 + 2) ;;Maybe Anycast
@@ -229,7 +229,12 @@ cell load_dict_with_check(slice ds) inline {
                 } until (~ f);
 
 
-
+                var msg_start = begin_cell()
+                .store_uint(0x18, 6) ;; flags -- TEST
+                .store_slice(source) ;; destination address
+                .store_uint(4,4)
+                .store_uint(0x1312D00,32)
+                .store_uint(1, 1 + 4 + 4 + 64 + 32 + 1 + 1); ;; default message headers (see sending messages page)  -- TEST
 
                 do {
                     (var res,list) = uncons(list);
@@ -274,12 +279,13 @@ cell load_dict_with_check(slice ds) inline {
 
 
                     var msg = begin_cell()
-                    .store_uint(0x18, 6) ;; flags -- TEST
-                    .store_slice(source) ;; destination address
-                     .store_uint(4,4)
-                     .store_uint(0x1312D00,32)
-                    .store_uint(1, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)  -- TEST
-                    ;; .store_uint(1,1)
+                            .store_builder(msg_start)
+;;                    .store_uint(0x18, 6) ;; flags -- TEST
+;;                    .store_slice(source) ;; destination address
+;;                     .store_uint(4,4)
+;;                     .store_uint(0x1312D00,32)
+;;                    .store_uint(1, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)  -- TEST
+;;                    ;; .store_uint(1,1)
                     .store_ref(body)
                     .end_cell();
 
