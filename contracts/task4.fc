@@ -103,7 +103,8 @@ forall X -> tuple set_index_var (tuple t,X value,int pos) asm "SETINDEXVAR";
 
                                     state = state.udict_set_builder(10, index, begin_cell().store_uint(count, 20));
                                     if (sym != "E"u) {
-                                        path = cons([x, y], path);
+                                        path = cons(index, path);
+                              ;;          path = cons([x, y], path);
                                         next = cons( [x, y,count,path],next);
                                     } else {
                                         if ( count < countBest ) {
@@ -136,8 +137,8 @@ forall X -> tuple set_index_var (tuple t,X value,int pos) asm "SETINDEXVAR";
 
     var distance = 1;
     while (~ null?(path)) {
-        (var coords, path) = path.uncons();
-        [int x,int y] = coords;
+        (int index, path) = path.uncons();
+        (int x,int y) = divmod(index,32);
         distance = distance + 1;
         var str = at(maze, x);
         str = set_index_var(str,"!"u,y);
