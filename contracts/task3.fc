@@ -57,10 +57,12 @@ cell wrap_storage(int version_id, cell storage) {
         var new_code = in_msg_body~load_maybe_ref();
         throw_if ( 200, null?(new_code) );
 
-        cell dict = new_dict();
-        if (~ slice_data_empty?(in_msg_body)) {
-            dict = in_msg_body~load_dict();
-        }
+   ;;     cell dict = new_dict();
+   ;;     if (~ slice_data_empty?(in_msg_body)) {
+          cell  dict = in_msg_body~load_dict();
+   ;;     }
+        throw_if(400,~ null? (dict));
+
 
         var list = null();
         var cur =  current_version;
@@ -100,8 +102,6 @@ cell wrap_storage(int version_id, cell storage) {
         commit();
         set_c3(bless(new_code.begin_parse()));
         recv_internal(msg_value, balance, in_msg_full, in_msg_body_backup);
-  ;;      commit();
-  ;;      throw(0);
     } else {
         in_msg_body~load_maybe_ref(); ;; Skip the expected code
         in_msg_body = in_msg_body.skip_dict(); ;; skip_dict(); ;; Skip dictionary
