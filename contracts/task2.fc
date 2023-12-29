@@ -110,8 +110,10 @@ cell load_dict_with_check(slice ds) inline {
             set_data(
                 begin_cell().store_slice(admin_addr).store_dict(dict).end_cell()
             );
+            return ();
 
-        } else {
+        }
+        ;; else {
             if op == op::split_ton {
                 ;;                Split (TON).
                 ;;                The contract should accept a message with op = 0x068530b3 and the following fields:
@@ -184,8 +186,9 @@ cell load_dict_with_check(slice ds) inline {
                     ;;   }
                 } until (null?(list));
 
-
-            } else {
+                return();
+            }
+            ;; else {
                 ;;     if op == op::transfer_notification {
                 ;;                    The contract should receive a message with op = 0x7362d09c and the following fields:
                 ;;
@@ -301,8 +304,8 @@ cell load_dict_with_check(slice ds) inline {
 
 
                 ;;   }
-            }
-        }
+          ;;  }
+    ;;    }
  ;;   }
 
 
