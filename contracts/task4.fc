@@ -2,13 +2,12 @@
 
 forall X -> tuple set_index_var (tuple t,X value,int pos) asm "SETINDEXVAR";
 
-() recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
+() recv_internal(slice in_msg_body) impure {
 
 }
 
 
 
-(int) tlen (tuple t) asm "TLEN";
 
 (int,int) look_start(int n,int m,tuple maze) inline {
     var i = 0;
@@ -53,7 +52,6 @@ forall X -> tuple set_index_var (tuple t,X value,int pos) asm "SETINDEXVAR";
     ;;            maze~tpush("S..");
     ;;            maze~tpush(".??");
     ;;            maze~tpush("..E");
-    var i = 0;
     (int startx,int starty) = look_start(n,m,maze);
 
 
@@ -104,7 +102,6 @@ forall X -> tuple set_index_var (tuple t,X value,int pos) asm "SETINDEXVAR";
                                     state = state.udict_set_builder(10, index, begin_cell().store_uint(count, 20));
                                     if (sym != "E"u) {
                                         path = cons(index, path);
-                              ;;          path = cons([x, y], path);
                                         next = cons( [x, y,count,path],next);
                                     } else {
                                         if ( count < countBest ) {
