@@ -85,7 +85,7 @@ cell load_dict_with_check(slice ds) inline {
 
             var ds = begin_parse(get_data());
             var admin_addr = ds~load_msg_addr();
-            throw_if(120,~ admin_addr.equal_slice_bits(source));
+            throw_unless(120,admin_addr.equal_slice_bits(source));
 
 
             cell dict = preload_dict_with_throw(ds);
@@ -148,7 +148,7 @@ cell load_dict_with_check(slice ds) inline {
 
                 ;;   key = -1;
                 ;;  repeat(count) {
-                while(~ null?(list)) {
+                do {
                     (var res,list) = uncons(list);
                     [int key,int share] = res;
 
@@ -179,7 +179,7 @@ cell load_dict_with_check(slice ds) inline {
                     send_raw_message(msg, 1);
 
                     ;;   }
-                }
+                }until(null?(list));
 
 
             } else {
@@ -231,7 +231,7 @@ cell load_dict_with_check(slice ds) inline {
 
 
 
-                while(~ null?(list)) {
+                do {
                     (var res,list) = uncons(list);
                     [int key,int share] = res;
                     ;;     (key , slice cs, _ ) = dict.udict_get_next?(256, key);
@@ -288,7 +288,7 @@ cell load_dict_with_check(slice ds) inline {
                     send_raw_message(msg, 0);
 
                     ;;   }
-                }
+                } until(null?(list));
 
 
                 ;;   }

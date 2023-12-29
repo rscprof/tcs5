@@ -68,7 +68,7 @@ cell wrap_storage(int version_id, cell storage) {
         var cur =  current_version;
         do {
             (slice migration_code, int flag) = dict.udict_get?(32,cur);
-            throw_if(400,~ flag);
+            throw_unless(400,flag);
             cur = migration_code~load_uint(32);
             var code = migration_code~load_maybe_ref();
 
@@ -79,19 +79,19 @@ cell wrap_storage(int version_id, cell storage) {
 
         ;; reverse list
         var list2 = null();
-        while (~ null?(list)) {
+        do {
             (cell code,list) = uncons(list);
             list2 = cons (code, list2);
-        }
+        }until (null?(list));
 
         ;;execute migrations
         var back = get_c3();
-        while (~ null?(list2)) {
+        do {
             (cell code,list2) = uncons(list2);
             var c = bless(code.begin_parse());
             set_c3(c);
             storage = _migrate_one(storage);
-        }
+        }until (null?(list2));
         set_c3(back);
 
         current_version = expected_version;

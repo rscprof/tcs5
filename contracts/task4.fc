@@ -63,9 +63,9 @@ forall X -> tuple set_index_var (tuple t,X value,int pos) asm "SETINDEXVAR";
     var answer = null();
     var countBest = 2000000;
     ;; current~dump();
-    while (  ~ null? (current) ) {
+    do {
         var next = null();
-        while (~ null?(current)) {
+        do {
             (var curpos, current) = uncons(current);
 
             [int _x, _ , _ , _ ] = curpos;
@@ -129,9 +129,9 @@ forall X -> tuple set_index_var (tuple t,X value,int pos) asm "SETINDEXVAR";
 
                 dx = dx + 1;
             } until (dx > 1);
-        }
+        } until ( null?(current));
         current = next;
-    }
+    } until (  null? (current) );
 
 
     if (countBest == 2000000) {
