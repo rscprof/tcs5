@@ -83,7 +83,7 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
     state = set_value(state,startx,starty,0);
 
     ;; var finished = 0;
-    var current = cons ([ startx , starty , 0 , null() ], null());
+    var current = cons ([ startx , 0 , null(), starty  ], null());
     var answer = null();
     var countBest = 2000000;
     ;; current~dump();
@@ -96,14 +96,14 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
             var dx = ( _x ) ? -1 : 0 ;
 
             do {
-                var __x = _x + dx;
-                if ( __x < n) {
-                    var str = at(maze, __x);
+                var x = _x + dx;
+                if ( x < n) {
+                    var str = at(maze, x);
                     var dy = -1;
                     repeat (3) {
                         if (dx | dy) {
-                            [_, int y, int count, tuple path] = curpos;
-                            int x = __x;
+                            [_,  int count, tuple path, int y] = curpos;
+                       ;;     int x = __x;
                             y = y + dy;
                             if (((y >= 0) & (y < m))) {
                                 var sym = at(str, y);
@@ -124,7 +124,7 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
                                                         countBest = count;
                                                 } else {
                                                     path = cons([x , y], path);
-                                                    next = cons([x, y, count, path], next);
+                                                    next = cons([x, count, path,  y], next);
                                                 }
                                             }
                                         }
