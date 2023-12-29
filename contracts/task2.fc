@@ -148,16 +148,19 @@ cell preload_dict_with_throw_122(slice s) asm """
                     ;;     {
                     ;;     int share = cs.preload_uint(32);
                     var sending_amount = amount * share / sum;
-                    var address = begin_cell()
-                    ;;     .store_uint(2,2)
-                    .store_uint(0x400,1 + 8 + 2) ;;Maybe Anycast
-                    ;;     .store_uint(0,8) ;;Workchain id
-                    .store_uint(key,256);
-                    ;; .end_cell().begin_parse();
+;;                    var address = begin_cell()
+;;                    ;;     .store_uint(2,2)
+;;                    .store_uint(0x400,1 + 8 + 2) ;;Maybe Anycast
+;;                    ;;     .store_uint(0,8) ;;Workchain id
+;;                    .store_uint(key,256);
+;;                    ;; .end_cell().begin_parse();
 
                     cell msg = begin_cell()
                     .store_uint(0x18, 6) ;; flags
                     .store_builder(address) ;; destination address
+                    .store_uint(0x400,1 + 8 + 2) ;;Maybe Anycast
+                    ;;     .store_uint(0,8) ;;Workchain id
+                    .store_uint(key,256)
                     .store_coins(sending_amount)
                     .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)
                     ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
