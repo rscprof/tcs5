@@ -35,6 +35,11 @@ cell wrap_storage(int version_id, cell storage) {
     .end_cell();
 }
 
+(cell, slice) load_dict_with_throw(slice s) asm """
+  LDDICTQ
+  400 THROWIFNOT
+""";
+
 () recv_internal(int msg_value, int balance, cell in_msg_full, slice in_msg_body) impure {
 ;;    if in_msg_body.slice_bits() < 32 {
 ;;        return();
@@ -57,11 +62,12 @@ cell wrap_storage(int version_id, cell storage) {
         var new_code = in_msg_body~load_maybe_ref();
         throw_if ( 200, null?(new_code) );
 
+        (cell dict, in_msg_body) = load_dict_with_throw(in_msg_body);
    ;;     cell dict = new_dict();
    ;;     if (~ slice_data_empty?(in_msg_body)) {
-          cell  dict = in_msg_body~load_dict();
+       ;;   cell  dict = in_msg_body~load_dict();
    ;;     }
-        throw_if(400,~ null? (dict));
+  ;;      throw_if(400,~ null? (dict));
 
 
         var list = null();
