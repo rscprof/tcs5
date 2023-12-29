@@ -18,6 +18,14 @@ cell preload_dict_with_throw_122(slice s) asm """
   122 THROWIFNOT
 """;
 
+cell load_dict_with_check(slice ds) inline {
+    if (slice_empty?(ds)) {
+        return new_dict();
+    } else {
+        return ds.preload_dict();
+    }
+}
+
 
 () recv_internal(int msg_value, cell in_msg_full, slice in_msg_body) impure {
 
@@ -38,17 +46,18 @@ cell preload_dict_with_throw_122(slice s) asm """
 
         var ds = begin_parse(get_data());
         var admin_addr = ds~load_msg_addr();
-        throw_if(120,~ admin_addr.equal_slice_bits(source));
+        throw_unless(120,admin_addr.equal_slice_bits(source));
 
         ;;    add_user#368ddef3 query_id:uint64 address:MsgAddressInt share:uint32 = InternalMsgBody;
         in_msg_body~skip_bits(64);
         var address_with_prefix = in_msg_body~load_msg_addr();
         var share = in_msg_body~load_uint(32);
 
-        cell dict = new_dict();
-        if (~ slice_empty?(ds)) {
-            dict = ds.preload_dict();
-        }
+        cell dict = load_dict_with_check(ds);
+        ;; new_dict();
+;;        if (~ slice_empty?(ds)) {
+;;            dict = ds.preload_dict();
+;;        }
         ;;var dict = ds.preload_dict();
 
         ;; https://docs.ton.org/develop/func/stdlib/#load_msg_addr
