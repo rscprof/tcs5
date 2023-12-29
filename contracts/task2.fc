@@ -13,6 +13,12 @@ cell preload_dict_with_throw(slice s) asm """
   121 THROWIFNOT
 """;
 
+cell preload_dict_with_throw_122(slice s) asm """
+  PLDDICTQ
+  122 THROWIFNOT
+""";
+
+
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
 
     if in_msg_body.slice_bits() < 32 {
@@ -106,12 +112,13 @@ cell preload_dict_with_throw(slice s) asm """
 
                 var ds = begin_parse(get_data());
                 ds~load_msg_addr();
-                cell dict = new_dict();
-                if (~ slice_empty?(ds)) {
-                    dict = ds.preload_dict();
-                }
+;;                cell dict = new_dict();
+;;                if (~ slice_empty?(ds)) {
+;;                    dict = ds.preload_dict();
+;;                }
+                cell dict = preload_dict_with_throw_122(ds);
 
-                throw_if(122,dict.dict_empty?());
+        ;;        throw_if(122,dict.dict_empty?());
 
 
                 ;;  in_msg_body~skip_bits(64);
@@ -178,13 +185,14 @@ cell preload_dict_with_throw(slice s) asm """
 
                     var ds = begin_parse(get_data());
                     ds~load_msg_addr();
-                    cell dict = new_dict();
-                    if (~ slice_empty?(ds)) {
-                        dict = ds.preload_dict();
-                    }
-
-
-                    throw_if(122,dict.dict_empty?());
+                    cell dict = preload_dict_with_throw_122(ds);
+;;                    cell dict = new_dict();
+;;                    if (~ slice_empty?(ds)) {
+;;                        dict = ds.preload_dict();
+;;                    }
+;;
+;;
+;;                    throw_if(122,dict.dict_empty?());
 
                     in_msg_body~skip_bits(64);
                     var amount = in_msg_body~load_coins();
