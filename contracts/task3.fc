@@ -64,8 +64,9 @@ cell wrap_storage(int version_id, cell storage) {
 
         (cell dict, in_msg_body) = load_dict_with_throw(in_msg_body);
 
-        var list = null();
+;;        var list = null();
         var cur =  current_version;
+        var back = get_c3();
         do {
             (slice migration_code, int flag) = dict.udict_get?(32,cur);
             throw_unless(400,flag);
@@ -73,26 +74,30 @@ cell wrap_storage(int version_id, cell storage) {
             var code = migration_code~load_maybe_ref();
 
             if (~ null?(code)) {
-                list = cons (code, list);
+                var c = bless(code.begin_parse());
+                set_c3(c);
+                storage = _migrate_one(storage);
+;;                list = cons (code, list);
             }
         } until (cur == expected_version);
+        set_c3(back);
 
         ;; reverse list
-        var list2 = null();
-        while (~ null?(list)) {
-            (cell code,list) = uncons(list);
-            list2 = cons (code, list2);
-        }
+;;        var list2 = null();
+;;        while (~ null?(list)) {
+;;            (cell code,list) = uncons(list);
+;;            list2 = cons (code, list2);
+;;        }
 
         ;;execute migrations
-        var back = get_c3();
-        while ( ~ null?(list2)) {
-            (cell code,list2) = uncons(list2);
-            var c = bless(code.begin_parse());
-            set_c3(c);
-            storage = _migrate_one(storage);
-        }
-        set_c3(back);
+;;        var back = get_c3();
+;;        while ( ~ null?(list2)) {
+;;            (cell code,list2) = uncons(list2);
+;;            var c = bless(code.begin_parse());
+;;            set_c3(c);
+;;            storage = _migrate_one(storage);
+;;        }
+;;        set_c3(back);
 
         current_version = expected_version;
 
