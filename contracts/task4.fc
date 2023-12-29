@@ -101,8 +101,10 @@ forall X -> tuple set_index_var (tuple t,X value,int pos) asm "SETINDEXVAR";
 
                                     state = state.udict_set_builder(10, index, begin_cell().store_uint(count, 20));
                                     if (sym != "E"u) {
-                                        path = cons(index, path);
-                                        next = cons( [x, y,count,path],next);
+                                        if (count < countBest) {
+                                            path = cons(index, path);
+                                            next = cons([x, y, count, path], next);
+                                        }
                                     } else {
                                         if ( count < countBest ) {
                                             answer = path;
