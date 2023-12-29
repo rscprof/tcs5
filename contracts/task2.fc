@@ -152,6 +152,8 @@ cell preload_dict_with_throw_122(slice s) asm """
                 ;;
                 ;;                If there are no users, error 122 must be thrown
                 var send = (op == op::split_ton) ? send_ton : send_token;
+                                var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(4);  ;;skip flags
+                                var source = in_msg_full_slice~load_msg_addr();
 
                 var ds = begin_parse(get_data());
                 ds~load_msg_addr();
@@ -199,7 +201,7 @@ cell preload_dict_with_throw_122(slice s) asm """
                         ;; .end_cell().begin_parse();
 
 
-                        send(address,sending_amount,null());
+                        send(address,sending_amount,source);
 ;;
 ;;                        cell msg = begin_cell()
 ;;                        .store_uint(0x18, 6) ;; flags
