@@ -151,7 +151,17 @@ cell preload_dict_with_throw_122(slice s) asm """
                 ;;                The contract accepts the message, distributes the TON to users according to their shares. Transactions must be sent with mode = 1 and no body.
                 ;;
                 ;;                If there are no users, error 122 must be thrown
-                var send = (op == op::split_ton) ? send_ton : send_token;
+                int amount = 0;
+                var send = null();
+
+                if (op == op::split_ton) {
+                    send = send_ton;
+                    amount = msg_value;
+                } else {
+                    send = send_token;
+                    in_msg_body~skip_bits(64);
+                    amount = in_msg_body~load_coins();
+                }
                                 var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(4);  ;;skip flags
                                 var source = in_msg_full_slice~load_msg_addr();
 
@@ -167,8 +177,12 @@ cell preload_dict_with_throw_122(slice s) asm """
 
 
                 ;;  in_msg_body~skip_bits(64);
-                var amount = msg_value;
-                int sum = 0;
+;;                var amount = msg_value;
+;;
+;;            in_msg_body~skip_bits(64);
+;;            var amount = in_msg_body~load_coins();
+
+            int sum = 0;
                 int key = -1;
                 tuple list = null();
            ;;     int count = 0;
