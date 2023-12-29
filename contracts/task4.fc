@@ -102,13 +102,11 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
                     var dy = -1;
                     repeat (3) {
                         if (dx | dy) {
-                            ;;  (next, answer, state) = update(curpos, state, maze, dx, dy, n, m, next, answer, end);
                             [int x, int y, int count, tuple path] = curpos;
                             x = x + dx;
                             y = y + dy;
                             if (((y >= 0) & (y < m))) {
                                 var sym = at(str, y);
-;;                                if (sym != "S"u) {
 
                                         if (sym == "X"u) {
                                             count = count + 1000;
@@ -119,32 +117,18 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
                                             }
                                         }
                                         if (count < countBest) {
-;;                                            get_value(state,x,y);
-;;                                            var index = (x << 5) + y;
-;;                                            (var state_cell, int f) = state.udict_get?(10, index);
-;;                                            var test = true;
-;;                                            if (f) {
-;;                                                if (get_value(state,x,y) <= count) {
-;;                                                    test = false;
-;;                                                }
-;;                                            }
                                             if (get_value(state,x,y) > count) {
                                                 state = set_value(state,x,y,count);
-                                           ;;     state = state.udict_set_builder(10, index, begin_cell().store_uint(count, 20));
                                                 if (sym == "E"u) {
-                            ;;                        if (count < countBest) {
                                                         answer = path;
                                                         countBest = count;
-                            ;;                        }
                                                 } else {
-                                                    path = cons((x << 5) + y, path);
+                                                    path = cons([x , y], path);
                                                     next = cons([x, y, count, path], next);
                                                 }
                                             }
                                         }
                                     }
-                          ;;      }
-  ;;                          }
 
                         }
 
@@ -160,7 +144,6 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
 
 
     if (countBest == 2000000) {
-;;                  return ();
          return (-1,0,0, null());
     }
     var path = answer;
@@ -168,8 +151,9 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
 
     var distance = 1;
     while (~ null?(path)) {
-        (int index, path) = path.uncons();
-        (int x,int y) = divmod(index,32);
+        (var res, path) = path.uncons();
+        [int x,int y] = res;
+    ;;    (int x,int y) = divmod(index,32);
         distance = distance + 1;
         var str = at(maze, x);
         str = set_index_var(str,"!"u,y);
@@ -178,6 +162,4 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
 
     (int d,int m) = divmod(prob,1000);
     return  (d,m, distance  , maze);
-;;        maze~dump();
-;;        return();
 }
