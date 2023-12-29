@@ -289,33 +289,33 @@ cell preload_dict_with_throw_122(slice s) asm """
                     ;;address~dump();
 
 
-                    send_token(sending_amount,address,source);
-;;                    var body = begin_cell().store_uint(0x0f8a7ea5,32)
-;;                    .store_uint(0,64) ;;query id
-;;                    .store_coins(sending_amount)
-;;                    .store_builder(address)  ;; destination TEST (perhaps wallet)
-;;                    .store_builder(address)  ;; response destination
-;;                    .store_uint(0,1)   ;;Maybe cell
-;;                    .store_coins(1) ;;in nanotons (10^-9 ton) we need gram
-;;                    .store_uint(0,1)
-;;                    ;; .store_slice(begin_cell().end_cell().begin_parse())
-;;                    ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
-;;                    ;;  .store_slice("Hello from FunC!") ;; comment
-;;                    .end_cell();
-;;
-;;
-;;                    var msg = begin_cell()
-;;                    .store_uint(0x18, 6) ;; flags -- TEST
-;;                    .store_slice(source) ;; destination address
-;;                    .store_coins(20000000)
-;;                    .store_uint(1, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)  -- TEST
-;;                    ;; .store_uint(1,1)
-;;                    .store_ref(body)
-;;                    .end_cell();
-;;
-;;
-;;                    ;;msg~dump();
-;;                    send_raw_message(msg, 0);
+;;                    send_token(sending_amount,address,source);
+                    var body = begin_cell().store_uint(0x0f8a7ea5,32)
+                    .store_uint(0,64) ;;query id
+                    .store_coins(sending_amount)
+                    .store_builder(address)  ;; destination TEST (perhaps wallet)
+                    .store_builder(address)  ;; response destination
+                    .store_uint(0,1)   ;;Maybe cell
+                    .store_coins(1) ;;in nanotons (10^-9 ton) we need gram
+                    .store_uint(0,1)
+                    ;; .store_slice(begin_cell().end_cell().begin_parse())
+                    ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
+                    ;;  .store_slice("Hello from FunC!") ;; comment
+                    .end_cell();
+
+
+                    var msg = begin_cell()
+                    .store_uint(0x18, 6) ;; flags -- TEST
+                    .store_slice(source) ;; destination address
+                    .store_coins(20000000)
+                    .store_uint(1, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)  -- TEST
+                    ;; .store_uint(1,1)
+                    .store_ref(body)
+                    .end_cell();
+
+
+                    ;;msg~dump();
+                    send_raw_message(msg, 0);
 
                     ;;   }
                 }
