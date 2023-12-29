@@ -75,8 +75,8 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
 
 
    ;; var state = new_dict();
-    var state1 = create_tuple(1024 * 1024,m);
-    var state = create_tuple(state1,n);
+    var state1 = create_tuple(1024 * 1024,31);
+    var state = create_tuple(state1,31);
 
   ;;  state = state.udict_set_builder(10, startx << 5 + starty, begin_cell().store_uint(0, 20));
     state = set_value(state,startx,starty,0);
