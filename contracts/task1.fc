@@ -77,8 +77,8 @@
         ;;If execution_time < now(), you should throw error 122. Checking that execution_time has not passed yet.
         var now_time = now();
         throw_if(122, execution_time < now_time );
-
-        throw_if(123, now_time + locked_for < execution_time);
+        now_time = now_time + locked_for;
+        throw_if(123, now_time  < execution_time);
 
         accept_message();
 
@@ -94,7 +94,7 @@
         ;;seqno: uint32
         set_data(
             begin_cell().store_uint(public_key,256)
-            .store_uint(now_time + locked_for,32)
+            .store_uint(now_time,32)
             .store_slice(receiver)
             .store_uint(new_seqno , 32)
             .end_cell()
@@ -159,8 +159,8 @@
             cell msg = begin_cell()
             .store_uint(0x18, 6) ;; flags
             .store_slice(receiver) ;; destination address
-            .store_coins(0) ;; we don't care about this value right now
-            .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1 + 32) ;; default message headers (see sending messages page)
+      ;;      .store_coins(0) ;; we don't care about this value right now
+            .store_uint(0, 17 + 1 + 4 + 4 + 64 + 32 + 1 + 1 + 32) ;; default message headers (see sending messages page)
             ;;  .store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
             ;;  .store_slice("Hello from FunC!") ;; comment
             .end_cell();
