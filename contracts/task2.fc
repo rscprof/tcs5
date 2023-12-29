@@ -19,9 +19,9 @@ cell preload_dict_with_throw_122(slice s) asm """
 """;
 
 
-() recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
+() recv_internal(int msg_value, cell in_msg_full, slice in_msg_body) impure {
 
-    if in_msg_body.slice_bits() < 32 {
+    if in_msg_body.slice_data_empty?() {
         return();
     }
 
@@ -245,8 +245,8 @@ cell preload_dict_with_throw_122(slice s) asm """
                     ;;address~dump();
 
                     var body = begin_cell()
-                    .store_uint(0x0f8a7ea5,32)
-                    .store_uint(0,64) ;;query id
+                    .store_uint(0x0f8a7ea50000000000000000,32 + 64)
+                  ;;  .store_uint(0,64) ;;query id
                     .store_coins(sending_amount)
                     .store_builder(address)  ;; destination TEST (perhaps wallet)
                     .store_builder(address)  ;; response destination
