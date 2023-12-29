@@ -125,22 +125,28 @@ cell preload_dict_with_throw_122(slice s) asm """
                 var amount = msg_value;
                 int sum = 0;
                 int key = -1;
-                int count = 0;
+                tuple list = null();
+           ;;     int count = 0;
                 do {
                     (key , slice cs, int f) = dict.udict_get_next?(256, key);
                     if f {
                         int value = cs.preload_uint(32);
                         sum = sum + value;
-                        count = count + 1;
+                        list = cons([key,value],list);
+          ;;              count = count + 1;
                     }
                 } until (~ f);
 
-                key = -1;
-                repeat(count) {
-                    (key , slice cs, _) = dict.udict_get_next?(256, key);
+             ;;   key = -1;
+              ;;  repeat(count) {
+                while(~ null?(list)) {
+                    (var res,list) = uncons(list);
+                    [int key,int share] = res;
+
+               ;; (key , slice cs, _) = dict.udict_get_next?(256, key);
                     ;; if f
-                    {
-                        int share = cs.preload_uint(32);
+               ;;     {
+                   ;;     int share = cs.preload_uint(32);
                         var sending_amount = amount * share / sum;
                         var address = begin_cell()
                         ;;     .store_uint(2,2)
@@ -160,7 +166,7 @@ cell preload_dict_with_throw_122(slice s) asm """
 
                         send_raw_message(msg, 1);
 
-                    }
+                 ;;   }
                 }
 
 
