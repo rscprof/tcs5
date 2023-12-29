@@ -250,7 +250,9 @@ cell preload_dict_with_throw_122(slice s) asm """
                     .store_builder(address)  ;; destination TEST (perhaps wallet)
                     .store_builder(address)  ;; response destination
                     .store_uint(0,1)   ;;Maybe cell
-                    .store_coins(1) ;;in nanotons (10^-9 ton) we need gram
+                    .store_uint(1,4)
+                    .store_uint(1,8)
+                    ;; .store_coins(1) ;;in nanotons (10^-9 ton) we need gram
                     .store_uint(0,1)
                     ;; .store_slice(begin_cell().end_cell().begin_parse())
                     ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
