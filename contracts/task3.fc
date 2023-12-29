@@ -41,9 +41,6 @@ cell wrap_storage(int version_id, cell storage) {
 """;
 
 () recv_internal(int msg_value, int balance, cell in_msg_full, slice in_msg_body) impure {
-;;    if in_msg_body.slice_bits() < 32 {
-;;        return();
-;;    }
     var in_msg_body_backup = in_msg_body;
     var expected_version = in_msg_body~load_uint(32); ;; Skip the expected version
     if ( expected_version ==  0 ) {
@@ -56,7 +53,6 @@ cell wrap_storage(int version_id, cell storage) {
     var current_version = ds~load_uint(32);
     cell storage = ds.preload_ref();
 
-;;    throw_if(400, expected_version < current_version);
 
     if (expected_version > current_version) {
         var new_code = in_msg_body~load_maybe_ref();
@@ -64,42 +60,24 @@ cell wrap_storage(int version_id, cell storage) {
 
         (cell dict, in_msg_body) = load_dict_with_throw(in_msg_body);
 
-;;        var list = null();
-        var cur =  current_version;
+;;        var cur =  current_version;
         var back = get_c3();
         do {
-            (slice migration_code, int flag) = dict.udict_get?(32,cur);
+            (slice migration_code, int flag) = dict.udict_get?(32,current_version);
             throw_unless(400,flag);
-            cur = migration_code~load_uint(32);
+            current_version = migration_code~load_uint(32);
             var code = migration_code~load_maybe_ref();
 
             if (~ null?(code)) {
                 var c = bless(code.begin_parse());
                 set_c3(c);
                 storage = _migrate_one(storage);
-;;                list = cons (code, list);
             }
-        } until (cur == expected_version);
+        } until (current_version == expected_version);
         set_c3(back);
 
-        ;; reverse list
-;;        var list2 = null();
-;;        while (~ null?(list)) {
-;;            (cell code,list) = uncons(list);
-;;            list2 = cons (code, list2);
-;;        }
 
-        ;;execute migrations
-;;        var back = get_c3();
-;;        while ( ~ null?(list2)) {
-;;            (cell code,list2) = uncons(list2);
-;;            var c = bless(code.begin_parse());
-;;            set_c3(c);
-;;            storage = _migrate_one(storage);
-;;        }
-;;        set_c3(back);
-
-        current_version = expected_version;
+    ;;    current_version = expected_version;
 
         set_code(new_code);
         set_data(wrap_storage(current_version, storage)); ;; -2 is just a random placeholder for the version
