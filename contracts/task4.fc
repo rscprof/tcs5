@@ -134,7 +134,7 @@ forall X -> tuple set_index_var (tuple t,X value,int pos) asm "SETINDEXVAR";
     var path = answer;
     var prob = countBest;
 
-    var distance = 0;
+    var distance = 1;
     while (~ null?(path)) {
         (var coords, path) = path.uncons();
         [int x,int y] = coords;
@@ -142,10 +142,8 @@ forall X -> tuple set_index_var (tuple t,X value,int pos) asm "SETINDEXVAR";
         var str = at(maze, x);
         str = set_index_var(str,"!"u,y);
         maze = set_index_var(maze,str,x);
-
-
     }
 
     (int d,int m) = divmod(prob,1000);
-    return  (d,m, distance + 1 , maze);
+    return  (d,m, distance  , maze);
 }
