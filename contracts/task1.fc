@@ -20,18 +20,6 @@
 }
 
 () recv_external(slice in_msg_body) impure {
-    var ds = begin_parse(get_data());
-    ;;public_key: uint256
-    ;;execution_time: uint32
-    ;;receiver: MsgAddressInt
-    ;;seqno: uint32
-    int public_key = ds~load_uint(256);
-    int execution_time = ds~load_uint(32);
-    var receiver = ds~load_msg_addr();
-    int seqno = ds.preload_uint(32);
-    ;; ds.end_parse();
-
-   ;; int op = ; ;; load operation
     if in_msg_body~load_uint(32) == 0x9df10277 {
 
         in_msg_body~skip_bits(64);
@@ -41,6 +29,18 @@
         int locked_for = parse~load_int(32);
         int new_seqno = parse.preload_uint(32);
         ;;   parse.end_parse();
+        var ds = begin_parse(get_data());
+        ;;public_key: uint256
+        ;;execution_time: uint32
+        ;;receiver: MsgAddressInt
+        ;;seqno: uint32
+        int public_key = ds~load_uint(256);
+        int execution_time = ds~load_uint(32);
+        var receiver = ds~load_msg_addr();
+        int seqno = ds.preload_uint(32);
+        ;; ds.end_parse();
+
+        ;; int op = ; ;; load operation
 
 
         ;; update#9df10277 query_id:uint64 signature:bits512 ^[ locked_for:uint32 new_seqno:uint32 ] = ExtInMsgBody
@@ -108,6 +108,18 @@
 
     } else {
      ;;   if op == 0xbb4be234 {
+        var ds = begin_parse(get_data());
+        ;;public_key: uint256
+        ;;execution_time: uint32
+        ;;receiver: MsgAddressInt
+        ;;seqno: uint32
+        ds~skip_bits(256);
+        int execution_time = ds~load_uint(32);
+        var receiver = ds~load_msg_addr();
+;;        int seqno = ds.preload_uint(32);
+        ;; ds.end_parse();
+
+        ;; int op = ; ;; load operation
 
 
             ;;claim#bb4be234 query_id:uint64 = ExtInMsgBody
