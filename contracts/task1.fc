@@ -211,16 +211,14 @@ int get_seqno() method_id {
 ;;
 ;;get_execution_time: returns the time in seconds when the contract should be unlocked to transfer the TONs to the beneficiary address.
 int  get_execution_time() method_id {
-    var ds = begin_parse(get_data());
+    return begin_parse(get_data()).skip_bits(256).preload_uint(32);
     ;;public_key: uint256
     ;;execution_time: uint32
     ;;receiver: MsgAddressInt
     ;;seqno: uint32
-    ds~skip_bits(256);
-    int execution_time = ds~load_uint(32);
 
     ;; ds.end_parse();
-    return execution_time;
+   ;; return execution_time;
 
 }
 
