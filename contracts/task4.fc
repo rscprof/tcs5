@@ -56,6 +56,7 @@ forall X -> tuple set_index_var (tuple t,X value,int pos) asm "SETINDEXVAR";
 
 
     var state = new_dict();
+    state = state.udict_set_builder(10, startx << 5 + starty, begin_cell().store_uint(0, 20));
 
     ;; var finished = 0;
     var current = cons ([ startx , starty , 0 , null() ], null());
@@ -83,13 +84,8 @@ forall X -> tuple set_index_var (tuple t,X value,int pos) asm "SETINDEXVAR";
                             y = y + dy;
                             if (((y >= 0) & (y < m))) {
                                 var sym = at(str, y);
-                                if (sym != "S"u) {
-                                    if (sym == "E"u) {
-                                        if (count < countBest) {
-                                            answer = path;
-                                            countBest = count;
-                                        }
-                                    } else {
+;;                                if (sym != "S"u) {
+
                                         if (sym == "X"u) {
                                             count = count + 1000;
                                         }
@@ -110,13 +106,20 @@ forall X -> tuple set_index_var (tuple t,X value,int pos) asm "SETINDEXVAR";
                                             if (test) {
 
                                                 state = state.udict_set_builder(10, index, begin_cell().store_uint(count, 20));
+                                                if (sym == "E"u) {
+                            ;;                        if (count < countBest) {
+                                                        answer = path;
+                                                        countBest = count;
+                            ;;                        }
+                                                } else {
                                                     path = cons(index, path);
                                                     next = cons([x, y, count, path], next);
+                                                }
                                             }
                                         }
                                     }
-                                }
-                            }
+                          ;;      }
+  ;;                          }
 
                         }
 
