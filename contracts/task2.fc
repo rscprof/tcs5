@@ -18,49 +18,6 @@ cell preload_dict_with_throw_122(slice s) asm """
   122 THROWIFNOT
 """;
 
-() send_ton(int sending_amount,builder address) {
-    cell msg = begin_cell()
-    .store_uint(0x18, 6) ;; flags
-    .store_builder(address) ;; destination address
-    .store_coins(sending_amount)
-    .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)
-    ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
-    ;;  .store_slice("Hello from FunC!") ;; comment
-    .end_cell();
-
-    send_raw_message(msg, 1);
-
-}
-
-() send_token(int sending_amount,builder address,slice source) inline {
-    var body = begin_cell().store_uint(0x0f8a7ea5,32)
-    .store_uint(0,64) ;;query id
-    .store_coins(sending_amount)
-    .store_builder(address)  ;; destination TEST (perhaps wallet)
-    .store_builder(address)  ;; response destination
-    .store_uint(0,1)   ;;Maybe cell
-    .store_coins(1) ;;in nanotons (10^-9 ton) we need gram
-    .store_uint(0,1)
-    ;; .store_slice(begin_cell().end_cell().begin_parse())
-    ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
-    ;;  .store_slice("Hello from FunC!") ;; comment
-    .end_cell();
-
-
-    var msg = begin_cell()
-    .store_uint(0x18, 6) ;; flags -- TEST
-    .store_slice(source) ;; destination address
-    .store_coins(20000000)
-    .store_uint(1, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)  -- TEST
-    ;; .store_uint(1,1)
-    .store_ref(body)
-    .end_cell();
-
-
-    ;;msg~dump();
-    send_raw_message(msg, 0);
-
-}
 
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
 
@@ -143,7 +100,7 @@ cell preload_dict_with_throw_122(slice s) asm """
             );
 
         } else {
-            if op == op::split_ton {
+          ;;  if op == op::split_ton {
                 ;;                Split (TON).
                 ;;                The contract should accept a message with op = 0x068530b3 and the following fields:
                 ;;
@@ -152,6 +109,8 @@ cell preload_dict_with_throw_122(slice s) asm """
                 ;;                The contract accepts the message, distributes the TON to users according to their shares. Transactions must be sent with mode = 1 and no body.
                 ;;
                 ;;                If there are no users, error 122 must be thrown
+                            var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(4);  ;;skip flags
+                            var source = in_msg_full_slice~load_msg_addr();
 
                 var ds = begin_parse(get_data());
                 ds~load_msg_addr();
@@ -166,6 +125,10 @@ cell preload_dict_with_throw_122(slice s) asm """
 
                 ;;  in_msg_body~skip_bits(64);
                 var amount = msg_value;
+                if (op == op::transfer_notification) {
+                                    in_msg_body~skip_bits(64);
+                                    amount = in_msg_body~load_coins();
+                }
                 int sum = 0;
                 int key = -1;
                 tuple list = null();
@@ -199,130 +162,159 @@ cell preload_dict_with_throw_122(slice s) asm """
                     ;; .end_cell().begin_parse();
 
   ;;                  send_ton(sending_amount,address);
-                    cell msg = begin_cell()
-                    .store_uint(0x18, 6) ;; flags
-                    .store_builder(address) ;; destination address
-                    .store_coins(sending_amount)
-                    .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)
-                    ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
-                    ;;  .store_slice("Hello from FunC!") ;; comment
-                    .end_cell();
+                    if (op == op::split_ton) {
+                        cell msg = begin_cell()
+                        .store_uint(0x18, 6) ;; flags
+                        .store_builder(address) ;; destination address
+                        .store_coins(sending_amount)
+                        .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)
+                        ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
+                        ;;  .store_slice("Hello from FunC!") ;; comment
+                        .end_cell();
 
-                    send_raw_message(msg, 1);
+                        send_raw_message(msg, 1);
 
-                    ;;   }
-                }
-
-
-            } else {
-                ;;     if op == op::transfer_notification {
-                ;;                    The contract should receive a message with op = 0x7362d09c and the following fields:
-                ;;
-                ;;                    query_id: uint64
-                ;;                    amount: Coins
-                ;;                    If there are no users, then error 122 must be thrown.
-                ;;
-                ;;                    The contract should send out to all users according to their amount of tokens. You should send messages to the address of your token jack jetton_address according to TEP-0074.
-                ;;
-                ;;                    Message Value: 0.02 TON
-                ;;                    Response address must be equal to the recipient address
-                ;;                    Forward_amount = 1 nanoTON
-                ;;                    Without custom_payload / without forward_payload.
-                ;;                    Note: transfer_notification in this task does not conform to the TEP-0074 standard. This is done to simplify the task.
-                var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(4);  ;;skip flags
-                var source = in_msg_full_slice~load_msg_addr();
+                    } else {
+                        var body = begin_cell().store_uint(0x0f8a7ea5,32)
+                        .store_uint(0,64) ;;query id
+                        .store_coins(sending_amount)
+                        .store_builder(address)  ;; destination TEST (perhaps wallet)
+                        .store_builder(address)  ;; response destination
+                        .store_uint(0,1)   ;;Maybe cell
+                        .store_coins(1) ;;in nanotons (10^-9 ton) we need gram
+                        .store_uint(0,1)
+                        ;; .store_slice(begin_cell().end_cell().begin_parse())
+                        ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
+                        ;;  .store_slice("Hello from FunC!") ;; comment
+                        .end_cell();
 
 
-                var ds = begin_parse(get_data());
-                ds~load_msg_addr();
-                cell dict = preload_dict_with_throw_122(ds);
-                ;;                    cell dict = new_dict();
-                ;;                    if (~ slice_empty?(ds)) {
-                ;;                        dict = ds.preload_dict();
-                ;;                    }
-                ;;
-                ;;
-                throw_if(122,dict.dict_empty?());
+                        var msg = begin_cell()
+                        .store_uint(0x18, 6) ;; flags -- TEST
+                        .store_slice(source) ;; destination address
+                        .store_coins(20000000)
+                        .store_uint(1, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)  -- TEST
+                        ;; .store_uint(1,1)
+                        .store_ref(body)
+                        .end_cell();
 
-                in_msg_body~skip_bits(64);
-                var amount = in_msg_body~load_coins();
-                int sum = 0;
-                int key = -1;
-                ;;    int count = 0;
-                tuple list = null();
-                do {
-                    (key , slice cs, int f) = dict.udict_get_next?(256, key);
-                    if f {
-                        int value = cs.preload_uint(32);
-                        sum = sum + value;
-                        ;;          count = count + 1;
-                        list = cons([key,value],list);
+
+                        ;;msg~dump();
+                        send_raw_message(msg, 0);
                     }
-                } until (~ f);
-
-
-
-
-                while(~ null?(list)) {
-                    (var res,list) = uncons(list);
-                    [int key,int share] = res;
-                    ;;     (key , slice cs, _ ) = dict.udict_get_next?(256, key);
-                    ;; if f
-                    ;;     {
-                    ;;         int share = cs.preload_uint(32);
-                    var sending_amount = amount * share / sum;
-                    ;; sending_amount~dump();
-                    ;; key -> address
-                    ;; addr_std$10 anycast:(Maybe Anycast)
-                    ;; workchain_id:int8 address:bits256  = MsgAddressInt;
-                    var address = begin_cell()
-                    ;;  .store_uint(2,2)
-                    ;;  .store_uint(0,1) ;;Maybe Anycast
-                    .store_uint(0x400,8 + 1 + 2) ;;Workchain id
-                    .store_uint(key,256);
-                    ;;.end_cell().begin_parse();
-                    ;;                            transfer#0f8a7ea5 query_id:uint64 amount:(VarUInteger 16) destination:MsgAddress
-                    ;;                            response_destination:MsgAddress custom_payload:(Maybe ^Cell)
-                    ;;                            forward_ton_amount:(VarUInteger 16) forward_payload:(Either Cell ^Cell)
-                    ;;                            = InternalMsgBody;
-
-                    ;;address~dump();
-
-
-;;                    send_token(sending_amount,address,source);
-                    var body = begin_cell().store_uint(0x0f8a7ea5,32)
-                    .store_uint(0,64) ;;query id
-                    .store_coins(sending_amount)
-                    .store_builder(address)  ;; destination TEST (perhaps wallet)
-                    .store_builder(address)  ;; response destination
-                    .store_uint(0,1)   ;;Maybe cell
-                    .store_coins(1) ;;in nanotons (10^-9 ton) we need gram
-                    .store_uint(0,1)
-                    ;; .store_slice(begin_cell().end_cell().begin_parse())
-                    ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
-                    ;;  .store_slice("Hello from FunC!") ;; comment
-                    .end_cell();
-
-
-                    var msg = begin_cell()
-                    .store_uint(0x18, 6) ;; flags -- TEST
-                    .store_slice(source) ;; destination address
-                    .store_coins(20000000)
-                    .store_uint(1, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)  -- TEST
-                    ;; .store_uint(1,1)
-                    .store_ref(body)
-                    .end_cell();
-
-
-                    ;;msg~dump();
-                    send_raw_message(msg, 0);
-
                     ;;   }
                 }
+
+
+;;            } else {
+;;                ;;     if op == op::transfer_notification {
+;;                ;;                    The contract should receive a message with op = 0x7362d09c and the following fields:
+;;                ;;
+;;                ;;                    query_id: uint64
+;;                ;;                    amount: Coins
+;;                ;;                    If there are no users, then error 122 must be thrown.
+;;                ;;
+;;                ;;                    The contract should send out to all users according to their amount of tokens. You should send messages to the address of your token jack jetton_address according to TEP-0074.
+;;                ;;
+;;                ;;                    Message Value: 0.02 TON
+;;                ;;                    Response address must be equal to the recipient address
+;;                ;;                    Forward_amount = 1 nanoTON
+;;                ;;                    Without custom_payload / without forward_payload.
+;;                ;;                    Note: transfer_notification in this task does not conform to the TEP-0074 standard. This is done to simplify the task.
+;;                var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(4);  ;;skip flags
+;;                var source = in_msg_full_slice~load_msg_addr();
+;;
+;;
+;;                var ds = begin_parse(get_data());
+;;                ds~load_msg_addr();
+;;                cell dict = preload_dict_with_throw_122(ds);
+;;                ;;                    cell dict = new_dict();
+;;                ;;                    if (~ slice_empty?(ds)) {
+;;                ;;                        dict = ds.preload_dict();
+;;                ;;                    }
+;;                ;;
+;;                ;;
+;;                throw_if(122,dict.dict_empty?());
+;;
+;;                in_msg_body~skip_bits(64);
+;;                var amount = in_msg_body~load_coins();
+;;                int sum = 0;
+;;                int key = -1;
+;;                ;;    int count = 0;
+;;                tuple list = null();
+;;                do {
+;;                    (key , slice cs, int f) = dict.udict_get_next?(256, key);
+;;                    if f {
+;;                        int value = cs.preload_uint(32);
+;;                        sum = sum + value;
+;;                        ;;          count = count + 1;
+;;                        list = cons([key,value],list);
+;;                    }
+;;                } until (~ f);
+;;
+;;
+;;
+;;
+;;                while(~ null?(list)) {
+;;                    (var res,list) = uncons(list);
+;;                    [int key,int share] = res;
+;;                    ;;     (key , slice cs, _ ) = dict.udict_get_next?(256, key);
+;;                    ;; if f
+;;                    ;;     {
+;;                    ;;         int share = cs.preload_uint(32);
+;;                    var sending_amount = amount * share / sum;
+;;                    ;; sending_amount~dump();
+;;                    ;; key -> address
+;;                    ;; addr_std$10 anycast:(Maybe Anycast)
+;;                    ;; workchain_id:int8 address:bits256  = MsgAddressInt;
+;;                    var address = begin_cell()
+;;                    ;;  .store_uint(2,2)
+;;                    ;;  .store_uint(0,1) ;;Maybe Anycast
+;;                    .store_uint(0x400,8 + 1 + 2) ;;Workchain id
+;;                    .store_uint(key,256);
+;;                    ;;.end_cell().begin_parse();
+;;                    ;;                            transfer#0f8a7ea5 query_id:uint64 amount:(VarUInteger 16) destination:MsgAddress
+;;                    ;;                            response_destination:MsgAddress custom_payload:(Maybe ^Cell)
+;;                    ;;                            forward_ton_amount:(VarUInteger 16) forward_payload:(Either Cell ^Cell)
+;;                    ;;                            = InternalMsgBody;
+;;
+;;                    ;;address~dump();
+;;
+;;
+;;;;                    send_token(sending_amount,address,source);
+;;                    var body = begin_cell().store_uint(0x0f8a7ea5,32)
+;;                    .store_uint(0,64) ;;query id
+;;                    .store_coins(sending_amount)
+;;                    .store_builder(address)  ;; destination TEST (perhaps wallet)
+;;                    .store_builder(address)  ;; response destination
+;;                    .store_uint(0,1)   ;;Maybe cell
+;;                    .store_coins(1) ;;in nanotons (10^-9 ton) we need gram
+;;                    .store_uint(0,1)
+;;                    ;; .store_slice(begin_cell().end_cell().begin_parse())
+;;                    ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
+;;                    ;;  .store_slice("Hello from FunC!") ;; comment
+;;                    .end_cell();
+;;
+;;
+;;                    var msg = begin_cell()
+;;                    .store_uint(0x18, 6) ;; flags -- TEST
+;;                    .store_slice(source) ;; destination address
+;;                    .store_coins(20000000)
+;;                    .store_uint(1, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)  -- TEST
+;;                    ;; .store_uint(1,1)
+;;                    .store_ref(body)
+;;                    .end_cell();
+;;
+;;
+;;                    ;;msg~dump();
+;;                    send_raw_message(msg, 0);
+;;
+;;                    ;;   }
+;;                }
 
 
                 ;;   }
-            }
+          ;;  }
         }
     }
 
