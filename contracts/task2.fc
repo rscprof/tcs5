@@ -69,8 +69,11 @@ cell load_dict_with_check(slice ds) inline {
             begin_cell().store_slice(admin_addr).store_dict(dict).end_cell()
         );
 
+        return ();
 
-    } else {
+
+    }
+    ;; else {
         if op == op::remove_user {
             ;;            The contract should accept a message with op = 0x278205c8 and the following fields:
             ;;
@@ -300,7 +303,7 @@ cell load_dict_with_check(slice ds) inline {
                 ;;   }
             }
         }
-    }
+ ;;   }
 
 
     ;;    remove_user#278205c8 query_id:uint64 address:MsgAddressInt = InternalMsgBody;

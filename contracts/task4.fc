@@ -89,14 +89,16 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
 ;;                maze~tpush("S..");
 ;;                maze~tpush(".??");
 ;;                maze~tpush("..E");
-    int startx = 0;
-    int starty = 0;
     int endx = 0;
     int endy = 0;
 ;;    (int startx,int starty) = look_start(n,m,maze);
 ;;    (int endx,int endy) = look_end(n,m,maze);
     tuple maze2 = empty_tuple();
+    var current = null();
+    tuple state = null();
     {
+        int startx = 0;
+        int starty = 0;
         var i = 0;
         repeat (n) {
             tuple str = at(maze,i);
@@ -120,17 +122,18 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
             maze2~tpush(str_end);
             i = i + 1;
         }
+        ;; var state = new_dict();
+        tuple state1 = create_tuple(1024 * 1024,m);
+        state = create_tuple(state1,n);
+        ;;  state = state.udict_set_builder(10, startx << 5 + starty, begin_cell().store_uint(0, 20));
+        state = set_value(state,startx,starty,0);
+        ;; var finished = 0;
+        current = cons ([ starty , 0 , null(), startx  ], null());
     }
 
-   ;; var state = new_dict();
-    tuple state1 = create_tuple(1024 * 1024,m);
-    tuple state = create_tuple(state1,n);
 
-  ;;  state = state.udict_set_builder(10, startx << 5 + starty, begin_cell().store_uint(0, 20));
-    state = set_value(state,startx,starty,0);
 
-    ;; var finished = 0;
-    var current = cons ([ starty , 0 , null(), startx  ], null());
+
     var answer = null();
     var countBest = 2000000;
     ;; current~dump();
