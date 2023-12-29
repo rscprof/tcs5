@@ -198,17 +198,17 @@ cell preload_dict_with_throw_122(slice s) asm """
                     .store_uint(key,256);
                     ;; .end_cell().begin_parse();
 
-                    send_ton(sending_amount,address);
-;;                    cell msg = begin_cell()
-;;                    .store_uint(0x18, 6) ;; flags
-;;                    .store_builder(address) ;; destination address
-;;                    .store_coins(sending_amount)
-;;                    .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)
-;;                    ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
-;;                    ;;  .store_slice("Hello from FunC!") ;; comment
-;;                    .end_cell();
-;;
-;;                    send_raw_message(msg, 1);
+  ;;                  send_ton(sending_amount,address);
+                    cell msg = begin_cell()
+                    .store_uint(0x18, 6) ;; flags
+                    .store_builder(address) ;; destination address
+                    .store_coins(sending_amount)
+                    .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)
+                    ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
+                    ;;  .store_slice("Hello from FunC!") ;; comment
+                    .end_cell();
+
+                    send_raw_message(msg, 1);
 
                     ;;   }
                 }
