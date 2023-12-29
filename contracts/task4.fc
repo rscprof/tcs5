@@ -136,7 +136,7 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
                                                         countBest = count;
                             ;;                        }
                                                 } else {
-                                                    path = cons(x << 5 + y, path);
+                                                    path = cons((x << 5) + y, path);
                                                     next = cons([x, y, count, path], next);
                                                 }
                                             }
