@@ -179,7 +179,7 @@ cell load_dict_with_check(slice ds) inline {
                     send_raw_message(msg, 1);
 
                     ;;   }
-                }until(null?(list));
+                } until (null?(list));
 
 
             } else {

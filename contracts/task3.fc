@@ -82,7 +82,7 @@ cell wrap_storage(int version_id, cell storage) {
         do {
             (cell code,list) = uncons(list);
             list2 = cons (code, list2);
-        }until (null?(list));
+        } until (null?(list));
 
         ;;execute migrations
         var back = get_c3();
@@ -91,7 +91,7 @@ cell wrap_storage(int version_id, cell storage) {
             var c = bless(code.begin_parse());
             set_c3(c);
             storage = _migrate_one(storage);
-        }until (null?(list2));
+        } until (null?(list2));
         set_c3(back);
 
         current_version = expected_version;
