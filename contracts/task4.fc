@@ -81,7 +81,7 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
             tuple str_end = empty_tuple();
             var j = 0;
             repeat (m) {
-                int sym = str.at(i);
+                int sym = str.at(j);
                 str_end~tpush((sym == "?"u)? 1 : (sym == "X"u) ? 1000 : (sym == "E"u)? -1 : 0);
 
 
