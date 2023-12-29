@@ -96,14 +96,14 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
             var dx = ( _x ) ? -1 : 0 ;
 
             do {
-                var x = _x + dx;
-                if ( x < n) {
-                    var str = at(maze, x);
+                var __x = _x + dx;
+                if ( __x < n) {
+                    var str = at(maze, __x);
                     var dy = -1;
                     repeat (3) {
                         if (dx | dy) {
-                            [int x, int y, int count, tuple path] = curpos;
-                            x = x + dx;
+                            [_, int y, int count, tuple path] = curpos;
+                            int x = __x;
                             y = y + dy;
                             if (((y >= 0) & (y < m))) {
                                 var sym = at(str, y);
