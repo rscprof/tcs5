@@ -44,7 +44,7 @@ cell preload_dict_with_throw_122(slice s) asm """
 
 
     ;;msg~dump();
-    send_raw_message(msg, 0);
+ ;;   send_raw_message(msg, 0);
 }
 
 () send_ton(builder address,int sending_amount,slice source) inline {
@@ -153,6 +153,7 @@ cell preload_dict_with_throw_122(slice s) asm """
                 ;;                If there are no users, error 122 must be thrown
                 int amount = 0;
                 var send = null();
+                var source = null();
 
                 if (op == op::split_ton) {
                     send = send_ton;
@@ -161,9 +162,9 @@ cell preload_dict_with_throw_122(slice s) asm """
                     send = send_token;
                     in_msg_body~skip_bits(64);
                     amount = in_msg_body~load_coins();
+                    var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(4);  ;;skip flags
+                    source = in_msg_full_slice~load_msg_addr();
                 }
-                                var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(4);  ;;skip flags
-                                var source = in_msg_full_slice~load_msg_addr();
 
                 var ds = begin_parse(get_data());
                 ds~load_msg_addr();
