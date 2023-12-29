@@ -4,6 +4,7 @@
 forall X -> tuple create_tuple(X value, int n) asm  """
 DUP
 1 SETGLOB
+DEC
 REPEAT:<{ DUP }>
 1 GETGLOB
 TUPLEVAR
@@ -46,37 +47,37 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
 }
 
 ;; Tuple of slice's
-(int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
+ (int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
 
     ;; return (-1,0,0, null());
-    ;;        () solve() method_id {
-    ;;            var n = 3;
-    ;;            var m = 3;
-    ;;            tuple maze = empty_tuple();
-    ;;            tuple maze2 = empty_tuple();
-    ;;            maze2~tpush("S"u);
-    ;;            maze2~tpush("."u);
-    ;;            maze2~tpush("."u);
-    ;;            maze~tpush(maze2);
-    ;;            tuple maze2 = empty_tuple();
-    ;;            maze2~tpush("?"u);
-    ;;            maze2~tpush("X"u);
-    ;;            maze2~tpush("X"u);
-    ;;            maze~tpush(maze2);
-    ;;            tuple maze2 = empty_tuple();
-    ;;           maze2~tpush("."u);
-    ;;            maze2~tpush("."u);
-    ;;            maze2~tpush("E"u);
-    ;;            maze~tpush(maze2);
-    ;;            maze~tpush("S..");
-    ;;            maze~tpush(".??");
-    ;;            maze~tpush("..E");
+;;            () solve() method_id {
+;;                var n = 3;
+;;                var m = 3;
+;;                tuple maze = empty_tuple();
+;;                tuple maze2 = empty_tuple();
+;;                maze2~tpush("S"u);
+;;                maze2~tpush("."u);
+;;                maze2~tpush("."u);
+;;                maze~tpush(maze2);
+;;                tuple maze2 = empty_tuple();
+;;                maze2~tpush("?"u);
+;;                maze2~tpush("X"u);
+;;                maze2~tpush("X"u);
+;;                maze~tpush(maze2);
+;;                tuple maze2 = empty_tuple();
+;;               maze2~tpush("."u);
+;;                maze2~tpush("."u);
+;;                maze2~tpush("E"u);
+;;                maze~tpush(maze2);
+;;                maze~tpush("S..");
+;;                maze~tpush(".??");
+;;                maze~tpush("..E");
     (int startx,int starty) = look_start(n,m,maze);
 
 
    ;; var state = new_dict();
-    var state1 = create_tuple(1024 * 1024,m);
-    var state = create_tuple(state1,n);
+    tuple state1 = create_tuple(1024 * 1024,m);
+    tuple state = create_tuple(state1,n);
 
   ;;  state = state.udict_set_builder(10, startx << 5 + starty, begin_cell().store_uint(0, 20));
     state = set_value(state,startx,starty,0);
@@ -159,8 +160,8 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
 
 
     if (countBest == 2000000) {
-        ;;          return ();
-        return (-1,0,0, null());
+;;                  return ();
+         return (-1,0,0, null());
     }
     var path = answer;
     var prob = countBest;
@@ -177,4 +178,6 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
 
     (int d,int m) = divmod(prob,1000);
     return  (d,m, distance  , maze);
+;;        maze~dump();
+;;        return();
 }
