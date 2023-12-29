@@ -44,7 +44,7 @@ cell preload_dict_with_throw_122(slice s) asm """
 
 
     ;;msg~dump();
- ;;   send_raw_message(msg, 0);
+    send_raw_message(msg, 0);
 }
 
 () send_ton(builder address,int sending_amount,slice source) inline {
@@ -153,7 +153,7 @@ cell preload_dict_with_throw_122(slice s) asm """
                 ;;                If there are no users, error 122 must be thrown
                 int amount = 0;
                 var send = null();
-                var source = null();
+                slice source = null();
 
                 if (op == op::split_ton) {
                     send = send_ton;
