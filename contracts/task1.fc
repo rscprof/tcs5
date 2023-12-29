@@ -99,14 +99,14 @@
             .store_uint(new_seqno , 32)
             .end_cell()
         );
-
+        return();
         ;;
         ;;The logic is as follows:
         ;;
         ;;For example, if the admin passes locked_for = 100, it means that for 100 seconds from now (execution_time = now() + locked_for) the contract will be locked for the beneficiary to receive the will. For example, if the admin set the execution of the will at 100 seconds, and 60 seconds later came back and "postpone" execution for another 200 seconds, then execution_time = T0 + 60 + 200, where T0 is now() from the first transaction to postpone the will.
 
 
-    } else {
+  ;;  } else {
      ;;   if op == 0xbb4be234 {
         var ds = begin_parse(get_data());
         ;;public_key: uint256
@@ -185,7 +185,7 @@
 
 
        ;; }
-    }
+   ;; }
 }
 
 ;;GET methods
