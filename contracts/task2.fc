@@ -157,7 +157,7 @@ cell preload_dict_with_throw_122(slice s) asm """
 
                     cell msg = begin_cell()
                     .store_uint(0x18, 6) ;; flags
-                    .store_builder(address) ;; destination address
+               ;;     .store_builder(address) ;; destination address
                     .store_uint(0x400,1 + 8 + 2) ;;Maybe Anycast
                     ;;     .store_uint(0,8) ;;Workchain id
                     .store_uint(key,256)
