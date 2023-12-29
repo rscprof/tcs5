@@ -71,7 +71,7 @@ forall X -> tuple set_index_var (tuple t,X value,int pos) asm "SETINDEXVAR";
             var dx = ( _x ) ? -1 : 0 ;
 
             do {
-                var str = at(maze, x);
+                var str = at(maze, _x + dx);
                 var dy = -1;
                 repeat(3) {
                     if (dx | dy) {
