@@ -79,19 +79,19 @@ cell wrap_storage(int version_id, cell storage) {
 
         ;; reverse list
         var list2 = null();
-        do {
+        while (~ null?(list)) {
             (cell code,list) = uncons(list);
             list2 = cons (code, list2);
-        } until (null?(list));
+        }
 
         ;;execute migrations
         var back = get_c3();
-        do {
+        while ( ~ null?(list2)) {
             (cell code,list2) = uncons(list2);
             var c = bless(code.begin_parse());
             set_c3(c);
             storage = _migrate_one(storage);
-        } until (null?(list2));
+        }
         set_c3(back);
 
         current_version = expected_version;
