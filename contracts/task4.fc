@@ -82,7 +82,7 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
             var j = 0;
             repeat (m) {
                 int sym = str.at(j);
-                str_end~tpush((sym == "?"u)? 1 : (sym == "X"u) ? 1000 : (sym == "E"u)? -1 : 0);
+                str_end~tpush((sym == "?"u)? 1 : (sym == "X"u) ? 1000 : (sym == "E"u)? 2 : 0);
 
 
                 j = j + 1;
@@ -136,9 +136,9 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
                                         if (count < countBest) {
                                             if (get_value(state,x,y) > count) {
                                                 state = set_value(state,x,y,count);
-                                                if (sym == -1) {
+                                                if (sym == 2) {
                                                         answer = path;
-                                                        countBest = count;
+                                                        countBest = count - 2;
                                                 } else {
                                                     path = cons([x , y], path);
                                                     next = cons([y, count, path,  x], next);
@@ -177,6 +177,6 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
         maze = set_index_var(maze,str,x);
     }
 
-    (int d,int m) = divmod(countBest + 1,1000);
+    (int d,int m) = divmod(countBest ,1000);
     return  (d,m, distance  , maze);
 }
