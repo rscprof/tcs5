@@ -1,5 +1,8 @@
 #include "imports/stdlib.fc";
 
+forall X -> tuple set_index_var (tuple t,X value,int pos) asm "SETINDEXVAR";
+;; tuple set_index_var (tuple t,tuple value,int pos) asm "SETINDEXVER";
+
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
 
 }
@@ -168,28 +171,33 @@ int getbitmask((int,int,int,int) value,int pos) inline {
         (var coords, path) = path.uncons();
         [int x,int y] = coords;
         distance = distance + 1;
-        res_dict = setbitmask(res_dict,x * m + y);
+        var str = at(maze, x);
+        str = set_index_var(str,"!"u,y);
+        maze = set_index_var(maze,str,x);
+
+
+ ;;       res_dict = setbitmask(res_dict,x * m + y);
     }
 
-    tuple maze2 = empty_tuple();
-    var i = 0;
-    do {
-        var str = at(maze, i);
-        var j = 0;
-        var str_gen = empty_tuple();
-        do {
-            var item = at(str,j);
-            if (getbitmask(res_dict, i * m + j)) {
-                str_gen~tpush("!"u);
-            } else {
-                str_gen~tpush(item);
-            }
-            j = j + 1;
-        } until (j == m);
-        i  = i + 1;
-        maze2~tpush(str_gen);
-    } until (i == n);
-    var res =  (prob / 1000,prob % 1000, distance + 1 , maze2);
+;;    tuple maze2 = empty_tuple();
+;;    var i = 0;
+;;    do {
+;;        var str = at(maze, i);
+;;        var j = 0;
+;;        var str_gen = empty_tuple();
+;;        do {
+;;            var item = at(str,j);
+;;            if (getbitmask(res_dict, i * m + j)) {
+;;                str_gen~tpush("!"u);
+;;            } else {
+;;                str_gen~tpush(item);
+;;            }
+;;            j = j + 1;
+;;        } until (j == m);
+;;        i  = i + 1;
+;;        maze2~tpush(str_gen);
+;;    } until (i == n);
+    var res =  (prob / 1000,prob % 1000, distance + 1 , maze);
     ;;      prob~dump();
     ;;      distance~dump();
     ;;       maze2~dump();
