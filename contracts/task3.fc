@@ -63,12 +63,6 @@ cell wrap_storage(int version_id, cell storage) {
         throw_if ( 200, null?(new_code) );
 
         (cell dict, in_msg_body) = load_dict_with_throw(in_msg_body);
-   ;;     cell dict = new_dict();
-   ;;     if (~ slice_data_empty?(in_msg_body)) {
-       ;;   cell  dict = in_msg_body~load_dict();
-   ;;     }
-  ;;      throw_if(400,~ null? (dict));
-
 
         var list = null();
         var cur =  current_version;
@@ -76,7 +70,6 @@ cell wrap_storage(int version_id, cell storage) {
             (slice migration_code, int flag) = dict.udict_get?(32,cur);
             throw_if(400,~ flag);
             cur = migration_code~load_uint(32);
-  ;;          throw_if (400,cur > expected_version);
             var code = migration_code~load_maybe_ref();
 
             if (~ null?(code)) {
