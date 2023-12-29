@@ -46,6 +46,23 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
     return (0 , 0);
 }
 
+(int,int) look_end(int n,int m,tuple maze) inline {
+    var i = 0;
+    repeat (n) {
+        var str = at(maze, i);  ;;.begin_parse();
+        var j = 0;
+        repeat (m) {
+            var item = at(str, j);
+            if (item == "E"u) {
+                return (i, j);
+            }
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    return (0 , 0);
+}
+
 ;; Tuple of slice's
  (int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
 
@@ -73,6 +90,7 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
 ;;                maze~tpush(".??");
 ;;                maze~tpush("..E");
     (int startx,int starty) = look_start(n,m,maze);
+    (int endx,int endy) = look_end(n,m,maze);
     tuple maze2 = empty_tuple();
     {
         var i = 0;
@@ -82,7 +100,7 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
             var j = 0;
             repeat (m) {
                 int sym = str.at(j);
-                str_end~tpush((sym == "?"u)? 1 : (sym == "X"u) ? 1000 : (sym == "E"u)? 2 : 0);
+                str_end~tpush((sym == "?"u)? 1 : (sym == "X"u) ? 1000 : 0);
 
 
                 j = j + 1;
@@ -136,7 +154,7 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
                                         if (count < countBest) {
                                             if (get_value(state,x,y) > count) {
                                                 state = set_value(state,x,y,count);
-                                                if (sym == 2) {
+                                                if ((x != endx) | (y != endy)) {
                                                         answer = path;
                                                         countBest = count - 2;
                                                 } else {
