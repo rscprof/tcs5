@@ -71,6 +71,7 @@ forall X -> tuple set_index_var (tuple t,X value,int pos) asm "SETINDEXVAR";
             var dx = ( _x ) ? -1 : 0 ;
 
             do {
+                var str = at(maze, x);
                 var dy = -1;
                 repeat(3) {
                     if (dx | dy) {
@@ -79,7 +80,7 @@ forall X -> tuple set_index_var (tuple t,X value,int pos) asm "SETINDEXVAR";
                         x = x + dx;
                         y = y + dy;
                         if (((y >= 0) & (x < n) & ( y < m))) {
-                            var sym = at(at(maze, x), y);
+                            var sym = at(str, y);
                             if (sym != "S"u) {
                                 if (sym == "X"u) {
                                     count = count + 1000;
