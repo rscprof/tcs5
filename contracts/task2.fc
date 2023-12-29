@@ -118,7 +118,7 @@ cell preload_dict_with_throw_122(slice s) asm """
 ;;                }
                 cell dict = preload_dict_with_throw_122(ds);
 
-        ;;        throw_if(122,dict.dict_empty?());
+                throw_if(122,dict.dict_empty?());
 
 
                 ;;  in_msg_body~skip_bits(64);
@@ -192,7 +192,7 @@ cell preload_dict_with_throw_122(slice s) asm """
 ;;                    }
 ;;
 ;;
-;;                    throw_if(122,dict.dict_empty?());
+                    throw_if(122,dict.dict_empty?());
 
                     in_msg_body~skip_bits(64);
                     var amount = in_msg_body~load_coins();
