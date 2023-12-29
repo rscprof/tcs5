@@ -152,14 +152,14 @@ cell preload_dict_with_throw_122(slice s) asm """
                 ;;
                 ;;                If there are no users, error 122 must be thrown
                 int amount = 0;
-                var send = null();
+         ;;       var send = null();
                 slice source = null();
 
                 if (op == op::split_ton) {
-                    send = send_ton;
+          ;;          send = send_ton;
                     amount = msg_value;
                 } else {
-                    send = send_token;
+           ;;         send = send_token;
                     in_msg_body~skip_bits(64);
                     amount = in_msg_body~load_coins();
                     var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(4);  ;;skip flags
@@ -216,7 +216,12 @@ cell preload_dict_with_throw_122(slice s) asm """
                         ;; .end_cell().begin_parse();
 
 
-                        send(address,sending_amount,source);
+                    if (op == op::split_ton) {
+                        send_ton(address, sending_amount, source);
+                    } else {
+                        send_token(address, sending_amount, source);
+
+                    }
 ;;
 ;;                        cell msg = begin_cell()
 ;;                        .store_uint(0x18, 6) ;; flags
