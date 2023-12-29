@@ -89,26 +89,28 @@ forall X -> tuple set_index_var (tuple t,X value,int pos) asm "SETINDEXVAR";
                                         count = count + 1;
                                     }
                                 }
-                                var index = (x << 5) + y;
-                                (var state_cell, int f) = state.udict_get?(10, index);
-                                var test = true;
-                                if (f) {
-                                    if (state_cell.preload_int(20) <= count) {
-                                        test = false;
+                                if (count < countBest) {
+                                    var index = (x << 5) + y;
+                                    (var state_cell, int f) = state.udict_get?(10, index);
+                                    var test = true;
+                                    if (f) {
+                                        if (state_cell.preload_int(20) <= count) {
+                                            test = false;
+                                        }
                                     }
-                                }
-                                if (test) {
+                                    if (test) {
 
-                                    state = state.udict_set_builder(10, index, begin_cell().store_uint(count, 20));
-                                    if (sym != "E"u) {
-                                        if (count < countBest) {
+                                        state = state.udict_set_builder(10, index, begin_cell().store_uint(count, 20));
+                                        if (sym != "E"u) {
+                                            ;;   if (count < countBest) {
                                             path = cons(index, path);
                                             next = cons([x, y, count, path], next);
-                                        }
-                                    } else {
-                                        if ( count < countBest ) {
-                                            answer = path;
-                                            countBest = count;
+                                            ;;   }
+                                        } else {
+                                            if (count < countBest) {
+                                                answer = path;
+                                                countBest = count;
+                                            }
                                         }
                                     }
                                 }
