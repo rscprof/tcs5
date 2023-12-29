@@ -73,7 +73,24 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
 ;;                maze~tpush(".??");
 ;;                maze~tpush("..E");
     (int startx,int starty) = look_start(n,m,maze);
+    tuple maze2 = empty_tuple();
+    {
+        var i = 0;
+        repeat (n) {
+            tuple str = at(maze,i);
+            tuple str_end = empty_tuple();
+            var j = 0;
+            repeat (m) {
+                int sym = str.at(i);
+                str_end~tpush((sym == "?"u)? 1 : (sym == "X"u) ? 1000 : (sym == "E"u)? -1 : 0);
 
+
+                j = j + 1;
+            }
+            maze2~tpush(str_end);
+            i = i + 1;
+        }
+    }
 
    ;; var state = new_dict();
     tuple state1 = create_tuple(1024 * 1024,m);
@@ -98,7 +115,7 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
             do {
                 var x = _x + dx;
                 if ( x < n) {
-                    var str = at(maze, x);
+                    var str = at(maze2, x);
                     var dy = -1;
                     repeat (3) {
                         if (dx | dy) {
@@ -107,19 +124,19 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
                             y = y + dy;
                             if (((y >= 0) & (y < m))) {
                                 var sym = at(str, y);
-
-                                        if (sym == "X"u) {
-                                            count = count + 1000;
-                                        }
-                                        else {
-                                            if (sym == "?"u) {
-                                                count = count + 1;
-                                            }
-                                        }
+                                    count = count + sym;
+;;                                        if (sym == "X"u) {
+;;                                            count = count + 1000;
+;;                                        }
+;;                                        else {
+;;                                            if (sym == "?"u) {
+;;                                                count = count + 1;
+;;                                            }
+;;                                        }
                                         if (count < countBest) {
                                             if (get_value(state,x,y) > count) {
                                                 state = set_value(state,x,y,count);
-                                                if (sym == "E"u) {
+                                                if (sym == -1) {
                                                         answer = path;
                                                         countBest = count;
                                                 } else {
@@ -146,12 +163,12 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
     if (countBest == 2000000) {
          return (-1,0,0, null());
     }
-    var path = answer;
-    var prob = countBest;
+ ;;   var path = answer;
+   ;; var prob = countBest;
 
     var distance = 1;
-    while (~ null?(path)) {
-        (var res, path) = path.uncons();
+    while (~ null?(answer)) {
+        (var res, answer) = answer.uncons();
         [int x,int y] = res;
     ;;    (int x,int y) = divmod(index,32);
         distance = distance + 1;
@@ -160,6 +177,6 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
         maze = set_index_var(maze,str,x);
     }
 
-    (int d,int m) = divmod(prob,1000);
+    (int d,int m) = divmod(countBest + 1,1000);
     return  (d,m, distance  , maze);
 }
