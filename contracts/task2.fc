@@ -8,7 +8,7 @@ const op::remove_user = 0x278205c8;
 const op::split_ton = 0x068530b3;
 const op::transfer_notification = 0x7362d09c;
 
-(cell, slice) preload_dict_with_throw(slice s) asm """
+cell preload_dict_with_throw(slice s) asm """
   PLDDICTQ
   121 THROWIFNOT
 """;
