@@ -97,13 +97,13 @@ forall X -> tuple set_index_var (tuple t,X value,int pos) asm "SETINDEXVAR";
                                         if (count < countBest) {
                                             var index = (x << 5) + y;
                                             (var state_cell, int f) = state.udict_get?(10, index);
-                                            var test = true;
+                                          ;;  var test = true;
                                             if (f) {
                                                 if (state_cell.preload_int(20) <= count) {
-                                                    test = false;
+                                                    f = false;
                                                 }
                                             }
-                                            if (test) {
+                                            if (f) {
 
                                                 state = state.udict_set_builder(10, index, begin_cell().store_uint(count, 20));
                                                 if (sym == "E"u) {
