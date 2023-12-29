@@ -83,7 +83,7 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
     state = set_value(state,startx,starty,0);
 
     ;; var finished = 0;
-    var current = cons ([ startx , 0 , null(), starty  ], null());
+    var current = cons ([ starty , 0 , null(), startx  ], null());
     var answer = null();
     var countBest = 2000000;
     ;; current~dump();
@@ -92,7 +92,7 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
         do {
             (var curpos, current) = uncons(current);
 
-            [int _x, _ , _ , _ ] = curpos;
+            [_, _ , _ ,int _x ] = curpos;
             var dx = ( _x ) ? -1 : 0 ;
 
             do {
@@ -102,7 +102,7 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
                     var dy = -1;
                     repeat (3) {
                         if (dx | dy) {
-                            [_,  int count, tuple path, int y] = curpos;
+                            [int y,  int count, tuple path, _] = curpos;
                        ;;     int x = __x;
                             y = y + dy;
                             if (((y >= 0) & (y < m))) {
@@ -124,7 +124,7 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
                                                         countBest = count;
                                                 } else {
                                                     path = cons([x , y], path);
-                                                    next = cons([x, count, path,  y], next);
+                                                    next = cons([y, count, path,  x], next);
                                                 }
                                             }
                                         }
