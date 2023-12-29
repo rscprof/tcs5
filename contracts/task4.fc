@@ -29,39 +29,39 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
 
 
 
-(int,int) look_start(int n,int m,tuple maze) inline {
-    var i = 0;
-    repeat (n) {
-        var str = at(maze, i);  ;;.begin_parse();
-        var j = 0;
-        repeat (m) {
-            var item = at(str, j);
-            if (item == "S"u) {
-                return (i, j);
-            }
-            j = j + 1;
-        }
-        i = i + 1;
-    }
-    return (0 , 0);
-}
-
-(int,int) look_end(int n,int m,tuple maze) inline {
-    var i = 0;
-    repeat (n) {
-        var str = at(maze, i);  ;;.begin_parse();
-        var j = 0;
-        repeat (m) {
-            var item = at(str, j);
-            if (item == "E"u) {
-                return (i, j);
-            }
-            j = j + 1;
-        }
-        i = i + 1;
-    }
-    return (0 , 0);
-}
+;;(int,int) look_start(int n,int m,tuple maze) inline {
+;;    var i = 0;
+;;    repeat (n) {
+;;        var str = at(maze, i);  ;;.begin_parse();
+;;        var j = 0;
+;;        repeat (m) {
+;;            var item = at(str, j);
+;;            if (item == "S"u) {
+;;                return (i, j);
+;;            }
+;;            j = j + 1;
+;;        }
+;;        i = i + 1;
+;;    }
+;;    return (0 , 0);
+;;}
+;;
+;;(int,int) look_end(int n,int m,tuple maze) inline {
+;;    var i = 0;
+;;    repeat (n) {
+;;        var str = at(maze, i);  ;;.begin_parse();
+;;        var j = 0;
+;;        repeat (m) {
+;;            var item = at(str, j);
+;;            if (item == "E"u) {
+;;                return (i, j);
+;;            }
+;;            j = j + 1;
+;;        }
+;;        i = i + 1;
+;;    }
+;;    return (0 , 0);
+;;}
 
 ;; Tuple of slice's
  (int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
@@ -89,8 +89,12 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
 ;;                maze~tpush("S..");
 ;;                maze~tpush(".??");
 ;;                maze~tpush("..E");
-    (int startx,int starty) = look_start(n,m,maze);
-    (int endx,int endy) = look_end(n,m,maze);
+    int startx = 0;
+    int starty = 0;
+    int endx = 0;
+    int endy = 0;
+;;    (int startx,int starty) = look_start(n,m,maze);
+;;    (int endx,int endy) = look_end(n,m,maze);
     tuple maze2 = empty_tuple();
     {
         var i = 0;
@@ -101,7 +105,15 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
             repeat (m) {
                 int sym = str.at(j);
                 str_end~tpush((sym == "?"u)? 1 : (sym == "X"u) ? 1000 : 0);
-
+                if (sym == "S"u) {
+                    startx = i;
+                    starty = j;
+                } else {
+                    if (sym == "E"u) {
+                        endx = i;
+                        endy = j;
+                    }
+                }
 
                 j = j + 1;
             }
@@ -138,19 +150,10 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
                     repeat (3) {
                         if (dx | dy) {
                             [int y,  int count, tuple path, _] = curpos;
-                       ;;     int x = __x;
                             y = y + dy;
                             if (((y >= 0) & (y < m))) {
                                 var sym = at(str, y);
                                     count = count + sym;
-;;                                        if (sym == "X"u) {
-;;                                            count = count + 1000;
-;;                                        }
-;;                                        else {
-;;                                            if (sym == "?"u) {
-;;                                                count = count + 1;
-;;                                            }
-;;                                        }
                                         if (count < countBest) {
                                             if (get_value(state,x,y) > count) {
                                                 state = set_value(state,x,y,count);
