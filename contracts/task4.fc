@@ -1,7 +1,7 @@
 #include "imports/stdlib.fc";
 
 
-forall X -> tuple create_tuple(X value, int n) asm  """
+forall X -> tuple create_tuple(X value, int n) asm """
 DUP
 1 SETGLOB
 DEC
@@ -10,14 +10,22 @@ REPEAT:<{ DUP }>
 TUPLEVAR
 """;
 
-forall X -> X get_value(tuple t,int i, int j) inline {
-    return at(at(t,i),j);
+forall X -> X get_value(tuple t, int i, int j) inline {
+    return at(at(t, i), j);
 }
 
-forall X -> tuple set_index_var (tuple t,X value,int pos) asm "SETINDEXVAR";
+forall X -> tuple set_index_var(tuple t, X value, int pos) asm "SETINDEXVAR";
 
-forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
-    return set_index_var(t,set_index_var(at(t,i),value,j),i);
+forall X -> tuple set_value(tuple t, int i, int j, X value) inline {
+    return set_index_var(t, set_index_var(at(t, i), value, j), i);
+}
+
+(tuple,int) get_set_value_min (tuple t, int i, int j, int value) inline {
+    tuple str = at(t, i);
+    if (at(str, j) <= value) {
+        return (t,false);
+    }
+    return (set_index_var(t,set_index_var(str,value,j),i),true);
 }
 
 
@@ -28,35 +36,35 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
 
 
 ;; Tuple of slice's
- (int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
+(int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
 
     ;; return (-1,0,0, null());
-;;            () solve() method_id {
-;;                var n = 3;
-;;                var m = 3;
-;;                tuple maze = empty_tuple();
-;;                tuple maze2 = empty_tuple();
-;;                maze2~tpush("S"u);
-;;                maze2~tpush("."u);
-;;                maze2~tpush("."u);
-;;                maze~tpush(maze2);
-;;                tuple maze2 = empty_tuple();
-;;                maze2~tpush("?"u);
-;;                maze2~tpush("X"u);
-;;                maze2~tpush("X"u);
-;;                maze~tpush(maze2);
-;;                tuple maze2 = empty_tuple();
-;;               maze2~tpush("."u);
-;;                maze2~tpush("."u);
-;;                maze2~tpush("E"u);
-;;                maze~tpush(maze2);
-;;                maze~tpush("S..");
-;;                maze~tpush(".??");
-;;                maze~tpush("..E");
+    ;;            () solve() method_id {
+    ;;                var n = 3;
+    ;;                var m = 3;
+    ;;                tuple maze = empty_tuple();
+    ;;                tuple maze2 = empty_tuple();
+    ;;                maze2~tpush("S"u);
+    ;;                maze2~tpush("."u);
+    ;;                maze2~tpush("."u);
+    ;;                maze~tpush(maze2);
+    ;;                tuple maze2 = empty_tuple();
+    ;;                maze2~tpush("?"u);
+    ;;                maze2~tpush("X"u);
+    ;;                maze2~tpush("X"u);
+    ;;                maze~tpush(maze2);
+    ;;                tuple maze2 = empty_tuple();
+    ;;               maze2~tpush("."u);
+    ;;                maze2~tpush("."u);
+    ;;                maze2~tpush("E"u);
+    ;;                maze~tpush(maze2);
+    ;;                maze~tpush("S..");
+    ;;                maze~tpush(".??");
+    ;;                maze~tpush("..E");
     int endx = 0;
     int endy = 0;
-;;    (int startx,int starty) = look_start(n,m,maze);
-;;    (int endx,int endy) = look_end(n,m,maze);
+    ;;    (int startx,int starty) = look_start(n,m,maze);
+    ;;    (int endx,int endy) = look_end(n,m,maze);
     tuple maze2 = empty_tuple();
     var current = null();
     tuple state = null();
@@ -65,12 +73,12 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
         int starty = 0;
         var i = 0;
         repeat (n) {
-            tuple str = at(maze,i);
+            tuple str = at(maze, i);
             tuple str_end = empty_tuple();
             var j = 0;
             repeat (m) {
                 int sym = str.at(j);
-                str_end~tpush((sym == "?"u)? 1 : (sym == "X"u) ? 1000 : 0);
+                str_end~tpush((sym == "?"u) ? 1 : (sym == "X"u) ? 1000 : 0);
                 if (sym == "S"u) {
                     startx = i;
                     starty = j;
@@ -89,9 +97,9 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
         ;; var state = new_dict();
 
         ;;  state = state.udict_set_builder(10, startx << 5 + starty, begin_cell().store_uint(0, 20));
-        state = set_value(create_tuple(create_tuple(1024 * 1024,m),n),startx,starty,0);
+        state = set_value(create_tuple(create_tuple(1024 * 1024, m), n), startx, starty, 0);
         ;; var finished = 0;
-        current = cons ([ starty , 0 , null(), startx  ], null());
+        current = cons ([starty, 0, null(), startx], null());
     }
 
 
@@ -105,7 +113,7 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
         do {
             (var curpos, current) = uncons(current);
 
-            [int _y, int count , _ ,int _x ] = curpos;
+            [int _y, int count, _, int _x] = curpos;
             if (count < countBest) {
                 var dx = (_x) ? -1 : 0;
                 var startdy = (_y) ? -1 : 0;
@@ -120,22 +128,18 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
                             if (dx | dy) {
                                 [int y, int count, tuple path, _] = curpos;
                                 y = y + dy;
-                               ;; if (((y < m))) {
-                                ;;    var sym = at(str, y);
-                                    count = count + at(str, y);
-                                ;;    if (count < countBest) {
-                                        if (get_value(state, x, y) > count) {
-                                            state = set_value(state, x, y, count);
-                                            if ((x == endx) & (y == endy)) {
-                                                answer = path;
-                                                countBest = count;
-                                            } else {
-                                                path = cons([x, y], path);
-                                                next = cons([y, count, path, x], next);
-                                            }
-                                  ;;      }
+                                count = count + at(str, y);
+                                if (state~get_set_value_min(x,y,count)) {
+                               ;; if (get_value(state, x, y) > count) {
+                               ;;     state = set_value(state, x, y, count);
+                                    if ((x == endx) & (y == endy)) {
+                                        answer = path;
+                                        countBest = count;
+                                    } else {
+                                        path = cons([x, y], path);
+                                        next = cons([y, count, path, x], next);
                                     }
-                               ;; }
+                                }
 
                             }
 
@@ -146,28 +150,28 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
                     dx = dx + 1;
                 } until (dx > 1);
             }
-        } until ( null?(current));
+        } until (null?(current));
         current = next;
-    } until (  null? (current) );
+    } until (null? (current));
 
 
     if (countBest == 2000000) {
-         return (-1,0,0, null());
+        return (-1, 0, 0, null());
     }
- ;;   var path = answer;
-   ;; var prob = countBest;
+    ;;   var path = answer;
+    ;; var prob = countBest;
 
     var distance = 1;
     while (~ null?(answer)) {
         (var res, answer) = answer.uncons();
-        [int x,int y] = res;
-    ;;    (int x,int y) = divmod(index,32);
+        [int x, int y] = res;
+        ;;    (int x,int y) = divmod(index,32);
         distance = distance + 1;
         var str = at(maze, x);
-        str = set_index_var(str,"!"u,y);
-        maze = set_index_var(maze,str,x);
+        str = set_index_var(str, "!"u, y);
+        maze = set_index_var(maze, str, x);
     }
 
-    (int d,int m) = divmod(countBest ,1000);
-    return  (d,m, distance  , maze);
+    (int d, int m) = divmod(countBest, 1000);
+    return (d, m, distance, maze);
 }
