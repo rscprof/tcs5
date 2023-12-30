@@ -323,12 +323,7 @@ cell load_dict_with_check(slice ds) inline {
 cell  get_users() method_id {
     var ds = begin_parse(get_data());
     ds~load_msg_addr();
-    cell dict = new_dict();
-    if (~ slice_empty?(ds)) {
-        dict = ds.preload_dict();
-    }
-
-    return dict;
+    return(slice_empty?(ds)) ? (new_dict()) : ds.preload_dict();
 }
 
 ;;    (_, int address) = user_address.parse_std_addr();
