@@ -105,20 +105,21 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
         do {
             (var curpos, current) = uncons(current);
 
-            [_, int count , _ ,int _x ] = curpos;
+            [int _y, int count , _ ,int _x ] = curpos;
             if (count < countBest) {
                 var dx = (_x) ? -1 : 0;
+                var startdy = (_y) ? -1 : 0;
 
                 do {
                     var x = _x + dx;
                     if (x < n) {
                         var str = at(maze2, x);
-                        var dy = -1;
-                        repeat (3) {
+                        var dy = startdy;
+                        do {
                             if (dx | dy) {
                                 [int y, int count, tuple path, _] = curpos;
                                 y = y + dy;
-                                if (((y >= 0) & (y < m))) {
+                                if (((y < m))) {
                                     var sym = at(str, y);
                                     count = count + sym;
                                     if (count < countBest) {
@@ -138,7 +139,7 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
                             }
 
                             dy = dy + 1;
-                        }
+                        } until (dy > 1);
                     }
 
                     dx = dx + 1;
