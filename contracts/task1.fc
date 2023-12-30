@@ -23,77 +23,24 @@
 
 () recv_external(slice in_msg_body) impure {
     if in_msg_body~load_uint(32) == 0x9df10277 {
-
         in_msg_body~skip_bits(64);
         var signature = in_msg_body~load_bits(512);
         cell ref = in_msg_body.preload_ref();
         var parse = ref.begin_parse();
         int locked_for = parse~load_int(32);
         int new_seqno = parse.preload_uint(32);
-        ;;   parse.end_parse();
         var ds = begin_parse(get_data());
-        ;;public_key: uint256
-        ;;execution_time: uint32
-        ;;receiver: MsgAddressInt
-        ;;seqno: uint32
         int public_key = ds~load_uint(256);
         int execution_time = ds~load_uint(32);
         var receiver = ds~load_msg_addr();
-        int seqno = ds.preload_uint(32);
-        ;; ds.end_parse();
-
-        ;; int op = ; ;; load operation
-
-
-        ;; update#9df10277 query_id:uint64 signature:bits512 ^[ locked_for:uint32 new_seqno:uint32 ] = ExtInMsgBody
-        ;;The contract must accept an external message (meaning the contract will process the message at the expense of its balance)
-        ;; with op = 0x9df10277, which contains information, query_id and a signature that is obtained after signing this information.
-        ;;
-        ;;The information must contain a 32-bit uint number, which will indicate
-        ;; how many seconds the execution of the will is delayed (locked_for)
-        ;; and a seqno to prevent scammers from using old messages on behalf of the contract owner multiple times.
-        ;;
-        ;;Function 0x9df10277
-        ;;The body of the message op = 0x9df10277 must have a query_id + signature and 1 ref that will point to the cell with locked_for and new_seqno.
-        ;;
-        ;;TL-B:
-        ;;
-        ;;update#9df10277 query_id:uint64 signature:bits512 ^[ locked_for:uint32 new_seqno:uint32 ] = ExtInMsgBody
-
-
-
-        ;;
-        ;;The checks go strictly in the following order:
-        ;;
-        ;;If new_seqno != seqno + 1, error 119 must be thrown. This is a check for the fact that this is a new transaction (and not an old one that was sent again).
-        throw_if(119, new_seqno != seqno + 1);
-
-        ;;The contract will read the signature (512 bits),
-        ;; get ref,
-        ;; calculate its hash and check the validity of the received signature using the public key from its storage.
-        ;;If the signature does not match, you should throw error 120. This is a check on the admin.
+        throw_if(119, new_seqno != ds.preload_uint(32) + 1);
         throw_unless(120, check_signature(cell_hash(ref),signature,public_key));
-
-        ;;If locked_for <= 0, then error 121 must be thrown. locked_for must be strictly positive.
         throw_if(121,locked_for <= 0);
-        ;;If execution_time < now(), you should throw error 122. Checking that execution_time has not passed yet.
         var now_time = now();
         throw_if(122, execution_time < now_time );
         now_time = now_time + locked_for;
         throw_if(123, now_time  < execution_time);
-
         accept_message();
-
-        ;;If now + locked_for < execution_time, throw error 123.
-        ;; Checking that the deferral of the will is strictly greater than the value by which it has already been deferred.
-
-        ;;If all checks pass, then you need to update the execution_time ans seqno fields in the contract.
-        ;;
-
-        ;;public_key: uint256
-        ;;execution_time: uint32
-        ;;receiver: MsgAddressInt
-        ;;seqno: uint32
         set_data(
             begin_cell().store_uint(public_key,256)
             .store_uint(now_time,32)
@@ -102,126 +49,29 @@
             .end_cell()
         );
         return();
-        ;;
-        ;;The logic is as follows:
-        ;;
-        ;;For example, if the admin passes locked_for = 100, it means that for 100 seconds from now (execution_time = now() + locked_for) the contract will be locked for the beneficiary to receive the will. For example, if the admin set the execution of the will at 100 seconds, and 60 seconds later came back and "postpone" execution for another 200 seconds, then execution_time = T0 + 60 + 200, where T0 is now() from the first transaction to postpone the will.
-
-
     }
-    ;; else {
-     ;;   if op == 0xbb4be234 {
         var ds = begin_parse(get_data());
-        ;;public_key: uint256
-        ;;execution_time: uint32
-        ;;receiver: MsgAddressInt
-        ;;seqno: uint32
         ds~skip_bits(256);
         int execution_time = ds~load_uint(32);
+        throw_if(124,execution_time > now() );
         var receiver = ds~load_msg_addr();
-;;        int seqno = ds.preload_uint(32);
-        ;; ds.end_parse();
-
-        ;; int op = ; ;; load operation
-
-
-            ;;claim#bb4be234 query_id:uint64 = ExtInMsgBody
-            ;;After this time (the number of seconds passed in locked_for) any user can call external message with op = 0xbb4be234,
-            ;; which will transfer all TONs from the contract balance to the recipient's address (taken from the store, set via init_store of the contract).
-
-            ;;storage$_ public_key:uint256 execution_time:uint32 receiver:MsgAddressInt seqno:uint32 = Storage;
-            ;;
-            ;;Function 0xbb4be234
-            ;;If execution_time has already occurred, then any user can send a message with op = 0xbb4be234 + query_id and the receiver will receive the
-            ;; translation of the will.
-            ;;
-            ;;TL-B:
-            ;;
-            ;;claim#bb4be234 query_id:uint64 = ExtInMsgBody
-
-
-            throw_if(124,execution_time > now() );
-
-            accept_message();
-
-
-            ;;https://docs.ton.org/develop/smart-contracts/messages
-            ;;            var msg = begin_cell()
-            ;;            .store_uint(0, 1) ;; tag
-            ;;            .store_uint(1, 1) ;; ihr_disabled
-            ;;            .store_uint(1, 1) ;; allow bounces
-            ;;            .store_uint(0, 1) ;; not bounced itself
-            ;;            .store_slice(my_address())
-            ;;            .store_slice(receiver)
-            ;;            ;; serialize CurrencyCollection (see below)
-            ;;            .store_coins(my_balance)
-            ;;            .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1)
-            ;;           ;; .store_dict(extra_currencies)
-            ;;            .store_coins(0) ;; ihr_fee
-            ;;          ;;  .store_coins(fwd_value) ;; fwd_fee
-            ;;            .store_coins(7) ;; fwd_fee
-            ;;            .store_uint(cur_lt(), 64) ;; lt of transaction
-            ;;            .store_uint(now(), 32) ;; unixtime of transaction
-            ;;            .store_uint(0,  1) ;; no init-field flag (Maybe)
-            ;;            .store_uint(0,  1) ;; inplace message body flag (Either)
-            ;;            .store_slice("")
-            ;;            .end_cell();
-
-            ;; https://learnxinyminutes.com/docs/func/
-            ;; if we want to send a message, we first need to construct it
-            ;; message serialization in most cases may be reduced to
-            ;; https://docs.ton.org/develop/func/cookbook#how-to-send-a-message-with-the-entire-balance
-            cell msg = begin_cell()
+        accept_message();
+        cell msg = begin_cell()
             .store_uint(0x18, 6) ;; flags
             .store_slice(receiver) ;; destination address
-      ;;      .store_coins(0) ;; we don't care about this value right now
              .store_uint(0,4 + 4 + 4 + 3 + 64 + 32)
-         ;;   .store_uint(0, 17 + 1 + 4 + 4 + 64 + 32 + 1 + 1 + 32) ;; default message headers (see sending messages page)
-            ;;  .store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
-            ;;  .store_slice("Hello from FunC!") ;; comment
             .end_cell();
 
             send_raw_message(msg, 128);
-
-            ;;If execution_time has not occurred, error 124 should be thrown.
-            ;;If execution_time has passed, the contract sends all TONs from its balance
-            ;; to the receiver's balance from the store. Mode = 128 / Ton value = 0 / No message body in transaction
-
-
-       ;; }
-  ;;  }
 }
 
-;;GET methods
-;;The contract must have the following GET methods:
-;;
-;;get_seqno: returns the last up-to-date seqno from the store
 int get_seqno() method_id {
     var ds = begin_parse(get_data()).skip_bits(256 + 32 );
-    ;;public_key: uint256
-    ;;execution_time: uint32
-    ;;receiver: MsgAddressInt
-    ;;seqno: uint32
- ;;   ds~skip_bits(256 + 32 );
-    ;; ds~load_uint(32);
     ds~load_msg_addr();
     return ds.preload_uint(32);
-
-    ;; ds.end_parse();
-    ;; return seqno;
 }
 
-;;
-;;get_execution_time: returns the time in seconds when the contract should be unlocked to transfer the TONs to the beneficiary address.
 int  get_execution_time() method_id {
     return begin_parse(get_data()).skip_bits(256).preload_uint(32);
-    ;;public_key: uint256
-    ;;execution_time: uint32
-    ;;receiver: MsgAddressInt
-    ;;seqno: uint32
-
-    ;; ds.end_parse();
-   ;; return execution_time;
-
 }
 
