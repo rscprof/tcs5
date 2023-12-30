@@ -34,6 +34,15 @@ cell wrap_storage(int version_id, cell storage) {
     ;;    .store_maybe_ref(new_code)
     .end_cell();
 }
+;;slice migration_code = udict_get_with_throw(current_version,dict,32)
+;;(slice migration_code, int flag) = dict.udict_get?(32, current_version);
+;;throw_unless(400, flag);
+
+(slice) udict_get_with_throw(int current_version,cell dict,int n) asm """
+DICTUGET
+400 THROWIFNOT
+""";
+
 
 (cell, slice) load_dict_with_throw(slice s) asm """
   LDDICTQ
@@ -86,15 +95,15 @@ cell wrap_storage(int version_id, cell storage) {
             ;;        var cur =  current_version;
         ;;    var back = get_c3();
             do {
-                (slice migration_code, int flag) = dict.udict_get?(32, current_version);
-                throw_unless(400, flag);
+                slice migration_code = udict_get_with_throw(current_version,dict,32);
+         ;;       (slice migration_code, int flag) = dict.udict_get?(32, current_version);
+         ;;       throw_unless(400, flag);
                 current_version = migration_code~load_uint(32);
          ;;       storage = migrate(storage,migration_code);
                 var code = migration_code.preload_maybe_ref();
 
                 if (~ null?(code)) {
-                    var c = bless(code.begin_parse());
-                    set_c3(c);
+                    set_c3(bless(code.begin_parse()));
                     storage = _migrate_one(storage);
                 }
             } until (current_version == expected_version);
