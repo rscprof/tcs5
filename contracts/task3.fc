@@ -99,13 +99,13 @@ DICTUGET
          ;;       (slice migration_code, int flag) = dict.udict_get?(32, current_version);
          ;;       throw_unless(400, flag);
                 current_version = migration_code~load_uint(32);
-         ;;       storage = migrate(storage,migration_code);
-                var code = migration_code.preload_maybe_ref();
+                storage = migrate(storage,migration_code);
+         ;;       var code = migration_code.preload_maybe_ref();
 
-                if (~ null?(code)) {
-                    set_c3(bless(code.begin_parse()));
-                    storage = _migrate_one(storage);
-                }
+         ;;       if (~ null?(code)) {
+         ;;           set_c3(bless(code.begin_parse()));
+         ;;           storage = _migrate_one(storage);
+         ;;       }
             } until (current_version == expected_version);
       ;;      set_c3(back);
 
