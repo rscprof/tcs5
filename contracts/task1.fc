@@ -16,7 +16,7 @@
 
 ;; https://docs.ton.org/develop/func/functions
 ;; We need not to work with internal messages by task
-() recv_internal(slice in_msg_body) impure {
+() recv_internal() impure {
 }
 
 
