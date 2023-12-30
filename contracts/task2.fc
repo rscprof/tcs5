@@ -83,8 +83,8 @@ cell load_dict_with_check(slice ds) inline {
             ;;
             ;;            If the user is not in the storage, it should throw error 121.
 
-            var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(4);  ;;skip flags
-            var source = in_msg_full_slice~load_msg_addr();
+       ;;     var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(4);  ;;skip flags
+            (_, var source) = in_msg_full.begin_parse().skip_bits(4).load_msg_addr();
 
             var ds = begin_parse(get_data());
             var admin_addr = ds~load_msg_addr();
@@ -102,9 +102,9 @@ cell load_dict_with_check(slice ds) inline {
 
             in_msg_body~skip_bits(64);
             ;; int address_index = address_slice.preload_uint(address_slice.slice_bits());
-            var address_with_prefix = in_msg_body~load_msg_addr();
+         ;;   var address_with_prefix = ;
             ;; https://docs.ton.org/develop/func/stdlib/#load_msg_addr
-            (_ , int address) = address_with_prefix.parse_std_addr();
+            (_ , int address) = (in_msg_body~load_msg_addr()).parse_std_addr();
             throw_unless(121,dict~udict_delete?(256,address));
 
             set_data(
