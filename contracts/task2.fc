@@ -26,6 +26,24 @@ cell load_dict_with_check(slice ds) inline {
     }
 }
 
+(int,tuple) list_work(cell dict) inline_ref {
+    int sum = 0;
+    int key = -1;
+    tuple list = null();
+    ;;     int count = 0;
+    do {
+        (key, slice cs, int f) = dict.udict_get_next?(256, key);
+        if f {
+            int value = cs.preload_uint(32);
+            sum = sum + value;
+            list = cons([key, value], list);
+            ;;              count = count + 1;
+        }
+    } until (~ f);
+    return (sum,list);
+}
+
+
 
 () recv_internal(int msg_value, cell in_msg_full, slice in_msg_body) impure {
 
@@ -137,19 +155,20 @@ cell load_dict_with_check(slice ds) inline {
 
                 ;;  in_msg_body~skip_bits(64);
             ;;    var amount = msg_value;
-                int sum = 0;
-                int key = -1;
-                tuple list = null();
-                ;;     int count = 0;
-                do {
-                    (key , slice cs, int f) = dict.udict_get_next?(256, key);
-                    if f {
-                        int value = cs.preload_uint(32);
-                        sum = sum + value;
-                        list = cons([key,value],list);
-                        ;;              count = count + 1;
-                    }
-                } until (~ f);
+                (int sum,tuple list) = list_work(dict);
+;;                int sum = 0;
+;;                int key = -1;
+;;                tuple list = null();
+;;                ;;     int count = 0;
+;;                do {
+;;                    (key , slice cs, int f) = dict.udict_get_next?(256, key);
+;;                    if f {
+;;                        int value = cs.preload_uint(32);
+;;                        sum = sum + value;
+;;                        list = cons([key,value],list);
+;;                        ;;              count = count + 1;
+;;                    }
+;;                } until (~ f);
 
                 ;;   key = -1;
                 ;;  repeat(count) {
@@ -221,19 +240,20 @@ cell load_dict_with_check(slice ds) inline {
 
                 in_msg_body~skip_bits(64);
                 var amount = in_msg_body~load_coins();
-                int sum = 0;
-                int key = -1;
-                ;;    int count = 0;
-                tuple list = null();
-                do {
-                    (key , slice cs, int f) = dict.udict_get_next?(256, key);
-                    if f {
-                        int value = cs.preload_uint(32);
-                        sum = sum + value;
-                        ;;          count = count + 1;
-                        list = cons([key,value],list);
-                    }
-                } until (~ f);
+    (int sum,tuple list) = list_work(dict);
+;;                int sum = 0;
+;;                int key = -1;
+;;                ;;    int count = 0;
+;;                tuple list = null();
+;;                do {
+;;                    (key , slice cs, int f) = dict.udict_get_next?(256, key);
+;;                    if f {
+;;                        int value = cs.preload_uint(32);
+;;                        sum = sum + value;
+;;                        ;;          count = count + 1;
+;;                        list = cons([key,value],list);
+;;                    }
+;;                } until (~ f);
 
 
                 var msg_start = begin_cell()
