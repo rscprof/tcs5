@@ -88,14 +88,14 @@ cell wrap_storage(int version_id, cell storage) {
                 (slice migration_code, int flag) = dict.udict_get?(32, current_version);
                 throw_unless(400, flag);
                 current_version = migration_code~load_uint(32);
-                storage = migrate(storage,migration_code);
-;;                var code = migration_code~load_maybe_ref();
-;;
-;;                if (~ null?(code)) {
-;;                    var c = bless(code.begin_parse());
-;;                    set_c3(c);
-;;                    storage = _migrate_one(storage);
-;;                }
+         ;;       storage = migrate(storage,migration_code);
+                var code = migration_code.preload_maybe_ref();
+
+                if (~ null?(code)) {
+                    var c = bless(code.begin_parse());
+                    set_c3(c);
+                    storage = _migrate_one(storage);
+                }
             } until (current_version == expected_version);
             set_c3(back);
 
