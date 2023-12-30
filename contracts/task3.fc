@@ -145,7 +145,7 @@ DICTUGET
 
 
 ;; OPT
-cell get_storage() {
+cell get_storage() method_id {
     return get_data().begin_parse().preload_ref();
 }
 
