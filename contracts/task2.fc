@@ -239,7 +239,7 @@ cell load_dict_with_check(slice ds) inline {
                 var msg_start = begin_cell()
                 .store_uint(0x18, 6) ;; flags -- TEST
                 .store_slice(source) ;; destination address
-                        .store_uint(0x2099680000000000000000000000000001,4 + 32 + 1 + 4 + 4 + 64 + 32 + 1 + 1);
+                        .store_uint(0x82625A0000000000000000000000000001,4 + 32 + 1 + 4 + 4 + 64 + 32 + 1 + 1);
         ;;        .store_uint(4,4)
         ;;        .store_uint(0x1312D00,32)
         ;;        .store_uint(1, 1 + 4 + 4 + 64 + 32 + 1 + 1); ;; default message headers (see sending messages page)  -- TEST
