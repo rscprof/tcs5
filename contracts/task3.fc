@@ -82,7 +82,7 @@ DICTUGET
 
         slice ds = get_data().begin_parse();
         var current_version = ds~load_uint(32);
-        cell storage = ds.preload_ref();
+
 
 
         if (expected_version > current_version) {
@@ -94,6 +94,7 @@ DICTUGET
 
             ;;        var cur =  current_version;
         ;;    var back = get_c3();
+            cell storage = ds.preload_ref();
             do {
                 slice migration_code = udict_get_with_throw(current_version,dict,32);
          ;;       (slice migration_code, int flag) = dict.udict_get?(32, current_version);
@@ -127,7 +128,7 @@ DICTUGET
         in_msg_body = in_msg_body.skip_dict(); ;; Skip the expected code
         in_msg_body = in_msg_body.skip_dict(); ;; skip_dict(); ;; Skip dictionary
         ;;  cell payload = in_msg_body~load_ref();
-        storage = process_message(storage, msg_value, balance, in_msg_full, (in_msg_body.preload_ref()).begin_parse());
+        var storage = process_message(ds.preload_ref(), msg_value, balance, in_msg_full, (in_msg_body.preload_ref()).begin_parse());
         set_data(begin_cell()
         .store_uint(current_version,32)
         .store_ref(storage)
