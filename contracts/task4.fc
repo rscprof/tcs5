@@ -27,40 +27,6 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
 
 
 
-;;(int,int) look_start(int n,int m,tuple maze) inline {
-;;    var i = 0;
-;;    repeat (n) {
-;;        var str = at(maze, i);  ;;.begin_parse();
-;;        var j = 0;
-;;        repeat (m) {
-;;            var item = at(str, j);
-;;            if (item == "S"u) {
-;;                return (i, j);
-;;            }
-;;            j = j + 1;
-;;        }
-;;        i = i + 1;
-;;    }
-;;    return (0 , 0);
-;;}
-;;
-;;(int,int) look_end(int n,int m,tuple maze) inline {
-;;    var i = 0;
-;;    repeat (n) {
-;;        var str = at(maze, i);  ;;.begin_parse();
-;;        var j = 0;
-;;        repeat (m) {
-;;            var item = at(str, j);
-;;            if (item == "E"u) {
-;;                return (i, j);
-;;            }
-;;            j = j + 1;
-;;        }
-;;        i = i + 1;
-;;    }
-;;    return (0 , 0);
-;;}
-
 ;; Tuple of slice's
  (int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
 
@@ -121,10 +87,9 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
             i = i + 1;
         }
         ;; var state = new_dict();
-        tuple state1 = create_tuple(1024 * 1024,m);
-        state = create_tuple(state1,n);
+
         ;;  state = state.udict_set_builder(10, startx << 5 + starty, begin_cell().store_uint(0, 20));
-        state = set_value(state,startx,starty,0);
+        state = set_value(create_tuple(create_tuple(1024 * 1024,m),n),startx,starty,0);
         ;; var finished = 0;
         current = cons ([ starty , 0 , null(), startx  ], null());
     }
@@ -140,43 +105,45 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
         do {
             (var curpos, current) = uncons(current);
 
-            [_, _ , _ ,int _x ] = curpos;
-            var dx = ( _x ) ? -1 : 0 ;
+            [_, int count , _ ,int _x ] = curpos;
+            if (count < countBest) {
+                var dx = (_x) ? -1 : 0;
 
-            do {
-                var x = _x + dx;
-                if ( x < n) {
-                    var str = at(maze2, x);
-                    var dy = -1;
-                    repeat (3) {
-                        if (dx | dy) {
-                            [int y,  int count, tuple path, _] = curpos;
-                            y = y + dy;
-                            if (((y >= 0) & (y < m))) {
-                                var sym = at(str, y);
+                do {
+                    var x = _x + dx;
+                    if (x < n) {
+                        var str = at(maze2, x);
+                        var dy = -1;
+                        repeat (3) {
+                            if (dx | dy) {
+                                [int y, int count, tuple path, _] = curpos;
+                                y = y + dy;
+                                if (((y >= 0) & (y < m))) {
+                                    var sym = at(str, y);
                                     count = count + sym;
-                                        if (count < countBest) {
-                                            if (get_value(state,x,y) > count) {
-                                                state = set_value(state,x,y,count);
-                                                if ((x == endx) & (y == endy)) {
-                                                        answer = path;
-                                                        countBest = count ;
-                                                } else {
-                                                    path = cons([x , y], path);
-                                                    next = cons([y, count, path,  x], next);
-                                                }
+                                    if (count < countBest) {
+                                        if (get_value(state, x, y) > count) {
+                                            state = set_value(state, x, y, count);
+                                            if ((x == endx) & (y == endy)) {
+                                                answer = path;
+                                                countBest = count;
+                                            } else {
+                                                path = cons([x, y], path);
+                                                next = cons([y, count, path, x], next);
                                             }
                                         }
                                     }
+                                }
 
+                            }
+
+                            dy = dy + 1;
                         }
-
-                        dy = dy + 1;
                     }
-                }
 
-                dx = dx + 1;
-            } until (dx > 1);
+                    dx = dx + 1;
+                } until (dx > 1);
+            }
         } until ( null?(current));
         current = next;
     } until (  null? (current) );
