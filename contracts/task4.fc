@@ -118,10 +118,11 @@ forall X -> tuple set_value(tuple t, int i, int j, X value) inline {
                 var dx = (_x) ? -1 : 0;
                 var startdy = (_y) ? -1 : 0;
                 var enddy = (_y == (m - 1)) ? 0 : 1;
+                var enddx = (_x == (n - 1)) ? 0 : 1;
 
                 do {
                     var x = _x + dx;
-                    if (x < n) {
+             ;;       if (x < n) {
                         var str = at(maze2, x);
                         var dy = startdy;
                         do {
@@ -129,9 +130,9 @@ forall X -> tuple set_value(tuple t, int i, int j, X value) inline {
                                 [int y, int count, tuple path, _] = curpos;
                                 y = y + dy;
                                 count = count + at(str, y);
-                                if (state~get_set_value_min(x,y,count)) {
-                               ;; if (get_value(state, x, y) > count) {
-                               ;;     state = set_value(state, x, y, count);
+                          ;;      if (state~get_set_value_min(x,y,count)) {
+                                if (get_value(state, x, y) > count) {
+                                    state = set_value(state, x, y, count);
                                     if ((x == endx) & (y == endy)) {
                                         answer = path;
                                         countBest = count;
@@ -145,10 +146,10 @@ forall X -> tuple set_value(tuple t, int i, int j, X value) inline {
 
                             dy = dy + 1;
                         } until (dy > enddy);
-                    }
+               ;;     }
 
                     dx = dx + 1;
-                } until (dx > 1);
+                } until (dx > enddx);
             }
         } until (null?(current));
         current = next;
