@@ -78,7 +78,7 @@ forall X -> tuple set_value(tuple t, int i, int j, X value) inline {
             var j = 0;
             repeat (m) {
                 int sym = str.at(j);
-                str_end~tpush((sym == "?"u) ? 1 : (sym == "X"u) ? 1000 : 0);
+                str_end~tpush((sym == "?"u) ? 1 : (sym == "X"u) ? 1000 : (sym == "E"u) ? -1 : 0);
                 if (sym == "S"u) {
                     startx = i;
                     starty = j;
@@ -127,18 +127,18 @@ forall X -> tuple set_value(tuple t, int i, int j, X value) inline {
                         do {
                                 [int y, int count, tuple path, _] = curpos;
                                 y = y + dy;
-                                count = count + at(str, y);
+                            var sym = at(str, y);
+                            if (sym < 0) {
+                                answer = path;
+                                countBest = count;
+                            } else {
+                                count = count + sym;
                                 if (get_value(state, x, y) > count) {
                                     state = set_value(state, x, y, count);
-                                    if ((x == endx) & (y == endy)) {
-                                        answer = path;
-                                        countBest = count;
-                                    } else {
-                                        path = cons([x, y], path);
-                                        next = cons([y, count, path, x], next);
-                                    }
+                                    path = cons([x, y], path);
+                                    next = cons([y, count, path, x], next);
                                 }
-
+                            }
                             dy = dy + adddy;
                         } until (dy > enddy);
                     dx = dx + 1;
@@ -161,9 +161,10 @@ forall X -> tuple set_value(tuple t, int i, int j, X value) inline {
         [int x, int y] = res;
         ;;    (int x,int y) = divmod(index,32);
         distance = distance + 1;
-        var str = at(maze, x);
-        str = set_index_var(str, "!"u, y);
-        maze = set_index_var(maze, str, x);
+        maze = set_value(maze,x,y,"!"u);
+;;        var str = at(maze, x);
+;;        str = set_index_var(str, "!"u, y);
+;;        maze = set_index_var(maze, str, x);
     }
 
     (int d, int m) = divmod(countBest, 1000);
