@@ -59,7 +59,9 @@ cell wrap_storage(int version_id, cell storage) {
 
 
         if (expected_version > current_version) {
-            (cell new_code,in_msg_body) = load_code(in_msg_body);
+            var new_code = in_msg_body~load_maybe_ref();
+            throw_if (200, null?(new_code));
+            ;;(cell new_code,in_msg_body) = load_code(in_msg_body);
 
             (cell dict, in_msg_body) = load_dict_with_throw(in_msg_body);
 
