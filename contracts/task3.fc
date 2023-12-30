@@ -65,59 +65,150 @@ cell wrap_storage(int version_id, cell storage) {
     }>
 """;
 
+() asm_recv_internal(int msg_value, int balance, cell in_msg_full, slice in_msg_body) impure asm """
+DUP
+32 LDU
+OVER
+IFJMP:<{
+c4 PUSH
+CTOS
+32 LDU
+PLDREF
+s3 s1 PUSH2
+GREATER
+IFJMP:<{
+s0 s2 XCHG
+LDDICTQ
+// in msg body -> new_code in_msg_body -1 | in_msg_body 0
+// LDOPTREF
+// in msg body -> new_code in_msg_body
+// OVER
+// new_code in_msg_body new_code
+// ISNULL
+// new_code in_msg_body flag
+// 200 THROWIF
+// new code in_msg_body
+200 THROWIFNOT
+// new_code in_msg_body
+LDDICTQ
+400 THROWIFNOT
+DROP
+c3 PUSH
+UNTIL:<{
+s3 s1 XCPU
+32 PUSHINT
+DICTUGET
+NULLSWAPIFNOT
+400 THROWIFNOT
+32 LDU
+PLDOPTREF
+DUP
+ISNULL
+NOT
+IF:<{
+CTOS
+BLESS
+c3 POP
+s0 s4 XCHG
+1 CALL
+s0 s4 XCHG
+}>ELSE<{
+DROP
+}>
+s0 s5 PUSH2
+EQUAL
+s1 s4 XCHG
+}>
+NIP
+s4 POP
+s0 s3 XCHG
+c3 POP
+s2 PUSH
+SETCODE
+SWAP
+wrap_storage CALLDICT
+c4 POP
+CTOS
+BLESS
+c3 POP
+recv_internal CALLDICT
+}>
+s3 POP
+s3 POP
+SKIPDICT
+SKIPDICT
+PLDREF
+CTOS
+s1 s4 XCHG
+s3 s5 XCHG
+s1 s5 s0 XCHG3
+process_message CALLDICT
+wrap_storage CALLDICT
+c4 POP
+}>
+6 BLKDROP
+c4 PUSH
+1 PUSHINT
+SWAP
+wrap_storage CALLDICT
+c4 POP
+
+""";
+
 () recv_internal(int msg_value, int balance, cell in_msg_full, slice in_msg_body) impure {
-    var in_msg_body_backup = in_msg_body;
-    var expected_version = in_msg_body~load_uint(32); ;; Skip the expected version
-    if ( expected_version ) {
-
-        slice ds = get_data().begin_parse();
-        var current_version = ds~load_uint(32);
-        cell storage = ds.preload_ref();
-
-
-        if (expected_version > current_version) {
-            var new_code = in_msg_body~load_maybe_ref();
-            throw_if (200, null?(new_code));
-            ;;(cell new_code,in_msg_body) = load_code(in_msg_body);
-
-            (cell dict, in_msg_body) = load_dict_with_throw(in_msg_body);
-
-            ;;        var cur =  current_version;
-            var back = get_c3();
-            do {
-                (slice migration_code, int flag) = dict.udict_get?(32, current_version);
-                throw_unless(400, flag);
-                current_version = migration_code~load_uint(32);
-         ;;       storage = migrate(storage,migration_code);
-                var code = migration_code.preload_maybe_ref();
-
-                if (~ null?(code)) {
-                    var c = bless(code.begin_parse());
-                    set_c3(c);
-                    storage = _migrate_one(storage);
-                }
-            } until (current_version == expected_version);
-            set_c3(back);
-
-
-            ;;    current_version = expected_version;
-
-            set_code(new_code);
-            set_data(wrap_storage(current_version, storage)); ;; -2 is just a random placeholder for the version
-            ;;        commit();
-            set_c3(bless(new_code.begin_parse()));
-            recv_internal(msg_value, balance, in_msg_full, in_msg_body_backup);
-            return ();
-        }
-        in_msg_body = in_msg_body.skip_dict(); ;; Skip the expected code
-        in_msg_body = in_msg_body.skip_dict(); ;; skip_dict(); ;; Skip dictionary
-        ;;  cell payload = in_msg_body~load_ref();
-        storage = process_message(storage, msg_value, balance, in_msg_full, (in_msg_body.preload_ref()).begin_parse());
-        set_data(wrap_storage(current_version, storage)); ;; -2 is just a random placeholder for the version
-        return();
-    }
-    cell ds = get_data();
-    set_data(wrap_storage(1,ds));
+    asm_recv_internal(msg_value,balance,in_msg_full,in_msg_body);
+;;    var in_msg_body_backup = in_msg_body;
+;;    var expected_version = in_msg_body~load_uint(32); ;; Skip the expected version
+;;    if ( expected_version ) {
+;;
+;;        slice ds = get_data().begin_parse();
+;;        var current_version = ds~load_uint(32);
+;;        cell storage = ds.preload_ref();
+;;
+;;
+;;        if (expected_version > current_version) {
+;;            var new_code = in_msg_body~load_maybe_ref();
+;;            throw_if (200, null?(new_code));
+;;            ;;(cell new_code,in_msg_body) = load_code(in_msg_body);
+;;
+;;            (cell dict, in_msg_body) = load_dict_with_throw(in_msg_body);
+;;
+;;            ;;        var cur =  current_version;
+;;            var back = get_c3();
+;;            do {
+;;                (slice migration_code, int flag) = dict.udict_get?(32, current_version);
+;;                throw_unless(400, flag);
+;;                current_version = migration_code~load_uint(32);
+;;         ;;       storage = migrate(storage,migration_code);
+;;                var code = migration_code.preload_maybe_ref();
+;;
+;;                if (~ null?(code)) {
+;;                    var c = bless(code.begin_parse());
+;;                    set_c3(c);
+;;                    storage = _migrate_one(storage);
+;;                }
+;;            } until (current_version == expected_version);
+;;            set_c3(back);
+;;
+;;
+;;            ;;    current_version = expected_version;
+;;
+;;            set_code(new_code);
+;;            set_data(wrap_storage(current_version, storage)); ;; -2 is just a random placeholder for the version
+;;            ;;        commit();
+;;            set_c3(bless(new_code.begin_parse()));
+;;            recv_internal(msg_value, balance, in_msg_full, in_msg_body_backup);
+;;            return ();
+;;        }
+;;        in_msg_body = in_msg_body.skip_dict(); ;; Skip the expected code
+;;        in_msg_body = in_msg_body.skip_dict(); ;; skip_dict(); ;; Skip dictionary
+;;        ;;  cell payload = in_msg_body~load_ref();
+;;        storage = process_message(storage, msg_value, balance, in_msg_full, (in_msg_body.preload_ref()).begin_parse());
+;;        set_data(wrap_storage(current_version, storage)); ;; -2 is just a random placeholder for the version
+;;        return();
+;;    }
+;;    cell ds = get_data();
+;;    set_data(wrap_storage(1,ds));
 }
 
 
