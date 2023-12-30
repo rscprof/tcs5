@@ -26,14 +26,14 @@ cell process_message(cell storage, int msg_value, int balance, cell in_msg_full,
 ;; Custom version-specific code ends >>>>>
 
 ;; OPT
-cell wrap_storage(int version_id, cell storage) {
-    ;; add additional data required for versioning in this cell
-    return begin_cell()
-    .store_uint(version_id,32)
-    .store_ref(storage)
-    ;;    .store_maybe_ref(new_code)
-    .end_cell();
-}
+;;cell wrap_storage(int version_id, cell storage) {
+;;    ;; add additional data required for versioning in this cell
+;;    return begin_cell()
+;;    .store_uint(version_id,32)
+;;    .store_ref(storage)
+;;    ;;    .store_maybe_ref(new_code)
+;;    .end_cell();
+;;}
 ;;slice migration_code = udict_get_with_throw(current_version,dict,32)
 ;;(slice migration_code, int flag) = dict.udict_get?(32, current_version);
 ;;throw_unless(400, flag);
