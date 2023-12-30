@@ -116,13 +116,13 @@ forall X -> tuple set_value(tuple t, int i, int j, X value) inline {
             [int _y, int count, _, int _x] = curpos;
             if (count < countBest) {
                 var dx = (_x) ? -1 : 0;
-                var startdy = (_y) ? -1 : 0;
                 var enddy = (_y == (m - 1)) ? 0 : 1;
                 var enddx = (_x == (n - 1)) ? 0 : 1;
 
                 do {
                     var x = _x + dx;
                     var adddy = dx ? 1 : 2 ;
+                    var startdy = (_y) ? -1 : dx ? 0 : 1;
              ;;       if (x < n) {
                         var str = at(maze2, x);
                         var dy = startdy;
