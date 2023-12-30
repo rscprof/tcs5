@@ -17,9 +17,7 @@ forall X -> X get_value(tuple t,int i, int j) inline {
 forall X -> tuple set_index_var (tuple t,X value,int pos) asm "SETINDEXVAR";
 
 forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
-    tuple t2 = at(t,i);
-    t2 = set_index_var(t2,value,j);
-    return set_index_var(t,t2,i);
+    return set_index_var(t,set_index_var(at(t,i),value,j),i);
 }
 
 
