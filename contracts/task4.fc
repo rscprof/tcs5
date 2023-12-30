@@ -122,11 +122,12 @@ forall X -> tuple set_value(tuple t, int i, int j, X value) inline {
 
                 do {
                     var x = _x + dx;
+                    var adddy = dx ? 1 : 2 ;
              ;;       if (x < n) {
                         var str = at(maze2, x);
                         var dy = startdy;
                         do {
-                            if (dx | dy) {
+                         ;;   if (dx | dy) {
                                 [int y, int count, tuple path, _] = curpos;
                                 y = y + dy;
                                 count = count + at(str, y);
@@ -142,9 +143,9 @@ forall X -> tuple set_value(tuple t, int i, int j, X value) inline {
                                     }
                                 }
 
-                            }
+                          ;;  }
 
-                            dy = dy + 1;
+                            dy = dy + adddy;
                         } until (dy > enddy);
                ;;     }
 
