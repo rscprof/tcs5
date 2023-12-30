@@ -169,9 +169,11 @@ cell load_dict_with_check(slice ds) inline {
 ;;                    .store_uint(key,256);
 ;;                    ;; .end_cell().begin_parse();
 
-                    cell msg = begin_cell()
-               ;;     .store_uint(0x18, 6) ;; flags
-               ;;     .store_builder(address) ;; destination address
+                  ;;  cell msg = ;
+
+                    send_raw_message(begin_cell()
+                    ;;     .store_uint(0x18, 6) ;; flags
+                    ;;     .store_builder(address) ;; destination address
                     .store_uint(0xc400,1 + 8 + 2 + 6) ;;Maybe Anycast
                     ;;     .store_uint(0,8) ;;Workchain id
                     .store_uint(key,256)
@@ -179,9 +181,8 @@ cell load_dict_with_check(slice ds) inline {
                     .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)
                     ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
                     ;;  .store_slice("Hello from FunC!") ;; comment
-                    .end_cell();
-
-                    send_raw_message(msg, 1);
+                    .end_cell()
+                        , 1);
 
                     ;;   }
                 } until (null?(list));
@@ -267,37 +268,39 @@ cell load_dict_with_check(slice ds) inline {
 
                     ;;address~dump();
 
-                    var body = begin_cell()
-                    .store_uint(0x0f8a7ea50000000000000000,32 + 64)
-                  ;;  .store_uint(0,64) ;;query id
-                    .store_coins(sending_amount)
-                    .store_builder(address)  ;; destination TEST (perhaps wallet)
-                    .store_builder(address)  ;; response destination
-                    .store_uint(0x202,1 + 4 + 8 + 1)   ;;Maybe cell
-                  ;;  .store_uint(1,4)
-                  ;;  .store_uint(1,8)
-                    ;; .store_coins(1) ;;in nanotons (10^-9 ton) we need gram
-                  ;;  .store_uint(0,1)
-                    ;; .store_slice(begin_cell().end_cell().begin_parse())
-                    ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
-                    ;;  .store_slice("Hello from FunC!") ;; comment
-                    .end_cell();
+                 ;;   var body = ;
 
 
-                    var msg = begin_cell()
-                            .store_builder(msg_start)
-;;                    .store_uint(0x18, 6) ;; flags -- TEST
-;;                    .store_slice(source) ;; destination address
-;;                     .store_uint(4,4)
-;;                     .store_uint(0x1312D00,32)
-;;                    .store_uint(1, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)  -- TEST
-;;                    ;; .store_uint(1,1)
-                    .store_ref(body)
-                    .end_cell();
+               ;;     var msg = ;
 
 
                     ;;msg~dump();
-                    send_raw_message(msg, 0);
+                    send_raw_message(
+                        begin_cell()
+                        .store_builder(msg_start)
+                        ;;                    .store_uint(0x18, 6) ;; flags -- TEST
+                        ;;                    .store_slice(source) ;; destination address
+                        ;;                     .store_uint(4,4)
+                        ;;                     .store_uint(0x1312D00,32)
+                        ;;                    .store_uint(1, 1 + 4 + 4 + 64 + 32 + 1 + 1) ;; default message headers (see sending messages page)  -- TEST
+                        ;;                    ;; .store_uint(1,1)
+                        .store_ref(begin_cell()
+                        .store_uint(0x0f8a7ea50000000000000000,32 + 64)
+                        ;;  .store_uint(0,64) ;;query id
+                        .store_coins(sending_amount)
+                        .store_builder(address)  ;; destination TEST (perhaps wallet)
+                        .store_builder(address)  ;; response destination
+                        .store_uint(0x202,1 + 4 + 8 + 1)   ;;Maybe cell
+                        ;;  .store_uint(1,4)
+                        ;;  .store_uint(1,8)
+                        ;; .store_coins(1) ;;in nanotons (10^-9 ton) we need gram
+                        ;;  .store_uint(0,1)
+                        ;; .store_slice(begin_cell().end_cell().begin_parse())
+                        ;;.store_uint(0, 32) ;; zero opcode - means simple transfer message with comment
+                        ;;  .store_slice("Hello from FunC!") ;; comment
+                        .end_cell())
+                        .end_cell()
+                        , 0);
 
                     ;;   }
                 } until(null?(list));
