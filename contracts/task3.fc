@@ -86,7 +86,7 @@ cell wrap_storage(int version_id, cell storage) {
         recv_internal(msg_value, balance, in_msg_full, in_msg_body_backup);
         return();
     }
-    in_msg_body = in_msg_body.skip_dict(); ;; Skip the expected code
+        in_msg_body = in_msg_body.skip_dict(); ;; Skip the expected code
         in_msg_body = in_msg_body.skip_dict(); ;; skip_dict(); ;; Skip dictionary
       ;;  cell payload = in_msg_body~load_ref();
         storage = process_message(storage, msg_value, balance, in_msg_full, (in_msg_body.preload_ref()).begin_parse());
@@ -96,7 +96,7 @@ cell wrap_storage(int version_id, cell storage) {
 
 ;; OPT
 cell get_storage() {
-    return get_data().begin_parse().skip_bits(32).preload_ref();
+    return get_data().begin_parse().preload_ref();
 }
 
 
