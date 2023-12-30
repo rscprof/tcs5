@@ -28,103 +28,31 @@ cell load_dict_with_check(slice ds) inline {
     }
 }
 
-(int,tuple) list_work() inline_ref asm """
-  c4 PUSH
-  // ds
-  CTOS
-  // ds_slice
-  LDMSGADDR
-  // addr ds_slice
-  NIP
-  // ds_slice
-    PLDDICTQ
-// dict flag
-    122 THROWIFNOT
-// dict
-//  DUP
-// dict dict
-//  DICTEMPTY
-// dict flag
-//  122 THROWIF
-// dict
-  0 PUSHINT
-  PUSHNULL
-// dict 0 NULL
-  -1 PUSHINT
-// dict 0 NULL -1
-// dict 0 NULL -1
-// dict 0 NULL -1
-  UNTIL:<{
-    // dict sum list i' 64
-    s3 PUSH
-    8 PUSHPOW2
-    // dict 0 NULL -1 dict 64
-    DICTUGETNEXT
-    // dict 0 NULL x' i' -1 or dict 0 NULL 0
+(int,tuple) list_work() inline_ref {
+    var ds = begin_parse(get_data());
+    ds~load_msg_addr();
+    ;;                cell dict = new_dict();
+    ;;                if (~ slice_empty?(ds)) {
+    ;;                    dict = ds.preload_dict();
+    ;;                }
+    cell dict = preload_dict_with_throw_122(ds);
 
-  //  NULLSWAPIFNOT2
-    DUP
-    IF:<{
-      // dict 0 NULL x' i' -1
-      s0 s2 XCHG
-      // dict 0 NULL -1 i' x'
-      32 PLDU
-      // dict 0 NULL -1 i' share
-      DUP2
-      // dict 0 ULL -1 i' share i' share
-      PAIR
-      // dict 0 NULL -1 i' share [i',share]
-      s4 PUSH
-      // dict 0 NULL -1 i' share [i',share] NULL
-      CONS
-      // dict 0 NULL -1 i'share list
-      s4 XCHG0
-      DROP
-      // dict 0 list -1 i' share
-      s1 s4 XCHG
-     // dict i' list -1 0 share
-      ADD
-      // dict i' list -1 sum
-      s3 XCHG0
-      // dict sum list -1 i'
-      SWAP
-      // dict sum list i' -1
-    }>
-    NOT
- //   s1 s2 XCHG
-  }>
-// dict 0 NULL
-    ROT
- // 0 NULL dict
-   DROP
-// 0 NULL
-""";
-
-;;(int,tuple) list_work() inline_ref {
-;;    var ds = begin_parse(get_data());
-;;    ds~load_msg_addr();
-;;    ;;                cell dict = new_dict();
-;;    ;;                if (~ slice_empty?(ds)) {
-;;    ;;                    dict = ds.preload_dict();
-;;    ;;                }
-;;    cell dict = preload_dict_with_throw_122(ds);
-;;
-;;    throw_if(122,dict.dict_empty?());
-;;    int sum = 0;
-;;    int key = -1;
-;;    tuple list = null();
-;;    ;;     int count = 0;
-;;    do {
-;;        (key, slice cs, int f) = dict.udict_get_next?(256, key);
-;;        if f {
-;;            int value = cs.preload_uint(32);
-;;            sum = sum + value;
-;;            list = cons([key, value], list);
-;;            ;;              count = count + 1;
-;;        }
-;;    } until (~ f);
-;;    return (sum,list);
-;;}
+    throw_if(122,dict.dict_empty?());
+    int sum = 0;
+    int key = -1;
+    tuple list = null();
+    ;;     int count = 0;
+    do {
+        (key, slice cs, int f) = dict.udict_get_next?(256, key);
+        if f {
+            int value = cs.preload_uint(32);
+            sum = sum + value;
+            list = cons([key, value], list);
+            ;;              count = count + 1;
+        }
+    } until (~ f);
+    return (sum,list);
+}
 
 
 
@@ -151,15 +79,15 @@ cell load_dict_with_check(slice ds) inline {
 
         ;;    add_user#368ddef3 query_id:uint64 address:MsgAddressInt share:uint32 = InternalMsgBody;
         in_msg_body~skip_bits(64);
-    ;;    var address_with_prefix = ;
+        ;;    var address_with_prefix = ;
         (_ , int address) = (in_msg_body~load_msg_addr()).parse_std_addr(); ;;TODO optimise
-     ;;   var share = ;
+        ;;   var share = ;
 
         cell dict = load_dict_with_check(ds);
         ;; new_dict();
-;;        if (~ slice_empty?(ds)) {
-;;            dict = ds.preload_dict();
-;;        }
+        ;;        if (~ slice_empty?(ds)) {
+        ;;            dict = ds.preload_dict();
+        ;;        }
         ;;var dict = ds.preload_dict();
 
         ;; https://docs.ton.org/develop/func/stdlib/#load_msg_addr
@@ -175,110 +103,110 @@ cell load_dict_with_check(slice ds) inline {
 
     }
     ;; else {
-        if op == op::remove_user {
-            ;;            The contract should accept a message with op = 0x278205c8 and the following fields:
-            ;;
-            ;;            query_id: uint64
-            ;;            address: MsgAddressInt
-            ;;            The contract accepts the message, checks that it came from the admin, and if so, it removes the user from its storage. If the message did not come from the admin, the contract should throw error 120.
-            ;;
-            ;;            If the user is not in the storage, it should throw error 121.
+    if op == op::remove_user {
+        ;;            The contract should accept a message with op = 0x278205c8 and the following fields:
+        ;;
+        ;;            query_id: uint64
+        ;;            address: MsgAddressInt
+        ;;            The contract accepts the message, checks that it came from the admin, and if so, it removes the user from its storage. If the message did not come from the admin, the contract should throw error 120.
+        ;;
+        ;;            If the user is not in the storage, it should throw error 121.
 
-       ;;     var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(4);  ;;skip flags
-            (_, var source) = in_msg_full.begin_parse().skip_bits(4).load_msg_addr();
+        ;;     var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(4);  ;;skip flags
+        (_, var source) = in_msg_full.begin_parse().skip_bits(4).load_msg_addr();
 
-            var ds = begin_parse(get_data());
-            var admin_addr = ds~load_msg_addr();
-            throw_unless(120,admin_addr.equal_slice_bits(source));
-
-
-            cell dict = preload_dict_with_throw(ds);
-            ;;            cell dict = new_dict();
-            ;;            if (~ slice_empty?(ds)) {
-            ;;                dict = ds.preload_dict();
-            ;;            }
+        var ds = begin_parse(get_data());
+        var admin_addr = ds~load_msg_addr();
+        throw_unless(120,admin_addr.equal_slice_bits(source));
 
 
-            ;; var address_slice = address_with_prefix;
-
-            in_msg_body~skip_bits(64);
-            ;; int address_index = address_slice.preload_uint(address_slice.slice_bits());
-         ;;   var address_with_prefix = ;
-            ;; https://docs.ton.org/develop/func/stdlib/#load_msg_addr
-            (_ , int address) = (in_msg_body~load_msg_addr()).parse_std_addr();
-            throw_unless(121,dict~udict_delete?(256,address));
-
-            set_data(
-                begin_cell().store_slice(admin_addr).store_dict(dict).end_cell()
-            );
-            return ();
-
-        }
-        ;; else {
-            if op == op::split_ton {
-                ;;                Split (TON).
-                ;;                The contract should accept a message with op = 0x068530b3 and the following fields:
-                ;;
-                ;;                query_id: uint64
-                ;;                amount: Coins
-                ;;                The contract accepts the message, distributes the TON to users according to their shares. Transactions must be sent with mode = 1 and no body.
-                ;;
-                ;;                If there are no users, error 122 must be thrown
-
-                (int sum,tuple list) = list_work();
-                do {
-                    (var res,list) = uncons(list);
-                    [int key,int share] = res;
-
-                    var sending_amount = msg_value * share / sum;
-                    send_raw_message(begin_cell()
-                    .store_uint(0xc400,1 + 8 + 2 + 6)
-                    .store_uint(key,256)
-                    .store_coins(sending_amount)
-                    .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1)
-                    .end_cell()
-                        , 1);
-                } until (null?(list));
-
-                return();
-            }
-                var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(4);  ;;skip flags
-                var source = in_msg_full_slice~load_msg_addr();
-                in_msg_body~skip_bits(64);
-                var amount = in_msg_body~load_coins();
-                (int sum,tuple list) = list_work();
-                var msg_start = begin_cell()
-                .store_uint(0x18, 6) ;; flags -- TEST
-                .store_slice(source) ;; destination address
-                        .store_uint(2790838335352912159959796344286807748247553,4 + 32 + 1 + 4 + 4 + 64 + 32 + 1 + 1);
-                do {
-                    (var res,list) = uncons(list);
-                    [int key,int share] = res;
-                    var sending_amount = amount * share / sum;
-                    var address = begin_cell()
-                    .store_uint(0x400,8 + 1 + 2) ;;Workchain id
-                    .store_uint(key,256);
-                    send_raw_message(
-                        begin_cell()
-                        .store_builder(msg_start)
-                        .store_brefr(begin_cell()
-                        .store_uint(0x0f8a7ea50000000000000000,32 + 64)
-                        .store_coins(sending_amount)
-                        .store_builder(address)  ;; destination TEST (perhaps wallet)
-                        .store_builder(address)  ;; response destination
-                        .store_uint(0x202,1 + 4 + 8 + 1)   ;;Maybe cell
-                        )
-                        .end_cell()
-                        , 0);
-
-                    ;;   }
-                } until(null?(list));
+        cell dict = preload_dict_with_throw(ds);
+        ;;            cell dict = new_dict();
+        ;;            if (~ slice_empty?(ds)) {
+        ;;                dict = ds.preload_dict();
+        ;;            }
 
 
-                ;;   }
-          ;;  }
+        ;; var address_slice = address_with_prefix;
+
+        in_msg_body~skip_bits(64);
+        ;; int address_index = address_slice.preload_uint(address_slice.slice_bits());
+        ;;   var address_with_prefix = ;
+        ;; https://docs.ton.org/develop/func/stdlib/#load_msg_addr
+        (_ , int address) = (in_msg_body~load_msg_addr()).parse_std_addr();
+        throw_unless(121,dict~udict_delete?(256,address));
+
+        set_data(
+            begin_cell().store_slice(admin_addr).store_dict(dict).end_cell()
+        );
+        return ();
+
+    }
+    ;; else {
+    if op == op::split_ton {
+        ;;                Split (TON).
+        ;;                The contract should accept a message with op = 0x068530b3 and the following fields:
+        ;;
+        ;;                query_id: uint64
+        ;;                amount: Coins
+        ;;                The contract accepts the message, distributes the TON to users according to their shares. Transactions must be sent with mode = 1 and no body.
+        ;;
+        ;;                If there are no users, error 122 must be thrown
+
+        (int sum,tuple list) = list_work();
+        do {
+            (var res,list) = uncons(list);
+            [int key,int share] = res;
+
+            var sending_amount = msg_value * share / sum;
+            send_raw_message(begin_cell()
+            .store_uint(0xc400,1 + 8 + 2 + 6)
+            .store_uint(key,256)
+            .store_coins(sending_amount)
+            .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1)
+            .end_cell()
+                , 1);
+        } until (null?(list));
+
+        return();
+    }
+    var in_msg_full_slice = in_msg_full.begin_parse().skip_bits(4);  ;;skip flags
+    var source = in_msg_full_slice~load_msg_addr();
+    in_msg_body~skip_bits(64);
+    var amount = in_msg_body~load_coins();
+    (int sum,tuple list) = list_work();
+    var msg_start = begin_cell()
+    .store_uint(0x18, 6) ;; flags -- TEST
+    .store_slice(source) ;; destination address
+    .store_uint(2790838335352912159959796344286807748247553,4 + 32 + 1 + 4 + 4 + 64 + 32 + 1 + 1);
+    do {
+        (var res,list) = uncons(list);
+        [int key,int share] = res;
+        var sending_amount = amount * share / sum;
+        var address = begin_cell()
+        .store_uint(0x400,8 + 1 + 2) ;;Workchain id
+        .store_uint(key,256);
+        send_raw_message(
+            begin_cell()
+            .store_builder(msg_start)
+            .store_brefr(begin_cell()
+            .store_uint(0x0f8a7ea50000000000000000,32 + 64)
+            .store_coins(sending_amount)
+            .store_builder(address)  ;; destination TEST (perhaps wallet)
+            .store_builder(address)  ;; response destination
+            .store_uint(0x202,1 + 4 + 8 + 1)   ;;Maybe cell
+            )
+            .end_cell()
+            , 0);
+
+        ;;   }
+    } until(null?(list));
+
+
+    ;;   }
+    ;;  }
     ;;    }
- ;;   }
+    ;;   }
 
 
     ;;    remove_user#278205c8 query_id:uint64 address:MsgAddressInt = InternalMsgBody;
