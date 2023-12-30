@@ -40,6 +40,14 @@ cell wrap_storage(int version_id, cell storage) {
   400 THROWIFNOT
 """;
 
+;;var new_code = in_msg_body~load_maybe_ref();
+;;throw_if (200, null?(new_code));
+(cell,slice) load_code(slice s) asm """
+    LDDICTQ
+    200 THROWIFNOT
+""";
+
+
 () recv_internal(int msg_value, int balance, cell in_msg_full, slice in_msg_body) impure {
     var in_msg_body_backup = in_msg_body;
     var expected_version = in_msg_body~load_uint(32); ;; Skip the expected version
@@ -51,8 +59,7 @@ cell wrap_storage(int version_id, cell storage) {
 
 
         if (expected_version > current_version) {
-            var new_code = in_msg_body~load_maybe_ref();
-            throw_if (200, null?(new_code));
+            (cell new_code,in_msg_body) = load_code(in_msg_body);
 
             (cell dict, in_msg_body) = load_dict_with_throw(in_msg_body);
 
