@@ -123,7 +123,7 @@ forall X -> tuple set_value(tuple t, int i, int j, X value) inline {
                                 y = y + dy;
                                 var sym = at(str, y);
                                 count = count + sym;
-                                if (get_value(state, x, y) > count) {
+                                if (count < get_value(state, x, y) ) {
                                     state = set_value(state, x, y, count);
                                     if (sym < 0) {
                                         answer = path;
