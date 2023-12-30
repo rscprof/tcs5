@@ -26,7 +26,16 @@ cell load_dict_with_check(slice ds) inline {
     }
 }
 
-(int,tuple) list_work(cell dict) inline_ref {
+(int,tuple) list_work() inline_ref {
+    var ds = begin_parse(get_data());
+    ds~load_msg_addr();
+    ;;                cell dict = new_dict();
+    ;;                if (~ slice_empty?(ds)) {
+    ;;                    dict = ds.preload_dict();
+    ;;                }
+    cell dict = preload_dict_with_throw_122(ds);
+
+    throw_if(122,dict.dict_empty?());
     int sum = 0;
     int key = -1;
     tuple list = null();
@@ -142,20 +151,20 @@ cell load_dict_with_check(slice ds) inline {
                 ;;
                 ;;                If there are no users, error 122 must be thrown
 
-                var ds = begin_parse(get_data());
-                ds~load_msg_addr();
-                ;;                cell dict = new_dict();
-                ;;                if (~ slice_empty?(ds)) {
-                ;;                    dict = ds.preload_dict();
-                ;;                }
-                cell dict = preload_dict_with_throw_122(ds);
-
-                throw_if(122,dict.dict_empty?());
+;;                var ds = begin_parse(get_data());
+;;                ds~load_msg_addr();
+;;                ;;                cell dict = new_dict();
+;;                ;;                if (~ slice_empty?(ds)) {
+;;                ;;                    dict = ds.preload_dict();
+;;                ;;                }
+;;                cell dict = preload_dict_with_throw_122(ds);
+;;
+;;                throw_if(122,dict.dict_empty?());
 
 
                 ;;  in_msg_body~skip_bits(64);
             ;;    var amount = msg_value;
-                (int sum,tuple list) = list_work(dict);
+                (int sum,tuple list) = list_work();
 ;;                int sum = 0;
 ;;                int key = -1;
 ;;                tuple list = null();
@@ -227,20 +236,20 @@ cell load_dict_with_check(slice ds) inline {
                 var source = in_msg_full_slice~load_msg_addr();
 
 
-                var ds = begin_parse(get_data());
-                ds~load_msg_addr();
-                cell dict = preload_dict_with_throw_122(ds);
-                ;;                    cell dict = new_dict();
-                ;;                    if (~ slice_empty?(ds)) {
-                ;;                        dict = ds.preload_dict();
-                ;;                    }
-                ;;
-                ;;
-                throw_if(122,dict.dict_empty?());
+;;                var ds = begin_parse(get_data());
+;;                ds~load_msg_addr();
+;;                cell dict = preload_dict_with_throw_122(ds);
+;;                ;;                    cell dict = new_dict();
+;;                ;;                    if (~ slice_empty?(ds)) {
+;;                ;;                        dict = ds.preload_dict();
+;;                ;;                    }
+;;                ;;
+;;                ;;
+;;                throw_if(122,dict.dict_empty?());
 
                 in_msg_body~skip_bits(64);
                 var amount = in_msg_body~load_coins();
-    (int sum,tuple list) = list_work(dict);
+    (int sum,tuple list) = list_work();
 ;;                int sum = 0;
 ;;                int key = -1;
 ;;                ;;    int count = 0;
