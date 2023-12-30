@@ -61,8 +61,8 @@ forall X -> tuple set_value(tuple t, int i, int j, X value) inline {
     ;;                maze~tpush("S..");
     ;;                maze~tpush(".??");
     ;;                maze~tpush("..E");
-    int endx = 0;
-    int endy = 0;
+  ;;  int endx = 0;
+  ;;  int endy = 0;
     ;;    (int startx,int starty) = look_start(n,m,maze);
     ;;    (int endx,int endy) = look_end(n,m,maze);
     tuple maze2 = empty_tuple();
@@ -82,12 +82,12 @@ forall X -> tuple set_value(tuple t, int i, int j, X value) inline {
                 if (sym == "S"u) {
                     startx = i;
                     starty = j;
-                } else {
-                    if (sym == "E"u) {
-                        endx = i;
-                        endy = j;
-                    }
-                }
+                };; else {
+                 ;;   if (sym == "E"u) {
+                 ;;       endx = i;
+                 ;;       endy = j;
+                ;;    }
+               ;; }
 
                 j = j + 1;
             }
