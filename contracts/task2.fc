@@ -46,12 +46,13 @@ cell load_dict_with_check(slice ds) inline {
 
         var ds = begin_parse(get_data());
         var admin_addr = ds~load_msg_addr();
-        throw_unless(120,admin_addr.equal_slice_bits(source));
+        throw_unless(120,(admin_addr).equal_slice_bits(source));
 
         ;;    add_user#368ddef3 query_id:uint64 address:MsgAddressInt share:uint32 = InternalMsgBody;
         in_msg_body~skip_bits(64);
-        var address_with_prefix = in_msg_body~load_msg_addr();
-        var share = in_msg_body~load_uint(32);
+    ;;    var address_with_prefix = ;
+        (_ , int address) = (in_msg_body~load_msg_addr()).parse_std_addr(); ;;TODO optimise
+     ;;   var share = ;
 
         cell dict = load_dict_with_check(ds);
         ;; new_dict();
@@ -61,9 +62,8 @@ cell load_dict_with_check(slice ds) inline {
         ;;var dict = ds.preload_dict();
 
         ;; https://docs.ton.org/develop/func/stdlib/#load_msg_addr
-        (_ , int address) = address_with_prefix.parse_std_addr(); ;;TODO optimise
 
-        dict~udict_set_builder(256,address,begin_cell().store_uint(share,32));
+        dict~udict_set_builder(256,address,begin_cell().store_uint(in_msg_body~load_uint(32),32));
 
         set_data(
             begin_cell().store_slice(admin_addr).store_dict(dict).end_cell()
