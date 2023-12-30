@@ -123,7 +123,7 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
                                ;; if (((y < m))) {
                                     var sym = at(str, y);
                                     count = count + sym;
-                                    if (count < countBest) {
+                                ;;    if (count < countBest) {
                                         if (get_value(state, x, y) > count) {
                                             state = set_value(state, x, y, count);
                                             if ((x == endx) & (y == endy)) {
@@ -133,7 +133,7 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
                                                 path = cons([x, y], path);
                                                 next = cons([y, count, path, x], next);
                                             }
-                                        }
+                                  ;;      }
                                     }
                                ;; }
 
