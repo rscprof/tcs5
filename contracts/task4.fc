@@ -109,6 +109,7 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
             if (count < countBest) {
                 var dx = (_x) ? -1 : 0;
                 var startdy = (_y) ? -1 : 0;
+                var enddy = (_y == (m - 1)) ? 0 : 1;
 
                 do {
                     var x = _x + dx;
@@ -119,7 +120,7 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
                             if (dx | dy) {
                                 [int y, int count, tuple path, _] = curpos;
                                 y = y + dy;
-                                if (((y < m))) {
+                               ;; if (((y < m))) {
                                     var sym = at(str, y);
                                     count = count + sym;
                                     if (count < countBest) {
@@ -134,12 +135,12 @@ forall X -> tuple set_value(tuple t,int i,int j, X value) inline  {
                                             }
                                         }
                                     }
-                                }
+                               ;; }
 
                             }
 
                             dy = dy + 1;
-                        } until (dy > 1);
+                        } until (dy > enddy);
                     }
 
                     dx = dx + 1;
